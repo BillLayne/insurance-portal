@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Layne Insurance - New Business Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header img {
+            width: 180px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .tab-container {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: -2px;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.secondary {
+            background: #6c757d;
+        }
+
+        .btn.success {
+            background: linear-gradient(135deg, #34a853 0%, #0f9d58 100%);
+        }
+
+        .btn.warning {
+            background: linear-gradient(135deg, #fbbc04 0%, #f59e0b 100%);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #ea4335 0%, #dc2626 100%);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        .checklist {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .checklist h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .checklist-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 12px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .checklist-item label {
+            flex: 1;
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .checklist-item.completed {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .checklist-item.completed label {
+            text-decoration: line-through;
+            color: #155724;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-received {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-na {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .upload-area {
+            border: 3px dashed #e9ecef;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        .file-item .file-name {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .file-item .file-size {
+            color: #6c757d;
+            font-size: 12px;
+            margin: 0 10px;
+        }
+
+        .file-item .remove-file {
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .company-select-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .company-card {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .company-card:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .company-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .company-card img {
+            height: 40px;
+            width: auto;
+            margin-bottom: 10px;
+        }
+
+        .company-card .company-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .company-select-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn-group .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="https://i.imgur.com/cBAgeX8.png" alt="Bill Layne Insurance">
+            <h1>New Business Portal</h1>
+            <p>Complete Your Insurance Application</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-container">
+            <button class="tab active" onclick="switchTab('new')">New Client</button>
+            <button class="tab" onclick="switchTab('status')">Check Status</button>
+            <button class="tab" onclick="switchTab('upload')">Upload Documents</button>
+        </div>
+
+        <!-- Alerts -->
+        <div id="alertContainer"></div>
+
+        <!-- Tab Content: New Client -->
+        <div id="new-tab" class="tab-content active">
+            <form id="newClientForm">
+                <h2 style="margin-bottom: 20px; color: #333;">Start New Application</h2>
+                
+                <div class="form-group">
+                    <label for="clientName">Full Name *</label>
+                    <input type="text" id="clientName" name="clientName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="clientEmail">Email Address *</label>
+                    <input type="email" id="clientEmail" name="clientEmail" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="clientPhone">Phone Number *</label>
+                    <input type="tel" id="clientPhone" name="clientPhone" required placeholder="(336) 555-0123">
+                </div>
+
+                <div class="form-group">
+                    <label>Select Insurance Company *</label>
+                    <div class="company-select-grid">
+                        <div class="company-card" onclick="selectCompany(this, 'Nationwide')">
+                            <img src="https://i.imgur.com/Mv5V7tV.png" alt="Nationwide">
+                            <div class="company-name">Nationwide</div>
+                        </div>
+                        <div class="company-card" onclick="selectCompany(this, 'Progressive')">
+                            <img src="https://i.imgur.com/K6kTnTa.png" alt="Progressive">
+                            <div class="company-name">Progressive</div>
+                        </div>
+                        <div class="company-card" onclick="selectCompany(this, 'Travelers')">
+                            <img src="https://i.imgur.com/I6ONc0K.png" alt="Travelers">
+                            <div class="company-name">Travelers</div>
+                        </div>
+                        <div class="company-card" onclick="selectCompany(this, 'National General')">
+                            <img src="https://i.imgur.com/HF8oPAF.png" alt="National General">
+                            <div class="company-name">National General</div>
+                        </div>
+                        <div class="company-card" onclick="selectCompany(this, 'Alamance')">
+                            <img src="https://imgur.com/CNFRCZc.png" alt="Alamance">
+                            <div class="company-name">Alamance</div>
+                        </div>
+                        <div class="company-card" onclick="selectCompany(this, 'Foremost')">
+                            <img src="https://i.imgur.com/rHIo4r5.jpg" alt="Foremost">
+                            <div class="company-name">Foremost</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedCompany" name="company" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="productType">Product Type *</label>
+                    <select id="productType" name="productType" required>
+                        <option value="">Select Product</option>
+                        <option value="Auto">Auto Insurance</option>
+                        <option value="Home">Homeowners Insurance</option>
+                        <option value="Mobile Home">Mobile Home Insurance</option>
+                        <option value="Renters">Renters Insurance</option>
+                        <option value="Motorcycle">Motorcycle Insurance</option>
+                        <option value="RV">RV Insurance</option>
+                        <option value="Boat">Boat Insurance</option>
+                        <option value="Business">Business Insurance</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="policyNumber">Policy Number (if available)</label>
+                    <input type="text" id="policyNumber" name="policyNumber">
+                </div>
+
+                <div class="form-group">
+                    <label for="effectiveDate">Desired Effective Date</label>
+                    <input type="date" id="effectiveDate" name="effectiveDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea id="notes" name="notes" placeholder="Any special circumstances or additional information..."></textarea>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%;">Start Application</button>
+            </form>
+        </div>
+
+        <!-- Tab Content: Check Status -->
+        <div id="status-tab" class="tab-content">
+            <h2 style="margin-bottom: 20px; color: #333;">Check Application Status</h2>
+            
+            <div class="form-group">
+                <label for="lookupId">Enter Your Client ID or Email</label>
+                <input type="text" id="lookupId" placeholder="CL1234567890 or email@example.com">
+            </div>
+
+            <button onclick="checkStatus()" class="btn" style="width: 100%;">Check Status</button>
+
+            <div id="statusResult" style="margin-top: 30px; display: none;">
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span>Application Progress</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3>📋 Required Documents</h3>
+                    <div id="documentChecklist"></div>
+                </div>
+
+                <div class="btn-group">
+                    <button onclick="switchTab('upload')" class="btn success">Upload Documents</button>
+                    <button onclick="requestReminder()" class="btn warning">Send Reminder</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Upload Documents -->
+        <div id="upload-tab" class="tab-content">
+            <h2 style="margin-bottom: 20px; color: #333;">Upload Documents</h2>
+            
+            <div class="form-group">
+                <label for="uploadClientId">Client ID *</label>
+                <input type="text" id="uploadClientId" placeholder="CL1234567890" required>
+            </div>
+
+            <div class="form-group">
+                <label for="documentType">Document Type *</label>
+                <select id="documentType" required>
+                    <option value="">Select Document Type</option>
+                    <option value="application">Signed Application</option>
+                    <option value="photos">Photos</option>
+                    <option value="mvr">Motor Vehicle Report</option>
+                    <option value="priorInsurance">Prior Insurance</option>
+                    <option value="inspection">Inspection Report</option>
+                    <option value="payment">Payment Confirmation</option>
+                    <option value="other">Other Documents</option>
+                </select>
+            </div>
+
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📁</div>
+                <p>Click to select files or drag and drop</p>
+                <p style="font-size: 12px; color: #6c757d; margin-top: 10px;">
+                    Supported formats: PDF, JPG, PNG, DOC, DOCX (Max 10MB)
+                </p>
+                <input type="file" id="fileInput" multiple style="display: none;" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+            </div>
+
+            <div id="fileList" class="file-list"></div>
+
+            <button onclick="uploadFiles()" class="btn success" style="width: 100%;">Upload Documents</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2024 Bill Layne Insurance Agency</p>
+            <p>📞 336-835-1993 | ✉️ Save@BillLayneInsurance.com</p>
+            <p>1283 N Bridge St, Elkin NC 28621</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL'; // Replace with your deployed script URL
+        let selectedFiles = [];
+        let currentClientData = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for client ID in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const clientId = urlParams.get('id');
+            
+            if (clientId) {
+                document.getElementById('uploadClientId').value = clientId;
+                switchTab('upload');
+                checkStatus(clientId);
+            }
+
+            // Setup form handlers
+            document.getElementById('newClientForm').addEventListener('submit', handleNewClient);
+            
+            // Setup file upload handlers
+            setupFileUpload();
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('effectiveDate').min = today;
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Activate tab button
+            event.target.classList.add('active');
+        }
+
+        // Company selection
+        function selectCompany(element, company) {
+            // Remove previous selection
+            document.querySelectorAll('.company-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection
+            element.classList.add('selected');
+            document.getElementById('selectedCompany').value = company;
+        }
+
+        // Handle new client form submission
+        async function handleNewClient(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const clientData = {
+                action: 'addClient',
+                name: formData.get('clientName'),
+                email: formData.get('clientEmail'),
+                phone: formData.get('clientPhone'),
+                company: formData.get('company'),
+                product: formData.get('productType'),
+                policyNumber: formData.get('policyNumber'),
+                effectiveDate: formData.get('effectiveDate'),
+                notes: formData.get('notes')
+            };
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(clientData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', `Application started successfully! Your Client ID is: ${result.clientId}. A welcome email has been sent to ${clientData.email}.`);
+                    
+                    // Switch to upload tab with client ID
+                    document.getElementById('uploadClientId').value = result.clientId;
+                    switchTab('upload');
+                    
+                    // Reset form
+                    e.target.reset();
+                    document.querySelectorAll('.company-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                } else {
+                    showAlert('error', 'Error starting application: ' + result.error);
+                }
+            } catch (error) {
+                showAlert('error', 'Connection error. Please try again.');
+                console.error(error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Check application status
+        async function checkStatus(clientIdParam) {
+            const lookupId = clientIdParam || document.getElementById('lookupId').value;
+            
+            if (!lookupId) {
+                showAlert('warning', 'Please enter your Client ID or email address.');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getClient&id=${lookupId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentClientData = result.client;
+                    displayStatus(result.client);
+                } else {
+                    showAlert('error', 'Client not found. Please check your Client ID.');
+                }
+            } catch (error) {
+                showAlert('error', 'Connection error. Please try again.');
+                console.error(error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Display status results
+        function displayStatus(client) {
+            const statusResult = document.getElementById('statusResult');
+            statusResult.style.display = 'block';
+            
+            // Calculate progress
+            const docs = client.documents;
+            const totalDocs = Object.keys(docs).filter(key => docs[key] !== 'N/A').length;
+            const completedDocs = Object.keys(docs).filter(key => docs[key] === 'Received' || docs[key] === 'Complete').length;
+            const progress = totalDocs > 0 ? Math.round((completedDocs / totalDocs) * 100) : 0;
+            
+            // Update progress bar
+            document.getElementById('progressPercent').textContent = `${progress}%`;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            // Build checklist
+            const checklist = document.getElementById('documentChecklist');
+            checklist.innerHTML = '';
+            
+            for (const [key, status] of Object.entries(docs)) {
+                if (status !== 'N/A') {
+                    const item = document.createElement('div');
+                    item.className = 'checklist-item';
+                    if (status === 'Received' || status === 'Complete') {
+                        item.classList.add('completed');
+                    }
+                    
+                    const label = getDocumentLabel(key);
+                    const badge = getStatusBadge(status);
+                    
+                    item.innerHTML = `
+                        <input type="checkbox" ${status === 'Received' || status === 'Complete' ? 'checked' : ''} disabled>
+                        <label>${label}</label>
+                        ${badge}
+                    `;
+                    
+                    checklist.appendChild(item);
+                }
+            }
+        }
+
+        // Get document label
+        function getDocumentLabel(key) {
+            const labels = {
+                application: 'Signed Application',
+                photos: 'Photos',
+                mvr: 'Motor Vehicle Report',
+                priorInsurance: 'Prior Insurance',
+                inspection: 'Inspection Report',
+                payment: 'Payment Confirmation',
+                other: 'Other Documents'
+            };
+            return labels[key] || key;
+        }
+
+        // Get status badge HTML
+        function getStatusBadge(status) {
+            const statusClass = status === 'Pending' ? 'pending' : 
+                               status === 'Received' || status === 'Complete' ? 'received' : 'na';
+            return `<span class="status-badge status-${statusClass}">${status}</span>`;
+        }
+
+        // Setup file upload
+        function setupFileUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+            
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        // Handle file selection
+        function handleFiles(files) {
+            selectedFiles = [];
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            for (let file of files) {
+                // Check file size (10MB limit)
+                if (file.size > 10 * 1024 * 1024) {
+                    showAlert('warning', `File "${file.name}" is too large. Maximum size is 10MB.`);
+                    continue;
+                }
+                
+                selectedFiles.push(file);
+                
+                // Display file
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span class="file-name">📄 ${file.name}</span>
+                    <span class="file-size">${formatFileSize(file.size)}</span>
+                    <span class="remove-file" onclick="removeFile('${file.name}')">✕</span>
+                `;
+                fileList.appendChild(fileItem);
+            }
+        }
+
+        // Remove file from selection
+        function removeFile(fileName) {
+            selectedFiles = selectedFiles.filter(f => f.name !== fileName);
+            handleFiles(selectedFiles);
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // Upload files
+        async function uploadFiles() {
+            const clientId = document.getElementById('uploadClientId').value;
+            const documentType = document.getElementById('documentType').value;
+            
+            if (!clientId) {
+                showAlert('warning', 'Please enter your Client ID.');
+                return;
+            }
+            
+            if (!documentType) {
+                showAlert('warning', 'Please select a document type.');
+                return;
+            }
+            
+            if (selectedFiles.length === 0) {
+                showAlert('warning', 'Please select at least one file to upload.');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // In production, you would upload files to a storage service
+                // For now, we'll just update the status
+                const updateData = {
+                    action: 'updateStatus',
+                    clientId: clientId,
+                    documentType: documentType,
+                    status: 'Received'
+                };
+                
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(updateData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', 'Documents uploaded successfully!');
+                    
+                    // Clear selection
+                    selectedFiles = [];
+                    document.getElementById('fileList').innerHTML = '';
+                    document.getElementById('documentType').value = '';
+                    document.getElementById('fileInput').value = '';
+                    
+                    // Refresh status if available
+                    if (currentClientData) {
+                        checkStatus(clientId);
+                    }
+                } else {
+                    showAlert('error', 'Upload failed. Please try again.');
+                }
+            } catch (error) {
+                showAlert('error', 'Connection error. Please try again.');
+                console.error(error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Request reminder
+        async function requestReminder() {
+            if (!currentClientData) return;
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'sendReminder',
+                        clientId: currentClientData.id
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', 'Reminder sent successfully!');
+                } else {
+                    showAlert('error', 'Failed to send reminder.');
+                }
+            } catch (error) {
+                showAlert('error', 'Connection error. Please try again.');
+                console.error(error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Show alert
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} show`;
+            alert.style.margin = '20px';
+            alert.innerHTML = message;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        }
+
+        // Show loading
+        function showLoading() {
+            const loading = document.createElement('div');
+            loading.className = 'loading show';
+            loading.id = 'loadingOverlay';
+            loading.innerHTML = `
+                <div class="spinner"></div>
+                <p>Processing...</p>
+            `;
+            document.body.appendChild(loading);
+        }
+
+        // Hide loading
+        function hideLoading() {
+            const loading = document.getElementById('loadingOverlay');
+            if (loading) {
+                loading.remove();
+            }
+        }
+    </script>
+</body>
+</html>
