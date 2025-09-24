@@ -591,6 +591,47 @@
                     <textarea id="notes" name="notes" placeholder="Any special circumstances or additional information..."></textarea>
                 </div>
 
+                <!-- Documents Already Collected -->
+                <div class="checklist" style="margin: 20px 0;">
+                    <h3 style="color: #333; margin-bottom: 15px;">📋 Documents Already Collected</h3>
+                    <p style="font-size: 14px; color: #6c757d; margin-bottom: 15px;">Check the documents you already have:</p>
+                    
+                    <div class="checklist-item">
+                        <input type="checkbox" id="hasApplication" name="hasApplication" value="true">
+                        <label for="hasApplication">Signed Application</label>
+                    </div>
+                    
+                    <div class="checklist-item">
+                        <input type="checkbox" id="hasPhotos" name="hasPhotos" value="true">
+                        <label for="hasPhotos">Photos</label>
+                    </div>
+                    
+                    <div class="checklist-item">
+                        <input type="checkbox" id="hasMVR" name="hasMVR" value="true">
+                        <label for="hasMVR">Motor Vehicle Report (MVR)</label>
+                    </div>
+                    
+                    <div class="checklist-item">
+                        <input type="checkbox" id="hasPriorInsurance" name="hasPriorInsurance" value="true">
+                        <label for="hasPriorInsurance">Prior Insurance</label>
+                    </div>
+                    
+                    <div class="checklist-item">
+                        <input type="checkbox" id="hasInspection" name="hasInspection" value="true">
+                        <label for="hasInspection">Inspection Report</label>
+                    </div>
+                    
+                    <div class="checklist-item">
+                        <input type="checkbox" id="hasPayment" name="hasPayment" value="true">
+                        <label for="hasPayment">Initial Payment</label>
+                    </div>
+                    
+                    <div class="checklist-item">
+                        <input type="checkbox" id="hasOther" name="hasOther" value="true">
+                        <label for="hasOther">Other Required Documents</label>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn" style="width: 100%;">Start Application</button>
             </form>
         </div>
@@ -632,6 +673,77 @@
         <!-- Tab Content: Upload Documents -->
         <div id="upload-tab" class="tab-content">
             <h2 style="margin-bottom: 20px; color: #333;">Upload Documents</h2>
+            
+            <!-- Quick Status Update Section -->
+            <div style="background: #f0f4ff; border: 2px solid #667eea; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+                <h3 style="color: #333; margin-bottom: 15px;">⚡ Quick Status Update</h3>
+                <div class="form-group">
+                    <label for="quickUpdateClientId">Client ID</label>
+                    <input type="text" id="quickUpdateClientId" placeholder="CL1234567890" onblur="if(this.value) loadClientStatus(this.value)">
+                </div>
+                <div id="quickUpdateChecklist" style="display: none;">
+                    <p style="font-size: 14px; color: #6c757d; margin-bottom: 15px;">Update document status:</p>
+                    <div class="checklist-item">
+                        <select id="statusApplication" style="width: 150px; display: inline-block; margin-left: 10px;">
+                            <option value="Pending">Pending</option>
+                            <option value="Received">Received</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+                        <label style="display: inline-block; width: 200px;">Signed Application</label>
+                    </div>
+                    <div class="checklist-item">
+                        <select id="statusPhotos" style="width: 150px; display: inline-block; margin-left: 10px;">
+                            <option value="Pending">Pending</option>
+                            <option value="Received">Received</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+                        <label style="display: inline-block; width: 200px;">Photos</label>
+                    </div>
+                    <div class="checklist-item">
+                        <select id="statusMVR" style="width: 150px; display: inline-block; margin-left: 10px;">
+                            <option value="Pending">Pending</option>
+                            <option value="Received">Received</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+                        <label style="display: inline-block; width: 200px;">MVR</label>
+                    </div>
+                    <div class="checklist-item">
+                        <select id="statusPriorInsurance" style="width: 150px; display: inline-block; margin-left: 10px;">
+                            <option value="Pending">Pending</option>
+                            <option value="Received">Received</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+                        <label style="display: inline-block; width: 200px;">Prior Insurance</label>
+                    </div>
+                    <div class="checklist-item">
+                        <select id="statusInspection" style="width: 150px; display: inline-block; margin-left: 10px;">
+                            <option value="Pending">Pending</option>
+                            <option value="Received">Received</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+                        <label style="display: inline-block; width: 200px;">Inspection</label>
+                    </div>
+                    <div class="checklist-item">
+                        <select id="statusPayment" style="width: 150px; display: inline-block; margin-left: 10px;">
+                            <option value="Pending">Pending</option>
+                            <option value="Received">Received</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+                        <label style="display: inline-block; width: 200px;">Payment</label>
+                    </div>
+                    <div class="checklist-item">
+                        <select id="statusOther" style="width: 150px; display: inline-block; margin-left: 10px;">
+                            <option value="Pending">Pending</option>
+                            <option value="Received">Received</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+                        <label style="display: inline-block; width: 200px;">Other Documents</label>
+                    </div>
+                    <button onclick="saveQuickUpdate()" class="btn success" style="width: 100%; margin-top: 15px;">Save Status Updates</button>
+                </div>
+            </div>
+            
+            <hr style="margin: 30px 0; border: 1px solid #e9ecef;">
             
             <!-- Mode Toggle (Hidden by default - set uploadMode variable to control) -->
             <div id="modeToggle" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
@@ -775,7 +887,17 @@
                 product: formData.get('productType'),
                 policyNumber: formData.get('policyNumber'),
                 effectiveDate: formData.get('effectiveDate'),
-                notes: formData.get('notes')
+                notes: formData.get('notes'),
+                // Documents already collected
+                documentsReceived: {
+                    application: formData.get('hasApplication') === 'true',
+                    photos: formData.get('hasPhotos') === 'true',
+                    mvr: formData.get('hasMVR') === 'true',
+                    priorInsurance: formData.get('hasPriorInsurance') === 'true',
+                    inspection: formData.get('hasInspection') === 'true',
+                    payment: formData.get('hasPayment') === 'true',
+                    other: formData.get('hasOther') === 'true'
+                }
             };
             
             showLoading();
@@ -1323,6 +1445,94 @@
                     window.open(result.url, '_blank');
                 } else {
                     showAlert('error', 'Failed to get folder link');
+                }
+            } catch (error) {
+                showAlert('error', 'Connection error');
+                console.error(error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Load client status for quick update
+        async function loadClientStatus(clientId) {
+            if (!clientId) return;
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getClient&id=${clientId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const docs = result.client.documents;
+                    
+                    // Show the checklist
+                    document.getElementById('quickUpdateChecklist').style.display = 'block';
+                    
+                    // Set current statuses
+                    document.getElementById('statusApplication').value = docs.application || 'Pending';
+                    document.getElementById('statusPhotos').value = docs.photos || 'Pending';
+                    document.getElementById('statusMVR').value = docs.mvr || 'Pending';
+                    document.getElementById('statusPriorInsurance').value = docs.priorInsurance || 'Pending';
+                    document.getElementById('statusInspection').value = docs.inspection || 'Pending';
+                    document.getElementById('statusPayment').value = docs.payment || 'Pending';
+                    document.getElementById('statusOther').value = docs.other || 'Pending';
+                    
+                    showAlert('info', `Loaded status for ${result.client.name}`);
+                } else {
+                    showAlert('error', 'Client not found');
+                    document.getElementById('quickUpdateChecklist').style.display = 'none';
+                }
+            } catch (error) {
+                showAlert('error', 'Error loading client status');
+                console.error(error);
+            }
+        }
+
+        // Save quick status updates
+        async function saveQuickUpdate() {
+            const clientId = document.getElementById('quickUpdateClientId').value;
+            
+            if (!clientId) {
+                showAlert('warning', 'Please enter a Client ID');
+                return;
+            }
+            
+            const updates = {
+                action: 'quickUpdate',
+                clientId: clientId,
+                updates: {
+                    application: document.getElementById('statusApplication').value,
+                    photos: document.getElementById('statusPhotos').value,
+                    mvr: document.getElementById('statusMVR').value,
+                    priorInsurance: document.getElementById('statusPriorInsurance').value,
+                    inspection: document.getElementById('statusInspection').value,
+                    payment: document.getElementById('statusPayment').value,
+                    other: document.getElementById('statusOther').value
+                }
+            };
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(updates)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', 'Document statuses updated successfully!');
+                    
+                    // Check if all documents are complete
+                    const allStatuses = Object.values(updates.updates);
+                    const hasNoMissing = !allStatuses.includes('Pending');
+                    
+                    if (hasNoMissing) {
+                        showAlert('success', '🎉 All documents complete for this client!');
+                    }
+                } else {
+                    showAlert('error', 'Failed to update statuses');
                 }
             } catch (error) {
                 showAlert('error', 'Connection error');
