@@ -448,6 +448,16 @@
             text-decoration: none;
         }
 
+        .info-box {
+            background: #e8f4ff;
+            border: 1px solid #b8d9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #0066cc;
+        }
+
         @media (max-width: 768px) {
             .container {
                 border-radius: 0;
@@ -607,11 +617,6 @@
                     </div>
                     
                     <div class="checklist-item">
-                        <input type="checkbox" id="hasMVR" name="hasMVR" value="true">
-                        <label for="hasMVR">Motor Vehicle Report (MVR)</label>
-                    </div>
-                    
-                    <div class="checklist-item">
                         <input type="checkbox" id="hasPriorInsurance" name="hasPriorInsurance" value="true">
                         <label for="hasPriorInsurance">Prior Insurance</label>
                     </div>
@@ -639,6 +644,10 @@
         <!-- Tab Content: Check Status -->
         <div id="status-tab" class="tab-content">
             <h2 style="margin-bottom: 20px; color: #333;">Check Application Status</h2>
+            
+            <div class="info-box">
+                💡 <strong>Tip:</strong> You can search by either Client ID (e.g., CL1234567890) or Email Address
+            </div>
             
             <div class="form-group">
                 <label for="lookupId">Enter Your Client ID or Email</label>
@@ -677,9 +686,12 @@
             <!-- Quick Status Update Section -->
             <div style="background: #f0f4ff; border: 2px solid #667eea; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
                 <h3 style="color: #333; margin-bottom: 15px;">⚡ Quick Status Update</h3>
+                <div class="info-box" style="margin-bottom: 15px;">
+                    💡 <strong>Tip:</strong> Enter either the Client ID or customer's email address to quickly update their document status
+                </div>
                 <div class="form-group">
-                    <label for="quickUpdateClientId">Client ID</label>
-                    <input type="text" id="quickUpdateClientId" placeholder="CL1234567890" onblur="if(this.value) loadClientStatus(this.value)">
+                    <label for="quickUpdateClientId">Client ID or Email Address</label>
+                    <input type="text" id="quickUpdateClientId" placeholder="CL1234567890 or customer@example.com" onblur="if(this.value) loadClientStatus(this.value)">
                 </div>
                 <div id="quickUpdateChecklist" style="display: none;">
                     <p style="font-size: 14px; color: #6c757d; margin-bottom: 15px;">Update document status:</p>
@@ -698,14 +710,6 @@
                             <option value="N/A">N/A</option>
                         </select>
                         <label style="display: inline-block; width: 200px;">Photos</label>
-                    </div>
-                    <div class="checklist-item">
-                        <select id="statusMVR" style="width: 150px; display: inline-block; margin-left: 10px;">
-                            <option value="Pending">Pending</option>
-                            <option value="Received">Received</option>
-                            <option value="N/A">N/A</option>
-                        </select>
-                        <label style="display: inline-block; width: 200px;">MVR</label>
                     </div>
                     <div class="checklist-item">
                         <select id="statusPriorInsurance" style="width: 150px; display: inline-block; margin-left: 10px;">
@@ -757,8 +761,8 @@
             </div>
             
             <div class="form-group">
-                <label for="uploadClientId">Client ID *</label>
-                <input type="text" id="uploadClientId" placeholder="CL1234567890" required onblur="if(this.value) loadClientFiles(this.value)">
+                <label for="uploadClientId">Client ID or Email Address *</label>
+                <input type="text" id="uploadClientId" placeholder="CL1234567890 or customer@example.com" required onblur="if(this.value) loadClientFiles(this.value)">
             </div>
 
             <div class="form-group">
@@ -767,7 +771,6 @@
                     <option value="">Select Document Type</option>
                     <option value="application">Signed Application</option>
                     <option value="photos">Photos</option>
-                    <option value="mvr">Motor Vehicle Report</option>
                     <option value="priorInsurance">Prior Insurance</option>
                     <option value="inspection">Inspection Report</option>
                     <option value="payment">Payment Confirmation</option>
@@ -794,7 +797,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>© 2024 Bill Layne Insurance Agency</p>
+            <p>© 2025 Bill Layne Insurance Agency</p>
             <p>📞 336-835-1993 | ✉️ Save@BillLayneInsurance.com</p>
             <p>1283 N Bridge St, Elkin NC 28621</p>
         </div>
@@ -806,6 +809,7 @@
         let selectedFiles = [];
         let currentClientData = null;
         let uploadMode = 'enhanced'; // 'basic' or 'enhanced' - set to enhanced for actual file storage
+        let actualClientId = null; // Store the actual Client ID for quick updates when searching by email
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -892,7 +896,6 @@
                 documentsReceived: {
                     application: formData.get('hasApplication') === 'true',
                     photos: formData.get('hasPhotos') === 'true',
-                    mvr: formData.get('hasMVR') === 'true',
                     priorInsurance: formData.get('hasPriorInsurance') === 'true',
                     inspection: formData.get('hasInspection') === 'true',
                     payment: formData.get('hasPayment') === 'true',
@@ -933,7 +936,7 @@
             }
         }
 
-        // Check application status
+        // Check application status - UPDATED TO HANDLE EMAIL
         async function checkStatus(clientIdParam) {
             const lookupId = clientIdParam || document.getElementById('lookupId').value;
             
@@ -945,19 +948,30 @@
             showLoading();
             
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=getClient&id=${lookupId}`);
+                // Determine if it's an email or Client ID
+                const isEmail = lookupId.includes('@');
+                const queryParam = isEmail ? `email=${encodeURIComponent(lookupId)}` : `id=${lookupId}`;
+                
+                console.log('Searching for client with:', queryParam);
+                
+                const response = await fetch(`${SCRIPT_URL}?action=getClient&${queryParam}`);
                 const result = await response.json();
                 
                 if (result.success) {
                     currentClientData = result.client;
                     displayStatus(result.client);
                     
+                    // Show client ID if searched by email
+                    if (isEmail && result.client.id) {
+                        showAlert('info', `Found client! Client ID: ${result.client.id}`);
+                    }
+                    
                     // Load files if in enhanced mode
                     if (uploadMode === 'enhanced') {
                         loadClientFiles(result.client.id);
                     }
                 } else {
-                    showAlert('error', 'Client not found. Please check your Client ID.');
+                    showAlert('error', `Client not found. Please check your ${isEmail ? 'email address' : 'Client ID'}.`);
                 }
             } catch (error) {
                 showAlert('error', 'Connection error. Please try again.');
@@ -1013,7 +1027,6 @@
             const labels = {
                 application: 'Signed Application',
                 photos: 'Photos',
-                mvr: 'Motor Vehicle Report',
                 priorInsurance: 'Prior Insurance',
                 inspection: 'Inspection Report',
                 payment: 'Payment Confirmation',
@@ -1098,11 +1111,11 @@
 
         // Upload files (Enhanced version with actual file storage)
         async function uploadFiles() {
-            const clientId = document.getElementById('uploadClientId').value;
+            const clientIdOrEmail = document.getElementById('uploadClientId').value;
             const documentType = document.getElementById('documentType').value;
             
-            if (!clientId) {
-                showAlert('warning', 'Please enter your Client ID.');
+            if (!clientIdOrEmail) {
+                showAlert('warning', 'Please enter your Client ID or email address.');
                 return;
             }
             
@@ -1116,9 +1129,19 @@
                 return;
             }
             
-            // Get client data first if we don't have it
-            if (!currentClientData || currentClientData.id !== clientId) {
-                await checkStatus(clientId);
+            // Determine if it's an email and get the actual Client ID
+            let clientId = clientIdOrEmail;
+            const isEmail = clientIdOrEmail.includes('@');
+            
+            // If it's an email, we need to fetch the client data first
+            if (isEmail || !currentClientData || currentClientData.id !== clientIdOrEmail) {
+                await checkStatus(clientIdOrEmail);
+                if (currentClientData) {
+                    clientId = currentClientData.id;
+                } else {
+                    showAlert('error', 'Could not find client. Please verify the email or Client ID.');
+                    return;
+                }
             }
             
             showLoading();
@@ -1197,6 +1220,9 @@
                 document.getElementById('documentType').value = '';
                 document.getElementById('fileInput').value = '';
                 
+                // Preserve the user's original input (email or Client ID)
+                document.getElementById('uploadClientId').value = clientIdOrEmail;
+                
                 // Refresh status if available
                 if (currentClientData) {
                     checkStatus(clientId);
@@ -1229,8 +1255,30 @@
         }
 
         // Load and display client files
-        async function loadClientFiles(clientId) {
-            if (uploadMode !== 'enhanced') return;
+        async function loadClientFiles(clientIdOrEmail) {
+            if (uploadMode !== 'enhanced' || !clientIdOrEmail) return;
+            
+            // Determine if it's an email and get the actual Client ID
+            let clientId = clientIdOrEmail;
+            const isEmail = clientIdOrEmail.includes('@');
+            
+            // If it's an email, fetch the client data first to get the ID
+            if (isEmail) {
+                try {
+                    const response = await fetch(`${SCRIPT_URL}?action=getClient&email=${encodeURIComponent(clientIdOrEmail)}`);
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        clientId = result.client.id;
+                    } else {
+                        console.error('Could not find client by email for file loading');
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error finding client by email:', error);
+                    return;
+                }
+            }
             
             try {
                 const response = await fetch(SCRIPT_URL, {
@@ -1454,16 +1502,23 @@
             }
         }
 
-        // Load client status for quick update
-        async function loadClientStatus(clientId) {
-            if (!clientId) return;
+        // Load client status for quick update - UPDATED TO HANDLE EMAIL
+        async function loadClientStatus(clientIdOrEmail) {
+            if (!clientIdOrEmail) return;
             
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=getClient&id=${clientId}`);
+                // Determine if it's an email or Client ID
+                const isEmail = clientIdOrEmail.includes('@');
+                const queryParam = isEmail ? `email=${encodeURIComponent(clientIdOrEmail)}` : `id=${clientIdOrEmail}`;
+                
+                const response = await fetch(`${SCRIPT_URL}?action=getClient&${queryParam}`);
                 const result = await response.json();
                 
                 if (result.success) {
                     const docs = result.client.documents;
+                    
+                    // Store the actual Client ID
+                    actualClientId = result.client.id;
                     
                     // Show the checklist
                     document.getElementById('quickUpdateChecklist').style.display = 'block';
@@ -1471,39 +1526,43 @@
                     // Set current statuses
                     document.getElementById('statusApplication').value = docs.application || 'Pending';
                     document.getElementById('statusPhotos').value = docs.photos || 'Pending';
-                    document.getElementById('statusMVR').value = docs.mvr || 'Pending';
                     document.getElementById('statusPriorInsurance').value = docs.priorInsurance || 'Pending';
                     document.getElementById('statusInspection').value = docs.inspection || 'Pending';
                     document.getElementById('statusPayment').value = docs.payment || 'Pending';
                     document.getElementById('statusOther').value = docs.other || 'Pending';
                     
-                    showAlert('info', `Loaded status for ${result.client.name}`);
+                    // Show success message with both name and Client ID
+                    if (isEmail) {
+                        showAlert('info', `Found: ${result.client.name} (Client ID: ${result.client.id})`);
+                    } else {
+                        showAlert('info', `Loaded status for ${result.client.name}`);
+                    }
                 } else {
-                    showAlert('error', 'Client not found');
+                    showAlert('error', `Client not found. Please check your ${isEmail ? 'email address' : 'Client ID'}`);
                     document.getElementById('quickUpdateChecklist').style.display = 'none';
+                    actualClientId = null;
                 }
             } catch (error) {
                 showAlert('error', 'Error loading client status');
                 console.error(error);
+                actualClientId = null;
             }
         }
 
         // Save quick status updates
         async function saveQuickUpdate() {
-            const clientId = document.getElementById('quickUpdateClientId').value;
-            
-            if (!clientId) {
-                showAlert('warning', 'Please enter a Client ID');
+            // Use the stored actual Client ID from the loadClientStatus function
+            if (!actualClientId) {
+                showAlert('warning', 'Please enter a Client ID or email address and wait for it to load');
                 return;
             }
             
             const updates = {
                 action: 'quickUpdate',
-                clientId: clientId,
+                clientId: actualClientId,  // Use the stored Client ID
                 updates: {
                     application: document.getElementById('statusApplication').value,
                     photos: document.getElementById('statusPhotos').value,
-                    mvr: document.getElementById('statusMVR').value,
                     priorInsurance: document.getElementById('statusPriorInsurance').value,
                     inspection: document.getElementById('statusInspection').value,
                     payment: document.getElementById('statusPayment').value,
@@ -1522,7 +1581,7 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showAlert('success', 'Document statuses updated successfully!');
+                    showAlert('success', `Document statuses updated successfully for Client ID: ${actualClientId}`);
                     
                     // Check if all documents are complete
                     const allStatuses = Object.values(updates.updates);
