@@ -428,7 +428,6 @@
                             <option value="">Select document type...</option>
                             <option value="application">Signed Application</option>
                             <option value="photos">Photos</option>
-                            <option value="mvr">Motor Vehicle Report (MVR)</option>
                             <option value="priorInsurance">Prior Insurance</option>
                             <option value="inspection">Inspection Report</option>
                             <option value="payment">Payment Confirmation</option>
@@ -674,11 +673,10 @@
                     <h4 style="color: #333; margin: 20px 0 15px;">Document Status:</h4>
                     <div class="status-grid">
                         ${Object.entries(client.documents).map(([type, status]) => {
-                            if (status === 'N/A') return '';
+                            if (status === 'N/A' || type === 'mvr') return '';  // Skip N/A and MVR
                             const displayName = {
                                 application: 'Signed Application',
                                 photos: 'Photos',
-                                mvr: 'Motor Vehicle Report',
                                 priorInsurance: 'Prior Insurance',
                                 inspection: 'Inspection Report',
                                 payment: 'Payment',
