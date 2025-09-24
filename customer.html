@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Layne Insurance - Customer Document Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .header img {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .client-info {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .client-info h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .client-id {
+            color: #667eea;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .tabs button {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .tabs button:hover {
+            color: #333;
+        }
+        
+        .tabs button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .instructions {
+            background: #e8f4ff;
+            border: 1px solid #b8d9ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .instructions h3 {
+            color: #0066cc;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .instructions ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .instructions li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .instructions li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #0066cc;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn.success {
+            background: linear-gradient(135deg, #34a853 0%, #0f9d58 100%);
+        }
+        
+        .status-result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .status-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .status-item.received {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .status-item.pending {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .badge-received {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-pending {
+            background: #ffc107;
+            color: #856404;
+        }
+        
+        .badge-na {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .help-section {
+            background: #f0f4ff;
+            border: 1px solid #667eea;
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .help-section h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .help-section p {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .contact-item strong {
+            color: #667eea;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Document Upload Portal</h1>
+            <p>Bill Layne Insurance Agency</p>
+        </div>
+        
+        <!-- Client Info Bar -->
+        <div class="client-info" id="clientInfoBar" style="display: none;">
+            <h2>Your Client ID:</h2>
+            <div class="client-id" id="displayClientId">Loading...</div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+            
+            <!-- Welcome Message -->
+            <div class="alert info" id="welcomeMessage">
+                <h3 style="margin: 0 0 10px;">Welcome to Your Secure Document Portal</h3>
+                <p style="margin: 0;">Please use this portal to upload your required documents and check your application status.</p>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="active" onclick="switchTab('upload')">📤 Upload Documents</button>
+                <button onclick="switchTab('status')">📊 Check Your Status</button>
+            </div>
+            
+            <!-- Upload Tab -->
+            <div id="upload-tab" class="tab-content active">
+                <div class="instructions">
+                    <h3>📝 How to Upload Your Documents</h3>
+                    <ul>
+                        <li>Select the type of document you're uploading</li>
+                        <li>Choose your file (PDF, JPG, PNG accepted)</li>
+                        <li>Click "Upload Document" to submit</li>
+                        <li>You'll receive a confirmation when upload is complete</li>
+                        <li>Upload each document type separately</li>
+                    </ul>
+                </div>
+                
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label for="clientId">Your Client ID *</label>
+                        <input type="text" id="clientId" placeholder="CL1234567890" required readonly>
+                        <small style="color: #666;">This was provided in your welcome email</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="documentType">Document Type *</label>
+                        <select id="documentType" required>
+                            <option value="">Select document type...</option>
+                            <option value="application">Signed Application</option>
+                            <option value="photos">Photos</option>
+                            <option value="mvr">Motor Vehicle Report (MVR)</option>
+                            <option value="priorInsurance">Prior Insurance</option>
+                            <option value="inspection">Inspection Report</option>
+                            <option value="payment">Payment Confirmation</option>
+                            <option value="other">Other Documents</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="file">Select File *</label>
+                        <input type="file" id="file" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small style="color: #666;">Maximum file size: 10MB. Accepted formats: PDF, JPG, PNG</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Additional Notes (Optional)</label>
+                        <textarea id="notes" rows="3" placeholder="Any additional information about this document..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn">Upload Document</button>
+                </form>
+                
+                <div class="loading" id="uploadLoading">
+                    <div class="spinner"></div>
+                    <p>Uploading your document...</p>
+                </div>
+            </div>
+            
+            <!-- Status Tab -->
+            <div id="status-tab" class="tab-content">
+                <div class="instructions">
+                    <h3>📋 Your Application Status</h3>
+                    <p style="margin-top: 10px; color: #333;">
+                        View which documents we've received and what's still needed to complete your application.
+                    </p>
+                </div>
+                
+                <form id="statusForm">
+                    <div class="form-group">
+                        <label for="statusClientId">Your Client ID *</label>
+                        <input type="text" id="statusClientId" placeholder="CL1234567890" required readonly>
+                    </div>
+                    
+                    <button type="submit" class="btn success">Check Status</button>
+                </form>
+                
+                <div class="loading" id="statusLoading">
+                    <div class="spinner"></div>
+                    <p>Loading your status...</p>
+                </div>
+                
+                <div id="statusResult" style="display: none;">
+                    <!-- Status will be displayed here -->
+                </div>
+            </div>
+            
+            <!-- Help Section -->
+            <div class="help-section">
+                <h4>Need Assistance?</h4>
+                <p>Our team is here to help you through the application process.</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span>📞</span>
+                        <strong>336-835-1993</strong>
+                    </div>
+                    <div class="contact-item">
+                        <span>✉️</span>
+                        <strong>Save@BillLayneInsurance.com</strong>
+                    </div>
+                </div>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                    Office Hours: Monday - Friday, 9:00 AM - 5:00 PM EST
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2025 Bill Layne Insurance Agency</p>
+            <p>1283 N Bridge St, Elkin NC 28621</p>
+            <p style="margin-top: 10px;">
+                <a href="https://www.billayneinsurance.com" style="color: #667eea; text-decoration: none;">www.BillLayneInsurance.com</a>
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXSOzvd36Jf7YJ95H6E_NviKyTpJIYVGRO1D6lAiHhYTS-4MWP06FK382UN_pbtmJazw/exec';
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('id');
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // If client ID is in URL, populate fields and show info bar
+            if (clientId) {
+                document.getElementById('clientId').value = clientId;
+                document.getElementById('statusClientId').value = clientId;
+                document.getElementById('displayClientId').textContent = clientId;
+                document.getElementById('clientInfoBar').style.display = 'block';
+                
+                // Auto-check status on load
+                setTimeout(() => {
+                    checkStatus();
+                }, 1000);
+            } else {
+                // If no client ID, show warning
+                showAlert('warning', 'Please use the link from your email to access this portal. If you need assistance, please contact us at 336-835-1993.');
+                document.getElementById('clientId').removeAttribute('readonly');
+                document.getElementById('statusClientId').removeAttribute('readonly');
+            }
+            
+            // Add form listeners
+            document.getElementById('uploadForm').addEventListener('submit', handleUpload);
+            document.getElementById('statusForm').addEventListener('submit', handleStatusCheck);
+        });
+        
+        // Switch tabs
+        function switchTab(tab) {
+            // Update active tab button
+            document.querySelectorAll('.tabs button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update visible content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tab + '-tab').classList.add('active');
+        }
+        
+        // Handle file upload
+        async function handleUpload(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showAlert('error', 'Please select a file to upload');
+                return;
+            }
+            
+            // Check file size (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                showAlert('error', 'File size must be less than 10MB');
+                return;
+            }
+            
+            showLoading('upload', true);
+            
+            try {
+                // For now, just update status
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'updateStatus',
+                        clientId: document.getElementById('clientId').value,
+                        documentType: document.getElementById('documentType').value,
+                        status: 'Received'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', 'Document uploaded successfully! We\'ll review it and update your status.');
+                    document.getElementById('uploadForm').reset();
+                    document.getElementById('clientId').value = clientId; // Restore client ID
+                    
+                    // Refresh status
+                    checkStatus();
+                } else {
+                    showAlert('error', 'Upload failed. Please try again or contact us for assistance.');
+                }
+            } catch (error) {
+                showAlert('error', 'Connection error. Please check your internet and try again.');
+                console.error(error);
+            } finally {
+                showLoading('upload', false);
+            }
+        }
+        
+        // Handle status check
+        async function handleStatusCheck(e) {
+            e.preventDefault();
+            checkStatus();
+        }
+        
+        // Check status function
+        async function checkStatus() {
+            const clientIdValue = document.getElementById('statusClientId').value;
+            
+            if (!clientIdValue) {
+                showAlert('warning', 'Please enter your Client ID');
+                return;
+            }
+            
+            showLoading('status', true);
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getClient&id=${clientIdValue}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayStatus(result.client);
+                } else {
+                    showAlert('error', 'Client ID not found. Please check your ID and try again.');
+                }
+            } catch (error) {
+                showAlert('error', 'Connection error. Please check your internet and try again.');
+                console.error(error);
+            } finally {
+                showLoading('status', false);
+            }
+        }
+        
+        // Display status
+        function displayStatus(client) {
+            const statusHtml = `
+                <div class="status-result">
+                    <h3 style="color: #333; margin-bottom: 15px;">Application Status for ${client.name}</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div>
+                            <strong>Company:</strong> ${client.company}
+                        </div>
+                        <div>
+                            <strong>Product:</strong> ${client.product}
+                        </div>
+                        <div>
+                            <strong>Policy Number:</strong> ${client.policyNumber || 'Pending'}
+                        </div>
+                        <div>
+                            <strong>Overall Status:</strong> 
+                            <span class="status-badge ${client.status === 'Complete' ? 'badge-received' : 'badge-pending'}">
+                                ${client.status}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <h4 style="color: #333; margin: 20px 0 15px;">Document Status:</h4>
+                    <div class="status-grid">
+                        ${Object.entries(client.documents).map(([type, status]) => {
+                            if (status === 'N/A') return '';
+                            const displayName = {
+                                application: 'Signed Application',
+                                photos: 'Photos',
+                                mvr: 'Motor Vehicle Report',
+                                priorInsurance: 'Prior Insurance',
+                                inspection: 'Inspection Report',
+                                payment: 'Payment',
+                                other: 'Other Documents'
+                            }[type] || type;
+                            
+                            return `
+                                <div class="status-item ${status === 'Received' ? 'received' : 'pending'}">
+                                    <span>${displayName}</span>
+                                    <span class="status-badge ${status === 'Received' ? 'badge-received' : 'badge-pending'}">
+                                        ${status}
+                                    </span>
+                                </div>
+                            `;
+                        }).filter(item => item).join('')}
+                    </div>
+                    
+                    ${client.status !== 'Complete' ? `
+                        <div class="alert info" style="margin-top: 20px;">
+                            <strong>Next Steps:</strong> Please upload any documents showing as "Pending" above. 
+                            Once all required documents are received, we'll process your application immediately.
+                        </div>
+                    ` : `
+                        <div class="alert success" style="margin-top: 20px;">
+                            <strong>Application Complete!</strong> All required documents have been received. 
+                            Your policy is being processed. If you have any questions, please contact us.
+                        </div>
+                    `}
+                </div>
+            `;
+            
+            document.getElementById('statusResult').innerHTML = statusHtml;
+            document.getElementById('statusResult').style.display = 'block';
+        }
+        
+        // Show alert
+        function showAlert(type, message) {
+            const alertHtml = `
+                <div class="alert ${type}">
+                    ${message}
+                </div>
+            `;
+            
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = alertHtml;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Show/hide loading
+        function showLoading(type, show) {
+            const loadingEl = document.getElementById(type + 'Loading');
+            if (show) {
+                loadingEl.classList.add('active');
+            } else {
+                loadingEl.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
