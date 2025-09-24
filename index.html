@@ -476,15 +476,16 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
+            <img src="https://i.imgur.com/cBAgeX8.png" alt="Bill Layne Insurance">
             <h1>New Business Portal</h1>
             <p>Complete Your Insurance Application</p>
         </div>
 
         <!-- Tabs -->
         <div class="tab-container">
-            <button class="tab active" onclick="switchTab('new')">New Client</button>
-            <button class="tab" onclick="switchTab('status')">Check Status</button>
-            <button class="tab" onclick="switchTab('upload')">Upload Documents</button>
+            <button class="tab active" onclick="switchTab('new', event)">New Client</button>
+            <button class="tab" onclick="switchTab('status', event)">Check Status</button>
+            <button class="tab" onclick="switchTab('upload', event)">Upload Documents</button>
         </div>
 
         <!-- Alerts -->
@@ -719,7 +720,7 @@
         });
 
         // Tab switching
-        function switchTab(tabName) {
+        function switchTab(tabName, event) {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -733,8 +734,20 @@
             // Show selected tab
             document.getElementById(`${tabName}-tab`).classList.add('active');
             
-            // Activate tab button
-            event.target.classList.add('active');
+            // Activate tab button - only if called from click event
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Find and activate the correct tab button programmatically
+                document.querySelectorAll('.tab').forEach(tab => {
+                    if (tab.textContent.toLowerCase().includes(tabName.toLowerCase()) || 
+                        (tabName === 'new' && tab.textContent.includes('New Client')) ||
+                        (tabName === 'status' && tab.textContent.includes('Check Status')) ||
+                        (tabName === 'upload' && tab.textContent.includes('Upload'))) {
+                        tab.classList.add('active');
+                    }
+                });
+            }
         }
 
         // Company selection
