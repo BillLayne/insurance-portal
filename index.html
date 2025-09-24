@@ -514,28 +514,48 @@
                     <label>Select Insurance Company *</label>
                     <div class="company-select-grid">
                         <div class="company-card" onclick="selectCompany(this, 'Nationwide')">
-                            <img src="https://i.imgur.com/Mv5V7tV.png" alt="Nationwide">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Nationwide%20Logo%20(1).webp?raw=true" alt="Nationwide">
                             <div class="company-name">Nationwide</div>
                         </div>
                         <div class="company-card" onclick="selectCompany(this, 'Progressive')">
-                            <img src="https://i.imgur.com/K6kTnTa.png" alt="Progressive">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Progressive%20Logo.webp?raw=true" alt="Progressive">
                             <div class="company-name">Progressive</div>
                         </div>
                         <div class="company-card" onclick="selectCompany(this, 'Travelers')">
-                            <img src="https://i.imgur.com/I6ONc0K.png" alt="Travelers">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Travelers%20Logo.webp?raw=true" alt="Travelers">
                             <div class="company-name">Travelers</div>
                         </div>
                         <div class="company-card" onclick="selectCompany(this, 'National General')">
-                            <img src="https://i.imgur.com/HF8oPAF.png" alt="National General">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/National%20General%20Insurance%20Logo.webp?raw=true" alt="National General">
                             <div class="company-name">National General</div>
                         </div>
                         <div class="company-card" onclick="selectCompany(this, 'Alamance')">
-                            <img src="https://imgur.com/CNFRCZc.png" alt="Alamance">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Alamance%20Logo.webp?raw=true" alt="Alamance">
                             <div class="company-name">Alamance</div>
                         </div>
                         <div class="company-card" onclick="selectCompany(this, 'Foremost')">
-                            <img src="https://i.imgur.com/rHIo4r5.jpg" alt="Foremost">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Foremost.webp?raw=true" alt="Foremost">
                             <div class="company-name">Foremost</div>
+                        </div>
+                        <div class="company-card" onclick="selectCompany(this, 'Dairyland')">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Dairyland%20Logo.webp?raw=true" alt="Dairyland">
+                            <div class="company-name">Dairyland</div>
+                        </div>
+                        <div class="company-card" onclick="selectCompany(this, 'Hagerty')">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Hagerty.webp?raw=true" alt="Hagerty">
+                            <div class="company-name">Hagerty</div>
+                        </div>
+                        <div class="company-card" onclick="selectCompany(this, 'JSA')">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/JSA%20LOGO.png?raw=true" alt="JSA">
+                            <div class="company-name">JSA</div>
+                        </div>
+                        <div class="company-card" onclick="selectCompany(this, 'NC Grange')">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/NC%20Grange%20Logo.webp?raw=true" alt="NC Grange">
+                            <div class="company-name">NC Grange</div>
+                        </div>
+                        <div class="company-card" onclick="selectCompany(this, 'NCJUA')">
+                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/ncjua%20LOGO.png?raw=true" alt="NCJUA">
+                            <div class="company-name">NCJUA</div>
                         </div>
                     </div>
                     <input type="hidden" id="selectedCompany" name="company" required>
@@ -613,9 +633,20 @@
         <div id="upload-tab" class="tab-content">
             <h2 style="margin-bottom: 20px; color: #333;">Upload Documents</h2>
             
+            <!-- Mode Toggle (Hidden by default - set uploadMode variable to control) -->
+            <div id="modeToggle" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" id="enhancedMode" checked onchange="toggleUploadMode()" style="width: auto; margin-right: 10px;">
+                    <span>Enhanced Mode (Store files in Google Drive)</span>
+                </label>
+                <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 25px;">
+                    When enabled, files are actually stored in Google Drive. When disabled, only tracks status.
+                </p>
+            </div>
+            
             <div class="form-group">
                 <label for="uploadClientId">Client ID *</label>
-                <input type="text" id="uploadClientId" placeholder="CL1234567890" required>
+                <input type="text" id="uploadClientId" placeholder="CL1234567890" required onblur="if(this.value) loadClientFiles(this.value)">
             </div>
 
             <div class="form-group">
@@ -644,6 +675,9 @@
             <div id="fileList" class="file-list"></div>
 
             <button onclick="uploadFiles()" class="btn success" style="width: 100%;">Upload Documents</button>
+            
+            <!-- Client Files Display Area (will be populated dynamically) -->
+            <div id="clientFiles" style="margin-top: 30px; display: none;"></div>
         </div>
 
         <!-- Footer -->
@@ -659,6 +693,7 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXSOzvd36Jf7YJ95H6E_NviKyTpJIYVGRO1D6lAiHhYTS-4MWP06FK382UN_pbtmJazw/exec';
         let selectedFiles = [];
         let currentClientData = null;
+        let uploadMode = 'enhanced'; // 'basic' or 'enhanced' - set to enhanced for actual file storage
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -782,6 +817,11 @@
                 if (result.success) {
                     currentClientData = result.client;
                     displayStatus(result.client);
+                    
+                    // Load files if in enhanced mode
+                    if (uploadMode === 'enhanced') {
+                        loadClientFiles(result.client.id);
+                    }
                 } else {
                     showAlert('error', 'Client not found. Please check your Client ID.');
                 }
@@ -922,7 +962,7 @@
             return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
         }
 
-        // Upload files
+        // Upload files (Enhanced version with actual file storage)
         async function uploadFiles() {
             const clientId = document.getElementById('uploadClientId').value;
             const documentType = document.getElementById('documentType').value;
@@ -942,47 +982,194 @@
                 return;
             }
             
+            // Get client data first if we don't have it
+            if (!currentClientData || currentClientData.id !== clientId) {
+                await checkStatus(clientId);
+            }
+            
             showLoading();
+            let successCount = 0;
+            let failCount = 0;
             
             try {
-                // In production, you would upload files to a storage service
-                // For now, we'll just update the status
-                const updateData = {
-                    action: 'updateStatus',
-                    clientId: clientId,
-                    documentType: documentType,
-                    status: 'Received'
-                };
-                
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(updateData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showAlert('success', 'Documents uploaded successfully!');
+                if (uploadMode === 'enhanced') {
+                    // Enhanced mode - actually upload files to Google Drive
+                    for (let file of selectedFiles) {
+                        try {
+                            const base64Content = await fileToBase64(file);
+                            
+                            const fileData = {
+                                action: 'uploadFile',
+                                clientId: clientId,
+                                clientName: currentClientData ? currentClientData.name : 'Unknown',
+                                company: currentClientData ? currentClientData.company : 'Unknown',
+                                documentType: documentType,
+                                fileName: file.name,
+                                fileContent: base64Content,
+                                mimeType: file.type || 'application/octet-stream'
+                            };
+                            
+                            const response = await fetch(SCRIPT_URL, {
+                                method: 'POST',
+                                body: JSON.stringify(fileData)
+                            });
+                            
+                            const result = await response.json();
+                            
+                            if (result.success) {
+                                successCount++;
+                                console.log(`Uploaded: ${file.name} - File URL: ${result.fileUrl}`);
+                            } else {
+                                failCount++;
+                                console.error(`Failed to upload ${file.name}: ${result.error}`);
+                            }
+                        } catch (error) {
+                            failCount++;
+                            console.error(`Error uploading ${file.name}:`, error);
+                        }
+                    }
                     
-                    // Clear selection
-                    selectedFiles = [];
-                    document.getElementById('fileList').innerHTML = '';
-                    document.getElementById('documentType').value = '';
-                    document.getElementById('fileInput').value = '';
-                    
-                    // Refresh status if available
-                    if (currentClientData) {
-                        checkStatus(clientId);
+                    if (successCount > 0) {
+                        showAlert('success', `Successfully uploaded ${successCount} file(s)${failCount > 0 ? `. ${failCount} file(s) failed.` : '.'}`);
+                    } else {
+                        showAlert('error', 'All uploads failed. Please try again.');
                     }
                 } else {
-                    showAlert('error', 'Upload failed. Please try again.');
+                    // Basic mode - just update status
+                    const updateData = {
+                        action: 'updateStatus',
+                        clientId: clientId,
+                        documentType: documentType,
+                        status: 'Received'
+                    };
+                    
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(updateData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showAlert('success', 'Documents marked as received!');
+                    } else {
+                        showAlert('error', 'Update failed. Please try again.');
+                    }
                 }
+                
+                // Clear selection
+                selectedFiles = [];
+                document.getElementById('fileList').innerHTML = '';
+                document.getElementById('documentType').value = '';
+                document.getElementById('fileInput').value = '';
+                
+                // Refresh status if available
+                if (currentClientData) {
+                    checkStatus(clientId);
+                }
+                
+                // Load client files if in enhanced mode
+                if (uploadMode === 'enhanced' && successCount > 0) {
+                    loadClientFiles(clientId);
+                }
+                
             } catch (error) {
                 showAlert('error', 'Connection error. Please try again.');
                 console.error(error);
             } finally {
                 hideLoading();
             }
+        }
+
+        // Convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Load and display client files
+        async function loadClientFiles(clientId) {
+            if (uploadMode !== 'enhanced') return;
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'getClientFiles',
+                        clientId: clientId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.files && result.files.length > 0) {
+                    displayClientFiles(result.files, result.folderUrl);
+                }
+            } catch (error) {
+                console.error('Error loading client files:', error);
+            }
+        }
+
+        // Display client files
+        function displayClientFiles(files, folderUrl) {
+            const filesContainer = document.getElementById('clientFiles');
+            if (!filesContainer) {
+                // Create files display section if it doesn't exist
+                const uploadTab = document.getElementById('upload-tab');
+                const filesDiv = document.createElement('div');
+                filesDiv.id = 'clientFiles';
+                filesDiv.style.marginTop = '30px';
+                filesDiv.innerHTML = `
+                    <div style="border-top: 2px solid #e9ecef; padding-top: 20px;">
+                        <h3 style="color: #333; margin-bottom: 15px;">📁 Uploaded Files</h3>
+                        <div id="uploadedFilesList"></div>
+                        ${folderUrl ? `<a href="${folderUrl}" target="_blank" class="btn secondary" style="margin-top: 15px;">View All Files in Drive</a>` : ''}
+                    </div>
+                `;
+                uploadTab.appendChild(filesDiv);
+            }
+            
+            const filesList = document.getElementById('uploadedFilesList') || document.getElementById('clientFiles');
+            let filesHTML = '<div style="max-height: 300px; overflow-y: auto;">';
+            
+            // Group files by type
+            const filesByType = {};
+            files.forEach(file => {
+                if (!filesByType[file.type]) {
+                    filesByType[file.type] = [];
+                }
+                filesByType[file.type].push(file);
+            });
+            
+            // Display files grouped by type
+            for (const [type, typeFiles] of Object.entries(filesByType)) {
+                filesHTML += `
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="color: #667eea; font-size: 14px; margin-bottom: 10px;">${getDocumentLabel(type)}</h4>
+                `;
+                
+                typeFiles.forEach(file => {
+                    filesHTML += `
+                        <div class="file-item" style="margin-bottom: 8px;">
+                            <span class="file-name">📄 ${file.name}</span>
+                            <span class="file-size">${formatFileSize(file.size)}</span>
+                            <a href="${file.url}" target="_blank" style="color: #667eea; text-decoration: none; margin: 0 10px;">View</a>
+                        </div>
+                    `;
+                });
+                
+                filesHTML += '</div>';
+            }
+            
+            filesHTML += '</div>';
+            filesList.innerHTML = filesHTML;
         }
 
         // Request reminder
@@ -1050,6 +1237,86 @@
             const loading = document.getElementById('loadingOverlay');
             if (loading) {
                 loading.remove();
+            }
+        }
+
+        // Toggle between basic and enhanced upload modes
+        function toggleUploadMode() {
+            const checkbox = document.getElementById('enhancedMode');
+            uploadMode = checkbox.checked ? 'enhanced' : 'basic';
+            console.log('Upload mode:', uploadMode);
+            
+            // Show/hide client files based on mode
+            const clientFiles = document.getElementById('clientFiles');
+            if (clientFiles) {
+                clientFiles.style.display = uploadMode === 'enhanced' ? 'block' : 'none';
+            }
+        }
+
+        // Delete file function for enhanced mode
+        async function deleteFile(fileId, clientId) {
+            if (confirm('Are you sure you want to delete this file?')) {
+                showLoading();
+                
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'deleteFile',
+                            fileId: fileId,
+                            clientId: clientId
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showAlert('success', 'File deleted successfully');
+                        loadClientFiles(clientId);
+                    } else {
+                        showAlert('error', 'Failed to delete file');
+                    }
+                } catch (error) {
+                    showAlert('error', 'Connection error');
+                    console.error(error);
+                } finally {
+                    hideLoading();
+                }
+            }
+        }
+
+        // Get folder link for client
+        async function getClientFolderLink() {
+            if (!currentClientData) {
+                showAlert('warning', 'Please check client status first');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'getClientFolderLink',
+                        clientId: currentClientData.id,
+                        clientName: currentClientData.name,
+                        company: currentClientData.company
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    window.open(result.url, '_blank');
+                } else {
+                    showAlert('error', 'Failed to get folder link');
+                }
+            } catch (error) {
+                showAlert('error', 'Connection error');
+                console.error(error);
+            } finally {
+                hideLoading();
             }
         }
     </script>
