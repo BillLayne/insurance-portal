@@ -83,13 +83,12 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
 </div>
 
 <script>
-  // >>>>>> PASTE YOUR NEW /exec URL HERE <<<<<<
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwqw4W9kO1RgUi6Kvv5Eb8Oo5Liwe91hoLS3NPk88dbShIBMJ7ZyCCFwaaK5mPWnhoalA/exec";
+  // >>>>>> PASTE YOUR LIVE /exec URL HERE <<<<<<
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPB0kS1wc6l6fdNOZ89TtIOQv4CyIzrW8b8SRKpzwT-y2MGZrdM5PpWloLDcjGtxG3/exec";
 
   const $ = s => document.querySelector(s);
   const show = (el, yes=true) => el.style.display = yes ? "" : "none";
 
-  // Minimal JSONP helper
   function jsonp(url){
     return new Promise((resolve, reject)=>{
       const cb = 'cb_' + Math.random().toString(36).slice(2);
@@ -99,10 +98,7 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
       window[cb] = (data)=>{ resolve(data); cleanup(); };
       s.onerror = ()=>{ reject(new Error('JSONP load error')); cleanup(); };
       document.head.appendChild(s);
-      function cleanup(){
-        delete window[cb];
-        s.remove();
-      }
+      function cleanup(){ delete window[cb]; s.remove(); }
     });
   }
 
@@ -187,4 +183,3 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
 </script>
 </body>
 </html>
-
