@@ -1,99 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Check My Status • Bill Layne Insurance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --primary:#1a5f7a;--secondary:#457b9d;--accent:#a8dadc;--bg:#f8f9fa;--text:#2c3e50;
-    --radius:12px;--shadow:0 8px 30px rgba(0,0,0,.08)
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",sans-serif}
-  .wrap{max-width:960px;margin:0 auto;padding:24px}
-  .header{
-    background:linear-gradient(135deg,var(--primary),var(--secondary));
-    color:#fff;border-radius:var(--radius);padding:28px;text-align:center;margin-bottom:16px
-  }
-  h1{margin:0;font-size:2rem}
-  .pill{display:inline-block;background:var(--accent);color:#084c61;border-radius:999px;padding:6px 12px;font-size:.875rem;margin-top:8px}
-  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
-  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-  label{font-size:.875rem;margin-bottom:6px;display:block}
-  input,button{width:100%;padding:12px;border-radius:10px;border:1px solid #d9e2ec;font-size:1rem}
-  button{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;border:none;cursor:pointer}
-  button:hover{filter:brightness(1.05)}
-  .section>h2{font-size:1.25rem;margin:0 0 10px;color:var(--primary)}
-  .status{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{padding:8px 12px;border-radius:999px;background:#eef6f8;border:1px solid #d6eef2;font-size:.875rem}
-  .ok{background:#e7f6ec;border-color:#ccebd7;color:#14532d}
-  .need{background:#fff6e5;border-color:#ffe3b3;color:#7c3a00}
-  .muted{opacity:.75}
-  .err{color:#b00020}
-  pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-radius:10px;overflow:auto}
-  @media print{.card{box-shadow:none} button{display:none}}
+:root{
+  --primary:#1a5f7a;--secondary:#457b9d;--accent:#a8dadc;--bg:#f8f9fa;--text:#2c3e50;
+  --radius:12px;--shadow:0 8px 30px rgba(0,0,0,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:24px}
+.header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:var(--radius);padding:28px;text-align:center;margin-bottom:16px}
+h1{margin:0;font-size:2rem}
+.pill{display:inline-block;background:var(--accent);color:#084c61;border-radius:999px;padding:6px 12px;font-size:.875rem;margin-top:8px}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+label{font-size:.875rem;margin-bottom:6px;display:block}
+input,button{width:100%;padding:12px;border-radius:10px;border:1px solid #d9e2ec;font-size:1rem}
+button{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;border:none;cursor:pointer}
+button:hover{filter:brightness(1.05)}
+.status{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 12px;border-radius:999px;background:#eef6f8;border:1px solid #d6eef2;font-size:.875rem}
+.ok{background:#e7f6ec;border-color:#ccebd7;color:#14532d}
+.need{background:#fff6e5;border-color:#ffe3b3;color:#7c3a00}
+.muted{opacity:.75}
+.err{color:#b00020}
+pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-radius:10px;overflow:auto}
+@media print{.card{box-shadow:none} button{display:none}}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="header">
-      <h1>Customer Status Checker</h1>
-      <div class="pill">Bill Layne Insurance • 336-835-1993 • Save@BillLayneInsurance.com</div>
-    </div>
+<div class="wrap">
+  <div class="header">
+    <h1>Customer Status Checker</h1>
+    <div class="pill">Bill Layne Insurance • 336-835-1993 • Save@BillLayneInsurance.com</div>
+  </div>
 
-    <div class="card">
-      <h2 style="margin-top:0">Find Your Account</h2>
-      <div class="grid">
-        <div>
-          <label for="email">Email (preferred)</label>
-          <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
-        </div>
-        <div>
-          <label for="cid">Or Client ID</label>
-          <input id="cid" placeholder="e.g., CL1727392">
-        </div>
-        <div style="align-self:end">
-          <button id="findBtn">Check Status</button>
-        </div>
+  <div class="card">
+    <h2 style="margin-top:0">Find Your Account</h2>
+    <div class="grid">
+      <div>
+        <label for="email">Email (preferred)</label>
+        <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
       </div>
-      <p class="muted">Tip: use the same email you gave the agency. We match by email or Client ID.</p>
-      <div id="error" class="err" style="display:none;margin-top:8px;"></div>
-    </div>
-
-    <div class="card" id="summary" style="display:none">
-      <h2 style="margin-top:0">Summary</h2>
-      <div class="grid">
-        <div><label>Client</label><div id="who" class="chip"></div></div>
-        <div><label>Company</label><div id="company" class="chip"></div></div>
-        <div><label>Product</label><div id="product" class="chip"></div></div>
-        <div><label>Policy #</label><div id="policy" class="chip"></div></div>
-        <div><label>Status</label><div id="status" class="chip"></div></div>
+      <div>
+        <label for="cid">Or Client ID</label>
+        <input id="cid" placeholder="e.g., CL1727392">
       </div>
-
-      <div style="margin-top:12px">
-        <label>Documents</label>
-        <div id="docs" class="status"></div>
-      </div>
-
-      <div style="margin-top:14px">
-        <button id="uploadBtn">Go to My Upload Page</button>
-        <p class="muted" style="margin-top:8px">This opens your secure upload link tied to your Client ID.</p>
+      <div style="align-self:end">
+        <button id="findBtn">Check Status</button>
       </div>
     </div>
+    <p class="muted">Use the same email you gave the agency. We match by email or Client ID.</p>
+    <div id="error" class="err" style="display:none;margin-top:8px;"></div>
+  </div>
 
-    <div class="card">
-      <h2 style="margin-top:0">Debug (for you)</h2>
-      <p class="muted">Raw response from Google Apps Script (helps if something doesn’t show).</p>
-      <pre id="raw">No request yet.</pre>
+  <div class="card" id="summary" style="display:none">
+    <h2 style="margin-top:0">Summary</h2>
+    <div class="grid">
+      <div><label>Client</label><div id="who" class="chip"></div></div>
+      <div><label>Company</label><div id="company" class="chip"></div></div>
+      <div><label>Product</label><div id="product" class="chip"></div></div>
+      <div><label>Policy #</label><div id="policy" class="chip"></div></div>
+      <div><label>Status</label><div id="status" class="chip"></div></div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label>Documents</label>
+      <div id="docs" class="status"></div>
+    </div>
+
+    <div style="margin-top:14px">
+      <button id="uploadBtn">Go to My Upload Page</button>
+      <p class="muted" style="margin-top:8px">Opens your secure upload link tied to your Client ID.</p>
     </div>
   </div>
 
+  <div class="card">
+    <h2 style="margin-top:0">Debug (for you)</h2>
+    <p class="muted">Raw response from Google Apps Script.</p>
+    <pre id="raw">No request yet.</pre>
+  </div>
+</div>
+
 <script>
-  // === IMPORTANT: your live Apps Script Web App URL ===
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxYq0f-zOY5J5DH6tAMV9HXbPOgWADeSfU5DVNxzwOFITQkoHzJh-tk5A1Vm0UKhuFT/exec";
+  // >>>>>> PASTE YOUR NEW /exec URL HERE <<<<<<
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwUXWw8BWT8EJ_zQbwwu2iWHn5mDSTcZjTl0gAlVGEfqgFETHgIKUDrSrHh4dDI_88XLw/exec";
 
   const $ = s => document.querySelector(s);
   const show = (el, yes=true) => el.style.display = yes ? "" : "none";
@@ -105,20 +101,24 @@
     return d;
   }
 
+  async function getJSON(url) {
+    const r = await fetch(url, { method: "GET" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  }
+
   async function getClientByEmail(email) {
     const u = new URL(WEB_APP_URL);
     u.searchParams.set("action", "getClient");
     u.searchParams.set("email", email);
-    const r = await fetch(u.toString(), { method: "GET" });
-    return r.json();
+    return getJSON(u.toString());
   }
 
   async function getClientById(id) {
     const u = new URL(WEB_APP_URL);
     u.searchParams.set("action", "getClient");
     u.searchParams.set("id", id);
-    const r = await fetch(u.toString(), { method: "GET" });
-    return r.json();
+    return getJSON(u.toString());
   }
 
   function renderClient(data) {
@@ -132,16 +132,15 @@
     const docs = $("#docs");
     docs.innerHTML = "";
     const d = c.documents || {};
-    // Status classes: ok=Received, need=Pending
-    docs.appendChild(chip("Application", d.application, d.application==="Received"?"ok":d.application==="Pending"?"need":""));
-    docs.appendChild(chip("Photos", d.photos, d.photos==="Received"?"ok":d.photos==="Pending"?"need":""));
-    docs.appendChild(chip("MVR", d.mvr, d.mvr==="Received"?"ok":d.mvr==="Pending"?"need":""));
-    docs.appendChild(chip("Prior Ins", d.priorInsurance, d.priorInsurance==="Received"?"ok":d.priorInsurance==="Pending"?"need":""));
-    docs.appendChild(chip("Inspection", d.inspection, d.inspection==="Received"?"ok":d.inspection==="Pending"?"need":""));
-    docs.appendChild(chip("Payment", d.payment, d.payment==="Received"?"ok":d.payment==="Pending"?"need":""));
+    const s = (v)=> v==="Received" ? "ok" : (v==="Pending" ? "need" : "");
+    docs.appendChild(chip("Application", d.application, s(d.application)));
+    docs.appendChild(chip("Photos", d.photos, s(d.photos)));
+    docs.appendChild(chip("MVR", d.mvr, s(d.mvr)));
+    docs.appendChild(chip("Prior Ins", d.priorInsurance, s(d.priorInsurance)));
+    docs.appendChild(chip("Inspection", d.inspection, s(d.inspection)));
+    docs.appendChild(chip("Payment", d.payment, s(d.payment)));
     if (d.other) docs.appendChild(chip("Other", d.other));
 
-    // Use your same pattern to generate upload URL
     const uploadUrl = `https://billlayne.github.io/insurance-portal/customer.html?id=${encodeURIComponent(c.id)}#upload`;
     $("#uploadBtn").onclick = () => window.open(uploadUrl, "_blank");
 
@@ -168,22 +167,26 @@
     }
 
     try {
+      // Smoke test API: ?action=ping
+      const ping = await fetch(`${WEB_APP_URL}?action=ping`).then(r=>r.text()).catch(()=> 'err');
+      if (ping !== 'ok') console.warn('Ping returned:', ping);
+
       const res = email ? await getClientByEmail(email) : await getClientById(cid);
       $("#raw").textContent = JSON.stringify(res, null, 2);
-
       if (!res || !res.success) {
         showError(res?.error || "Client not found.");
         return;
       }
       renderClient(res);
     } catch (e) {
-      showError("Could not reach the server. Check your Web App deployment settings.");
+      showError("Failed to reach the server. Double-check your Web App deployment and URL.");
       $("#raw").textContent = String(e);
     }
   }
 
-  // Button + auto-load if URL has ?id=
   $("#findBtn").addEventListener("click", handleFind);
+
+  // Auto-load if ?id= is present
   const params = new URLSearchParams(location.search);
   if (params.get("id")) {
     $("#cid").value = params.get("id");
