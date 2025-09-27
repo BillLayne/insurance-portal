@@ -1,1605 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bill Layne Insurance - New Business Portal</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 30px;
-            text-align: center;
-            color: white;
-        }
-
-        .header img {
-            width: 180px;
-            height: auto;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-
-        .tab-container {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            font-size: 16px;
-            font-weight: 600;
-            color: #6c757d;
-            transition: all 0.3s;
-        }
-
-        .tab.active {
-            background: white;
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
-            margin-bottom: -2px;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 30px;
-            animation: fadeIn 0.5s;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        select {
-            cursor: pointer;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 14px 32px;
-            border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn.secondary {
-            background: #6c757d;
-        }
-
-        .btn.success {
-            background: linear-gradient(135deg, #34a853 0%, #0f9d58 100%);
-        }
-
-        .btn.warning {
-            background: linear-gradient(135deg, #fbbc04 0%, #f59e0b 100%);
-        }
-
-        .btn.danger {
-            background: linear-gradient(135deg, #ea4335 0%, #dc2626 100%);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-group .btn {
-            flex: 1;
-        }
-
-        .checklist {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .checklist h3 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 18px;
-        }
-
-        .checklist-item {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            background: white;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            border: 2px solid #e9ecef;
-            transition: all 0.3s;
-        }
-
-        .checklist-item:hover {
-            border-color: #667eea;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .checklist-item input[type="checkbox"] {
-            width: auto;
-            margin-right: 12px;
-            transform: scale(1.2);
-            cursor: pointer;
-        }
-
-        .checklist-item label {
-            flex: 1;
-            margin: 0;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .checklist-item.completed {
-            background: #d4edda;
-            border-color: #c3e6cb;
-        }
-
-        .checklist-item.completed label {
-            text-decoration: line-through;
-            color: #155724;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-received {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-na {
-            background: #e9ecef;
-            color: #6c757d;
-        }
-
-        .upload-area {
-            border: 3px dashed #e9ecef;
-            border-radius: 8px;
-            padding: 40px;
-            text-align: center;
-            margin: 20px 0;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .upload-area:hover {
-            border-color: #667eea;
-            background: #f8f9fa;
-        }
-
-        .upload-area.dragover {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .upload-icon {
-            font-size: 48px;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .file-list {
-            margin-top: 20px;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            background: #f8f9fa;
-            margin-bottom: 10px;
-            border-radius: 6px;
-        }
-
-        .file-item .file-name {
-            flex: 1;
-            font-size: 14px;
-        }
-
-        .file-item .file-size {
-            color: #6c757d;
-            font-size: 12px;
-            margin: 0 10px;
-        }
-
-        .file-item .remove-file {
-            color: #dc3545;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .alert.show {
-            display: block;
-            animation: slideDown 0.3s;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-
-        .loading.show {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .progress-container {
-            margin: 20px 0;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
-
-        .company-select-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .company-card {
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .company-card:hover {
-            border-color: #667eea;
-            background: #f8f9fa;
-        }
-
-        .company-card.selected {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .company-card img {
-            height: 40px;
-            width: auto;
-            margin-bottom: 10px;
-        }
-
-        .company-card .company-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .footer {
-            background: #f8f9fa;
-            padding: 20px;
-            text-align: center;
-            color: #6c757d;
-            font-size: 14px;
-        }
-
-        .footer a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .info-box {
-            background: #e8f4ff;
-            border: 1px solid #b8d9ff;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 14px;
-            color: #0066cc;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                border-radius: 0;
-                box-shadow: none;
-            }
-
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .company-select-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .btn-group {
-                flex-direction: column;
-            }
-
-            .btn-group .btn {
-                width: 100%;
-            }
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Check My Status • Bill Layne Insurance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#1a5f7a;--secondary:#457b9d;--accent:#a8dadc;--bg:#f8f9fa;--text:#2c3e50;
+    --radius:12px;--shadow:0 8px 30px rgba(0,0,0,.08)
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:24px}
+  .header{
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    color:#fff;border-radius:var(--radius);padding:28px;text-align:center;margin-bottom:16px
+  }
+  h1{margin:0;font-size:2rem}
+  .pill{display:inline-block;background:var(--accent);color:#084c61;border-radius:999px;padding:6px 12px;font-size:.875rem;margin-top:8px}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  label{font-size:.875rem;margin-bottom:6px;display:block}
+  input,button{width:100%;padding:12px;border-radius:10px;border:1px solid #d9e2ec;font-size:1rem}
+  button{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;border:none;cursor:pointer}
+  button:hover{filter:brightness(1.05)}
+  .section>h2{font-size:1.25rem;margin:0 0 10px;color:var(--primary)}
+  .status{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:8px 12px;border-radius:999px;background:#eef6f8;border:1px solid #d6eef2;font-size:.875rem}
+  .ok{background:#e7f6ec;border-color:#ccebd7;color:#14532d}
+  .need{background:#fff6e5;border-color:#ffe3b3;color:#7c3a00}
+  .muted{opacity:.75}
+  .err{color:#b00020}
+  pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-radius:10px;overflow:auto}
+  @media print{.card{box-shadow:none} button{display:none}}
+</style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>New Business Portal</h1>
-            <p>Complete Your Insurance Application</p>
-        </div>
-
-        <!-- Tabs -->
-        <div class="tab-container">
-            <button class="tab active" onclick="switchTab('new', event)">New Client</button>
-            <button class="tab" onclick="switchTab('status', event)">Check Status</button>
-            <button class="tab" onclick="switchTab('upload', event)">Upload Documents</button>
-        </div>
-
-        <!-- Alerts -->
-        <div id="alertContainer"></div>
-
-        <!-- Tab Content: New Client -->
-        <div id="new-tab" class="tab-content active">
-            <form id="newClientForm">
-                <h2 style="margin-bottom: 20px; color: #333;">Start New Application</h2>
-                
-                <div class="form-group">
-                    <label for="clientName">Full Name *</label>
-                    <input type="text" id="clientName" name="clientName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="clientEmail">Email Address *</label>
-                    <input type="email" id="clientEmail" name="clientEmail" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="clientPhone">Phone Number *</label>
-                    <input type="tel" id="clientPhone" name="clientPhone" required placeholder="(336) 555-0123">
-                </div>
-
-                <div class="form-group">
-                    <label>Select Insurance Company *</label>
-                    <div class="company-select-grid">
-                        <div class="company-card" onclick="selectCompany(this, 'Nationwide')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Nationwide%20Logo%20(1).webp?raw=true" alt="Nationwide">
-                            <div class="company-name">Nationwide</div>
-                        </div>
-                        <div class="company-card" onclick="selectCompany(this, 'Progressive')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Progressive%20Logo.webp?raw=true" alt="Progressive">
-                            <div class="company-name">Progressive</div>
-                        </div>
-                        <div class="company-card" onclick="selectCompany(this, 'Travelers')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Travelers%20Logo.webp?raw=true" alt="Travelers">
-                            <div class="company-name">Travelers</div>
-                        </div>
-                        <div class="company-card" onclick="selectCompany(this, 'National General')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/National%20General%20Insurance%20Logo.webp?raw=true" alt="National General">
-                            <div class="company-name">National General</div>
-                        </div>
-                        <div class="company-card" onclick="selectCompany(this, 'Alamance')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Alamance%20Logo.webp?raw=true" alt="Alamance">
-                            <div class="company-name">Alamance</div>
-                        </div>
-                        <div class="company-card" onclick="selectCompany(this, 'Foremost')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Foremost.webp?raw=true" alt="Foremost">
-                            <div class="company-name">Foremost</div>
-                        </div>
-                        <div class="company-card" onclick="selectCompany(this, 'Dairyland')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Dairyland%20Logo.webp?raw=true" alt="Dairyland">
-                            <div class="company-name">Dairyland</div>
-                        </div>
-                        <div class="company-card" onclick="selectCompany(this, 'Hagerty')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/Hagerty.webp?raw=true" alt="Hagerty">
-                            <div class="company-name">Hagerty</div>
-                        </div>
-                        <div class="company-card" onclick="selectCompany(this, 'JSA')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/JSA%20LOGO.png?raw=true" alt="JSA">
-                            <div class="company-name">JSA</div>
-                        </div>
-                        <div class="company-card" onclick="selectCompany(this, 'NC Grange')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/NC%20Grange%20Logo.webp?raw=true" alt="NC Grange">
-                            <div class="company-name">NC Grange</div>
-                        </div>
-                        <div class="company-card" onclick="selectCompany(this, 'NCJUA')">
-                            <img src="https://github.com/BillLayne/bill-layne-images/blob/main/logos/ncjua%20LOGO.png?raw=true" alt="NCJUA">
-                            <div class="company-name">NCJUA</div>
-                        </div>
-                    </div>
-                    <input type="hidden" id="selectedCompany" name="company" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="productType">Product Type *</label>
-                    <select id="productType" name="productType" required>
-                        <option value="">Select Product</option>
-                        <option value="Auto">Auto Insurance</option>
-                        <option value="Home">Homeowners Insurance</option>
-                        <option value="Mobile Home">Mobile Home Insurance</option>
-                        <option value="Renters">Renters Insurance</option>
-                        <option value="Motorcycle">Motorcycle Insurance</option>
-                        <option value="RV">RV Insurance</option>
-                        <option value="Boat">Boat Insurance</option>
-                        <option value="Business">Business Insurance</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="policyNumber">Policy Number (if available)</label>
-                    <input type="text" id="policyNumber" name="policyNumber">
-                </div>
-
-                <div class="form-group">
-                    <label for="effectiveDate">Desired Effective Date</label>
-                    <input type="date" id="effectiveDate" name="effectiveDate">
-                </div>
-
-                <div class="form-group">
-                    <label for="notes">Additional Notes</label>
-                    <textarea id="notes" name="notes" placeholder="Any special circumstances or additional information..."></textarea>
-                </div>
-
-                <!-- Documents Already Collected -->
-                <div class="checklist" style="margin: 20px 0;">
-                    <h3 style="color: #333; margin-bottom: 15px;">📋 Documents Already Collected</h3>
-                    <p style="font-size: 14px; color: #6c757d; margin-bottom: 15px;">Check the documents you already have:</p>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="hasApplication" name="hasApplication" value="true">
-                        <label for="hasApplication">Signed Application</label>
-                    </div>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="hasPhotos" name="hasPhotos" value="true">
-                        <label for="hasPhotos">Photos</label>
-                    </div>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="hasPriorInsurance" name="hasPriorInsurance" value="true">
-                        <label for="hasPriorInsurance">Prior Insurance</label>
-                    </div>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="hasInspection" name="hasInspection" value="true">
-                        <label for="hasInspection">Inspection Report</label>
-                    </div>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="hasPayment" name="hasPayment" value="true">
-                        <label for="hasPayment">Initial Payment</label>
-                    </div>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="hasOther" name="hasOther" value="true">
-                        <label for="hasOther">Other Required Documents</label>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn" style="width: 100%;">Start Application</button>
-            </form>
-        </div>
-
-        <!-- Tab Content: Check Status -->
-        <div id="status-tab" class="tab-content">
-            <h2 style="margin-bottom: 20px; color: #333;">Check Application Status</h2>
-            
-            <div class="info-box">
-                💡 <strong>Tip:</strong> You can search by either Client ID (e.g., CL1234567890) or Email Address
-            </div>
-            
-            <div class="form-group">
-                <label for="lookupId">Enter Your Client ID or Email</label>
-                <input type="text" id="lookupId" placeholder="CL1234567890 or email@example.com">
-            </div>
-
-            <button onclick="checkStatus()" class="btn" style="width: 100%;">Check Status</button>
-
-            <div id="statusResult" style="margin-top: 30px; display: none;">
-                <div class="progress-container">
-                    <div class="progress-header">
-                        <span>Application Progress</span>
-                        <span id="progressPercent">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressBar" style="width: 0%;"></div>
-                    </div>
-                </div>
-
-                <div class="checklist">
-                    <h3>📋 Required Documents</h3>
-                    <div id="documentChecklist"></div>
-                </div>
-
-                <div class="btn-group">
-                    <button onclick="switchTab('upload')" class="btn success">Upload Documents</button>
-                    <button onclick="requestReminder()" class="btn warning">Send Reminder</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab Content: Upload Documents -->
-        <div id="upload-tab" class="tab-content">
-            <h2 style="margin-bottom: 20px; color: #333;">Upload Documents</h2>
-            
-            <!-- Quick Status Update Section -->
-            <div style="background: #f0f4ff; border: 2px solid #667eea; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
-                <h3 style="color: #333; margin-bottom: 15px;">⚡ Quick Status Update</h3>
-                <div class="info-box" style="margin-bottom: 15px;">
-                    💡 <strong>Tip:</strong> Enter either the Client ID or customer's email address to quickly update their document status
-                </div>
-                <div class="form-group">
-                    <label for="quickUpdateClientId">Client ID or Email Address</label>
-                    <input type="text" id="quickUpdateClientId" placeholder="CL1234567890 or customer@example.com" onblur="if(this.value) loadClientStatus(this.value)">
-                </div>
-                <div id="quickUpdateChecklist" style="display: none;">
-                    <p style="font-size: 14px; color: #6c757d; margin-bottom: 15px;">Update document status:</p>
-                    <div class="checklist-item">
-                        <select id="statusApplication" style="width: 150px; display: inline-block; margin-left: 10px;">
-                            <option value="Pending">Pending</option>
-                            <option value="Received">Received</option>
-                            <option value="N/A">N/A</option>
-                        </select>
-                        <label style="display: inline-block; width: 200px;">Signed Application</label>
-                    </div>
-                    <div class="checklist-item">
-                        <select id="statusPhotos" style="width: 150px; display: inline-block; margin-left: 10px;">
-                            <option value="Pending">Pending</option>
-                            <option value="Received">Received</option>
-                            <option value="N/A">N/A</option>
-                        </select>
-                        <label style="display: inline-block; width: 200px;">Photos</label>
-                    </div>
-                    <div class="checklist-item">
-                        <select id="statusPriorInsurance" style="width: 150px; display: inline-block; margin-left: 10px;">
-                            <option value="Pending">Pending</option>
-                            <option value="Received">Received</option>
-                            <option value="N/A">N/A</option>
-                        </select>
-                        <label style="display: inline-block; width: 200px;">Prior Insurance</label>
-                    </div>
-                    <div class="checklist-item">
-                        <select id="statusInspection" style="width: 150px; display: inline-block; margin-left: 10px;">
-                            <option value="Pending">Pending</option>
-                            <option value="Received">Received</option>
-                            <option value="N/A">N/A</option>
-                        </select>
-                        <label style="display: inline-block; width: 200px;">Inspection</label>
-                    </div>
-                    <div class="checklist-item">
-                        <select id="statusPayment" style="width: 150px; display: inline-block; margin-left: 10px;">
-                            <option value="Pending">Pending</option>
-                            <option value="Received">Received</option>
-                            <option value="N/A">N/A</option>
-                        </select>
-                        <label style="display: inline-block; width: 200px;">Payment</label>
-                    </div>
-                    <div class="checklist-item">
-                        <select id="statusOther" style="width: 150px; display: inline-block; margin-left: 10px;">
-                            <option value="Pending">Pending</option>
-                            <option value="Received">Received</option>
-                            <option value="N/A">N/A</option>
-                        </select>
-                        <label style="display: inline-block; width: 200px;">Other Documents</label>
-                    </div>
-                    <button onclick="saveQuickUpdate()" class="btn success" style="width: 100%; margin-top: 15px;">Save Status Updates</button>
-                </div>
-            </div>
-            
-            <hr style="margin: 30px 0; border: 1px solid #e9ecef;">
-            
-            <!-- Mode Toggle (Hidden by default - set uploadMode variable to control) -->
-            <div id="modeToggle" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <label style="display: flex; align-items: center; cursor: pointer;">
-                    <input type="checkbox" id="enhancedMode" checked onchange="toggleUploadMode()" style="width: auto; margin-right: 10px;">
-                    <span>Enhanced Mode (Store files in Google Drive)</span>
-                </label>
-                <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0 25px;">
-                    When enabled, files are actually stored in Google Drive. When disabled, only tracks status.
-                </p>
-            </div>
-            
-            <div class="form-group">
-                <label for="uploadClientId">Client ID or Email Address *</label>
-                <input type="text" id="uploadClientId" placeholder="CL1234567890 or customer@example.com" required onblur="if(this.value) loadClientFiles(this.value)">
-            </div>
-
-            <div class="form-group">
-                <label for="documentType">Document Type *</label>
-                <select id="documentType" required>
-                    <option value="">Select Document Type</option>
-                    <option value="application">Signed Application</option>
-                    <option value="photos">Photos</option>
-                    <option value="priorInsurance">Prior Insurance</option>
-                    <option value="inspection">Inspection Report</option>
-                    <option value="payment">Payment Confirmation</option>
-                    <option value="other">Other Documents</option>
-                </select>
-            </div>
-
-            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-                <div class="upload-icon">📁</div>
-                <p>Click to select files or drag and drop</p>
-                <p style="font-size: 12px; color: #6c757d; margin-top: 10px;">
-                    Supported formats: PDF, JPG, PNG, DOC, DOCX (Max 10MB)
-                </p>
-                <input type="file" id="fileInput" multiple style="display: none;" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-            </div>
-
-            <div id="fileList" class="file-list"></div>
-
-            <button onclick="uploadFiles()" class="btn success" style="width: 100%;">Upload Documents</button>
-            
-            <!-- Client Files Display Area (will be populated dynamically) -->
-            <div id="clientFiles" style="margin-top: 30px; display: none;"></div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p>© 2025 Bill Layne Insurance Agency</p>
-            <p>📞 336-835-1993 | ✉️ Save@BillLayneInsurance.com</p>
-            <p>1283 N Bridge St, Elkin NC 28621</p>
-        </div>
+  <div class="wrap">
+    <div class="header">
+      <h1>Customer Status Checker</h1>
+      <div class="pill">Bill Layne Insurance • 336-835-1993 • Save@BillLayneInsurance.com</div>
     </div>
 
-    <script>
-        // Configuration
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwjt0wXpaEemBE0vUl7jRjSbLO4Ekk9DYhVKcLYbmylUMEwGZZZ2BkeBT1mD5qtAyh/exec';
-        let selectedFiles = [];
-        let currentClientData = null;
-        let uploadMode = 'enhanced'; // 'basic' or 'enhanced' - set to enhanced for actual file storage
-        let actualClientId = null; // Store the actual Client ID for quick updates when searching by email
+    <div class="card">
+      <h2 style="margin-top:0">Find Your Account</h2>
+      <div class="grid">
+        <div>
+          <label for="email">Email (preferred)</label>
+          <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div>
+          <label for="cid">Or Client ID</label>
+          <input id="cid" placeholder="e.g., CL1727392">
+        </div>
+        <div style="align-self:end">
+          <button id="findBtn">Check Status</button>
+        </div>
+      </div>
+      <p class="muted">Tip: use the same email you gave the agency. We match by email or Client ID.</p>
+      <div id="error" class="err" style="display:none;margin-top:8px;"></div>
+    </div>
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check for client ID in URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const clientId = urlParams.get('id');
-            
-            if (clientId) {
-                document.getElementById('uploadClientId').value = clientId;
-                switchTab('upload');
-                checkStatus(clientId);
-            }
+    <div class="card" id="summary" style="display:none">
+      <h2 style="margin-top:0">Summary</h2>
+      <div class="grid">
+        <div><label>Client</label><div id="who" class="chip"></div></div>
+        <div><label>Company</label><div id="company" class="chip"></div></div>
+        <div><label>Product</label><div id="product" class="chip"></div></div>
+        <div><label>Policy #</label><div id="policy" class="chip"></div></div>
+        <div><label>Status</label><div id="status" class="chip"></div></div>
+      </div>
 
-            // Setup form handlers
-            document.getElementById('newClientForm').addEventListener('submit', handleNewClient);
-            
-            // Setup file upload handlers
-            setupFileUpload();
-            
-            // Set minimum date to today
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('effectiveDate').min = today;
-        });
+      <div style="margin-top:12px">
+        <label>Documents</label>
+        <div id="docs" class="status"></div>
+      </div>
 
-        // Tab switching
-        function switchTab(tabName, event) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Remove active from all tab buttons
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected tab
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-            
-            // Activate tab button - only if called from click event
-            if (event && event.target) {
-                event.target.classList.add('active');
-            } else {
-                // Find and activate the correct tab button programmatically
-                document.querySelectorAll('.tab').forEach(tab => {
-                    if (tab.textContent.toLowerCase().includes(tabName.toLowerCase()) || 
-                        (tabName === 'new' && tab.textContent.includes('New Client')) ||
-                        (tabName === 'status' && tab.textContent.includes('Check Status')) ||
-                        (tabName === 'upload' && tab.textContent.includes('Upload'))) {
-                        tab.classList.add('active');
-                    }
-                });
-            }
-        }
+      <div style="margin-top:14px">
+        <button id="uploadBtn">Go to My Upload Page</button>
+        <p class="muted" style="margin-top:8px">This opens your secure upload link tied to your Client ID.</p>
+      </div>
+    </div>
 
-        // Company selection
-        function selectCompany(element, company) {
-            // Remove previous selection
-            document.querySelectorAll('.company-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Add selection
-            element.classList.add('selected');
-            document.getElementById('selectedCompany').value = company;
-        }
+    <div class="card">
+      <h2 style="margin-top:0">Debug (for you)</h2>
+      <p class="muted">Raw response from Google Apps Script (helps if something doesn’t show).</p>
+      <pre id="raw">No request yet.</pre>
+    </div>
+  </div>
 
-        // Handle new client form submission
-        async function handleNewClient(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const clientData = {
-                action: 'addClient',
-                name: formData.get('clientName'),
-                email: formData.get('clientEmail'),
-                phone: formData.get('clientPhone'),
-                company: formData.get('company'),
-                product: formData.get('productType'),
-                policyNumber: formData.get('policyNumber'),
-                effectiveDate: formData.get('effectiveDate'),
-                notes: formData.get('notes'),
-                // Documents already collected
-                documentsReceived: {
-                    application: formData.get('hasApplication') === 'true',
-                    photos: formData.get('hasPhotos') === 'true',
-                    priorInsurance: formData.get('hasPriorInsurance') === 'true',
-                    inspection: formData.get('hasInspection') === 'true',
-                    payment: formData.get('hasPayment') === 'true',
-                    other: formData.get('hasOther') === 'true'
-                }
-            };
-            
-            showLoading();
-            
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(clientData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showAlert('success', `Application started successfully! Your Client ID is: ${result.clientId}. A welcome email has been sent to ${clientData.email}.`);
-                    
-                    // Switch to upload tab with client ID
-                    document.getElementById('uploadClientId').value = result.clientId;
-                    switchTab('upload');
-                    
-                    // Reset form
-                    e.target.reset();
-                    document.querySelectorAll('.company-card').forEach(card => {
-                        card.classList.remove('selected');
-                    });
-                } else {
-                    showAlert('error', 'Error starting application: ' + result.error);
-                }
-            } catch (error) {
-                showAlert('error', 'Connection error. Please try again.');
-                console.error(error);
-            } finally {
-                hideLoading();
-            }
-        }
+<script>
+  // === IMPORTANT: your live Apps Script Web App URL ===
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwwjt0wXpaEemBE0vUl7jRjSbLO4Ekk9DYhVKcLYbmylUMEwGZZZ2BkeBT1mD5qtAyh/exec";
 
-        // Check application status - UPDATED TO HANDLE EMAIL
-        async function checkStatus(clientIdParam) {
-            const lookupId = clientIdParam || document.getElementById('lookupId').value;
-            
-            if (!lookupId) {
-                showAlert('warning', 'Please enter your Client ID or email address.');
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                // Determine if it's an email or Client ID
-                const isEmail = lookupId.includes('@');
-                const queryParam = isEmail ? `email=${encodeURIComponent(lookupId)}` : `id=${lookupId}`;
-                
-                console.log('Searching for client with:', queryParam);
-                
-                const response = await fetch(`${SCRIPT_URL}?action=getClient&${queryParam}`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    currentClientData = result.client;
-                    displayStatus(result.client);
-                    
-                    // Show client ID if searched by email
-                    if (isEmail && result.client.id) {
-                        showAlert('info', `Found client! Client ID: ${result.client.id}`);
-                    }
-                    
-                    // Load files if in enhanced mode
-                    if (uploadMode === 'enhanced') {
-                        loadClientFiles(result.client.id);
-                    }
-                } else {
-                    showAlert('error', `Client not found. Please check your ${isEmail ? 'email address' : 'Client ID'}.`);
-                }
-            } catch (error) {
-                showAlert('error', 'Connection error. Please try again.');
-                console.error(error);
-            } finally {
-                hideLoading();
-            }
-        }
+  const $ = s => document.querySelector(s);
+  const show = (el, yes=true) => el.style.display = yes ? "" : "none";
 
-        // Display status results
-        function displayStatus(client) {
-            const statusResult = document.getElementById('statusResult');
-            statusResult.style.display = 'block';
-            
-            // Calculate progress
-            const docs = client.documents;
-            const totalDocs = Object.keys(docs).filter(key => docs[key] !== 'N/A').length;
-            const completedDocs = Object.keys(docs).filter(key => docs[key] === 'Received' || docs[key] === 'Complete').length;
-            const progress = totalDocs > 0 ? Math.round((completedDocs / totalDocs) * 100) : 0;
-            
-            // Update progress bar
-            document.getElementById('progressPercent').textContent = `${progress}%`;
-            document.getElementById('progressBar').style.width = `${progress}%`;
-            
-            // Build checklist
-            const checklist = document.getElementById('documentChecklist');
-            checklist.innerHTML = '';
-            
-            for (const [key, status] of Object.entries(docs)) {
-                if (status !== 'N/A') {
-                    const item = document.createElement('div');
-                    item.className = 'checklist-item';
-                    if (status === 'Received' || status === 'Complete') {
-                        item.classList.add('completed');
-                    }
-                    
-                    const label = getDocumentLabel(key);
-                    const badge = getStatusBadge(status);
-                    
-                    item.innerHTML = `
-                        <input type="checkbox" ${status === 'Received' || status === 'Complete' ? 'checked' : ''} disabled>
-                        <label>${label}</label>
-                        ${badge}
-                    `;
-                    
-                    checklist.appendChild(item);
-                }
-            }
-        }
+  function chip(label, value, klass="") {
+    const d = document.createElement("div");
+    d.className = `chip ${klass}`;
+    d.textContent = `${label}: ${value ?? "N/A"}`;
+    return d;
+  }
 
-        // Get document label
-        function getDocumentLabel(key) {
-            const labels = {
-                application: 'Signed Application',
-                photos: 'Photos',
-                priorInsurance: 'Prior Insurance',
-                inspection: 'Inspection Report',
-                payment: 'Payment Confirmation',
-                other: 'Other Documents'
-            };
-            return labels[key] || key;
-        }
+  async function getClientByEmail(email) {
+    const u = new URL(WEB_APP_URL);
+    u.searchParams.set("action", "getClient");
+    u.searchParams.set("email", email);
+    const r = await fetch(u.toString(), { method: "GET" });
+    return r.json();
+  }
 
-        // Get status badge HTML
-        function getStatusBadge(status) {
-            const statusClass = status === 'Pending' ? 'pending' : 
-                               status === 'Received' || status === 'Complete' ? 'received' : 'na';
-            return `<span class="status-badge status-${statusClass}">${status}</span>`;
-        }
+  async function getClientById(id) {
+    const u = new URL(WEB_APP_URL);
+    u.searchParams.set("action", "getClient");
+    u.searchParams.set("id", id);
+    const r = await fetch(u.toString(), { method: "GET" });
+    return r.json();
+  }
 
-        // Setup file upload
-        function setupFileUpload() {
-            const uploadArea = document.getElementById('uploadArea');
-            const fileInput = document.getElementById('fileInput');
-            
-            // Drag and drop
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                handleFiles(e.dataTransfer.files);
-            });
-            
-            // File input change
-            fileInput.addEventListener('change', (e) => {
-                handleFiles(e.target.files);
-            });
-        }
+  function renderClient(data) {
+    const c = data.client;
+    $("#who").textContent = `${c.name || "—"} (${c.id})`;
+    $("#company").textContent = c.company || "—";
+    $("#product").textContent = c.product || "—";
+    $("#policy").textContent = c.policyNumber || "Pending";
+    $("#status").textContent = c.status || "New";
 
-        // Handle file selection
-        function handleFiles(files) {
-            selectedFiles = [];
-            const fileList = document.getElementById('fileList');
-            fileList.innerHTML = '';
-            
-            for (let file of files) {
-                // Check file size (10MB limit)
-                if (file.size > 10 * 1024 * 1024) {
-                    showAlert('warning', `File "${file.name}" is too large. Maximum size is 10MB.`);
-                    continue;
-                }
-                
-                selectedFiles.push(file);
-                
-                // Display file
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <span class="file-name">📄 ${file.name}</span>
-                    <span class="file-size">${formatFileSize(file.size)}</span>
-                    <span class="remove-file" onclick="removeFile('${file.name}')">✕</span>
-                `;
-                fileList.appendChild(fileItem);
-            }
-        }
+    const docs = $("#docs");
+    docs.innerHTML = "";
+    const d = c.documents || {};
+    // Status classes: ok=Received, need=Pending
+    docs.appendChild(chip("Application", d.application, d.application==="Received"?"ok":d.application==="Pending"?"need":""));
+    docs.appendChild(chip("Photos", d.photos, d.photos==="Received"?"ok":d.photos==="Pending"?"need":""));
+    docs.appendChild(chip("MVR", d.mvr, d.mvr==="Received"?"ok":d.mvr==="Pending"?"need":""));
+    docs.appendChild(chip("Prior Ins", d.priorInsurance, d.priorInsurance==="Received"?"ok":d.priorInsurance==="Pending"?"need":""));
+    docs.appendChild(chip("Inspection", d.inspection, d.inspection==="Received"?"ok":d.inspection==="Pending"?"need":""));
+    docs.appendChild(chip("Payment", d.payment, d.payment==="Received"?"ok":d.payment==="Pending"?"need":""));
+    if (d.other) docs.appendChild(chip("Other", d.other));
 
-        // Remove file from selection
-        function removeFile(fileName) {
-            selectedFiles = selectedFiles.filter(f => f.name !== fileName);
-            handleFiles(selectedFiles);
-        }
+    // Use your same pattern to generate upload URL
+    const uploadUrl = `https://billlayne.github.io/insurance-portal/customer.html?id=${encodeURIComponent(c.id)}#upload`;
+    $("#uploadBtn").onclick = () => window.open(uploadUrl, "_blank");
 
-        // Format file size
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-        }
+    show($("#summary"), true);
+  }
 
-        // Upload files (Enhanced version with actual file storage)
-        async function uploadFiles() {
-            const clientIdOrEmail = document.getElementById('uploadClientId').value;
-            const documentType = document.getElementById('documentType').value;
-            
-            if (!clientIdOrEmail) {
-                showAlert('warning', 'Please enter your Client ID or email address.');
-                return;
-            }
-            
-            if (!documentType) {
-                showAlert('warning', 'Please select a document type.');
-                return;
-            }
-            
-            if (selectedFiles.length === 0) {
-                showAlert('warning', 'Please select at least one file to upload.');
-                return;
-            }
-            
-            // Determine if it's an email and get the actual Client ID
-            let clientId = clientIdOrEmail;
-            const isEmail = clientIdOrEmail.includes('@');
-            
-            // If it's an email, we need to fetch the client data first
-            if (isEmail || !currentClientData || currentClientData.id !== clientIdOrEmail) {
-                await checkStatus(clientIdOrEmail);
-                if (currentClientData) {
-                    clientId = currentClientData.id;
-                } else {
-                    showAlert('error', 'Could not find client. Please verify the email or Client ID.');
-                    return;
-                }
-            }
-            
-            showLoading();
-            let successCount = 0;
-            let failCount = 0;
-            
-            try {
-                if (uploadMode === 'enhanced') {
-                    // Enhanced mode - actually upload files to Google Drive
-                    for (let file of selectedFiles) {
-                        try {
-                            const base64Content = await fileToBase64(file);
-                            
-                            const fileData = {
-                                action: 'uploadFile',
-                                clientId: clientId,
-                                clientName: currentClientData ? currentClientData.name : 'Unknown',
-                                company: currentClientData ? currentClientData.company : 'Unknown',
-                                documentType: documentType,
-                                fileName: file.name,
-                                fileContent: base64Content,
-                                mimeType: file.type || 'application/octet-stream'
-                            };
-                            
-                            const response = await fetch(SCRIPT_URL, {
-                                method: 'POST',
-                                body: JSON.stringify(fileData)
-                            });
-                            
-                            const result = await response.json();
-                            
-                            if (result.success) {
-                                successCount++;
-                                console.log(`Uploaded: ${file.name} - File URL: ${result.fileUrl}`);
-                            } else {
-                                failCount++;
-                                console.error(`Failed to upload ${file.name}: ${result.error}`);
-                            }
-                        } catch (error) {
-                            failCount++;
-                            console.error(`Error uploading ${file.name}:`, error);
-                        }
-                    }
-                    
-                    if (successCount > 0) {
-                        showAlert('success', `Successfully uploaded ${successCount} file(s)${failCount > 0 ? `. ${failCount} file(s) failed.` : '.'}`);
-                    } else {
-                        showAlert('error', 'All uploads failed. Please try again.');
-                    }
-                } else {
-                    // Basic mode - just update status
-                    const updateData = {
-                        action: 'updateStatus',
-                        clientId: clientId,
-                        documentType: documentType,
-                        status: 'Received'
-                    };
-                    
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify(updateData)
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        showAlert('success', 'Documents marked as received!');
-                    } else {
-                        showAlert('error', 'Update failed. Please try again.');
-                    }
-                }
-                
-                // Clear selection
-                selectedFiles = [];
-                document.getElementById('fileList').innerHTML = '';
-                document.getElementById('documentType').value = '';
-                document.getElementById('fileInput').value = '';
-                
-                // Preserve the user's original input (email or Client ID)
-                document.getElementById('uploadClientId').value = clientIdOrEmail;
-                
-                // Refresh status if available
-                if (currentClientData) {
-                    checkStatus(clientId);
-                }
-                
-                // Load client files if in enhanced mode
-                if (uploadMode === 'enhanced' && successCount > 0) {
-                    loadClientFiles(clientId);
-                }
-                
-            } catch (error) {
-                showAlert('error', 'Connection error. Please try again.');
-                console.error(error);
-            } finally {
-                hideLoading();
-            }
-        }
+  function showError(msg) {
+    $("#error").textContent = msg;
+    show($("#error"), true);
+    show($("#summary"), false);
+  }
 
-        // Convert file to base64
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const base64 = reader.result.split(',')[1];
-                    resolve(base64);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
+  async function handleFind() {
+    show($("#error"), false);
+    show($("#summary"), false);
+    $("#raw").textContent = "Loading…";
 
-        // Load and display client files
-        async function loadClientFiles(clientIdOrEmail) {
-            if (uploadMode !== 'enhanced' || !clientIdOrEmail) return;
-            
-            // Determine if it's an email and get the actual Client ID
-            let clientId = clientIdOrEmail;
-            const isEmail = clientIdOrEmail.includes('@');
-            
-            // If it's an email, fetch the client data first to get the ID
-            if (isEmail) {
-                try {
-                    const response = await fetch(`${SCRIPT_URL}?action=getClient&email=${encodeURIComponent(clientIdOrEmail)}`);
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        clientId = result.client.id;
-                    } else {
-                        console.error('Could not find client by email for file loading');
-                        return;
-                    }
-                } catch (error) {
-                    console.error('Error finding client by email:', error);
-                    return;
-                }
-            }
-            
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'getClientFiles',
-                        clientId: clientId
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success && result.files && result.files.length > 0) {
-                    displayClientFiles(result.files, result.folderUrl);
-                }
-            } catch (error) {
-                console.error('Error loading client files:', error);
-            }
-        }
+    const email = $("#email").value.trim();
+    const cid = $("#cid").value.trim();
+    if (!email && !cid) {
+      showError("Enter your email or Client ID.");
+      $("#raw").textContent = "No input provided.";
+      return;
+    }
 
-        // Display client files
-        function displayClientFiles(files, folderUrl) {
-            const filesContainer = document.getElementById('clientFiles');
-            if (!filesContainer) {
-                // Create files display section if it doesn't exist
-                const uploadTab = document.getElementById('upload-tab');
-                const filesDiv = document.createElement('div');
-                filesDiv.id = 'clientFiles';
-                filesDiv.style.marginTop = '30px';
-                filesDiv.innerHTML = `
-                    <div style="border-top: 2px solid #e9ecef; padding-top: 20px;">
-                        <h3 style="color: #333; margin-bottom: 15px;">📁 Uploaded Files</h3>
-                        <div id="uploadedFilesList"></div>
-                        ${folderUrl ? `<a href="${folderUrl}" target="_blank" class="btn secondary" style="margin-top: 15px;">View All Files in Drive</a>` : ''}
-                    </div>
-                `;
-                uploadTab.appendChild(filesDiv);
-            }
-            
-            const filesList = document.getElementById('uploadedFilesList') || document.getElementById('clientFiles');
-            let filesHTML = '<div style="max-height: 300px; overflow-y: auto;">';
-            
-            // Group files by type
-            const filesByType = {};
-            files.forEach(file => {
-                if (!filesByType[file.type]) {
-                    filesByType[file.type] = [];
-                }
-                filesByType[file.type].push(file);
-            });
-            
-            // Display files grouped by type
-            for (const [type, typeFiles] of Object.entries(filesByType)) {
-                filesHTML += `
-                    <div style="margin-bottom: 15px;">
-                        <h4 style="color: #667eea; font-size: 14px; margin-bottom: 10px;">${getDocumentLabel(type)}</h4>
-                `;
-                
-                typeFiles.forEach(file => {
-                    filesHTML += `
-                        <div class="file-item" style="margin-bottom: 8px;">
-                            <span class="file-name">📄 ${file.name}</span>
-                            <span class="file-size">${formatFileSize(file.size)}</span>
-                            <a href="${file.url}" target="_blank" style="color: #667eea; text-decoration: none; margin: 0 10px;">View</a>
-                        </div>
-                    `;
-                });
-                
-                filesHTML += '</div>';
-            }
-            
-            filesHTML += '</div>';
-            filesList.innerHTML = filesHTML;
-        }
+    try {
+      const res = email ? await getClientByEmail(email) : await getClientById(cid);
+      $("#raw").textContent = JSON.stringify(res, null, 2);
 
-        // Request reminder
-        async function requestReminder() {
-            if (!currentClientData) return;
-            
-            showLoading();
-            
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'sendReminder',
-                        clientId: currentClientData.id
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showAlert('success', 'Reminder sent successfully!');
-                } else {
-                    showAlert('error', 'Failed to send reminder.');
-                }
-            } catch (error) {
-                showAlert('error', 'Connection error. Please try again.');
-                console.error(error);
-            } finally {
-                hideLoading();
-            }
-        }
+      if (!res || !res.success) {
+        showError(res?.error || "Client not found.");
+        return;
+      }
+      renderClient(res);
+    } catch (e) {
+      showError("Could not reach the server. Check your Web App deployment settings.");
+      $("#raw").textContent = String(e);
+    }
+  }
 
-        // Show alert
-        function showAlert(type, message) {
-            const alertContainer = document.getElementById('alertContainer');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type} show`;
-            alert.style.margin = '20px';
-            alert.innerHTML = message;
-            
-            alertContainer.innerHTML = '';
-            alertContainer.appendChild(alert);
-            
-            // Auto hide after 5 seconds
-            setTimeout(() => {
-                alert.classList.remove('show');
-                setTimeout(() => alert.remove(), 300);
-            }, 5000);
-        }
-
-        // Show loading
-        function showLoading() {
-            const loading = document.createElement('div');
-            loading.className = 'loading show';
-            loading.id = 'loadingOverlay';
-            loading.innerHTML = `
-                <div class="spinner"></div>
-                <p>Processing...</p>
-            `;
-            document.body.appendChild(loading);
-        }
-
-        // Hide loading
-        function hideLoading() {
-            const loading = document.getElementById('loadingOverlay');
-            if (loading) {
-                loading.remove();
-            }
-        }
-
-        // Toggle between basic and enhanced upload modes
-        function toggleUploadMode() {
-            const checkbox = document.getElementById('enhancedMode');
-            uploadMode = checkbox.checked ? 'enhanced' : 'basic';
-            console.log('Upload mode:', uploadMode);
-            
-            // Show/hide client files based on mode
-            const clientFiles = document.getElementById('clientFiles');
-            if (clientFiles) {
-                clientFiles.style.display = uploadMode === 'enhanced' ? 'block' : 'none';
-            }
-        }
-
-        // Delete file function for enhanced mode
-        async function deleteFile(fileId, clientId) {
-            if (confirm('Are you sure you want to delete this file?')) {
-                showLoading();
-                
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            action: 'deleteFile',
-                            fileId: fileId,
-                            clientId: clientId
-                        })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        showAlert('success', 'File deleted successfully');
-                        loadClientFiles(clientId);
-                    } else {
-                        showAlert('error', 'Failed to delete file');
-                    }
-                } catch (error) {
-                    showAlert('error', 'Connection error');
-                    console.error(error);
-                } finally {
-                    hideLoading();
-                }
-            }
-        }
-
-        // Get folder link for client
-        async function getClientFolderLink() {
-            if (!currentClientData) {
-                showAlert('warning', 'Please check client status first');
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'getClientFolderLink',
-                        clientId: currentClientData.id,
-                        clientName: currentClientData.name,
-                        company: currentClientData.company
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    window.open(result.url, '_blank');
-                } else {
-                    showAlert('error', 'Failed to get folder link');
-                }
-            } catch (error) {
-                showAlert('error', 'Connection error');
-                console.error(error);
-            } finally {
-                hideLoading();
-            }
-        }
-
-        // Load client status for quick update - UPDATED TO HANDLE EMAIL
-        async function loadClientStatus(clientIdOrEmail) {
-            if (!clientIdOrEmail) return;
-            
-            try {
-                // Determine if it's an email or Client ID
-                const isEmail = clientIdOrEmail.includes('@');
-                const queryParam = isEmail ? `email=${encodeURIComponent(clientIdOrEmail)}` : `id=${clientIdOrEmail}`;
-                
-                const response = await fetch(`${SCRIPT_URL}?action=getClient&${queryParam}`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    const docs = result.client.documents;
-                    
-                    // Store the actual Client ID
-                    actualClientId = result.client.id;
-                    
-                    // Show the checklist
-                    document.getElementById('quickUpdateChecklist').style.display = 'block';
-                    
-                    // Set current statuses
-                    document.getElementById('statusApplication').value = docs.application || 'Pending';
-                    document.getElementById('statusPhotos').value = docs.photos || 'Pending';
-                    document.getElementById('statusPriorInsurance').value = docs.priorInsurance || 'Pending';
-                    document.getElementById('statusInspection').value = docs.inspection || 'Pending';
-                    document.getElementById('statusPayment').value = docs.payment || 'Pending';
-                    document.getElementById('statusOther').value = docs.other || 'Pending';
-                    
-                    // Show success message with both name and Client ID
-                    if (isEmail) {
-                        showAlert('info', `Found: ${result.client.name} (Client ID: ${result.client.id})`);
-                    } else {
-                        showAlert('info', `Loaded status for ${result.client.name}`);
-                    }
-                } else {
-                    showAlert('error', `Client not found. Please check your ${isEmail ? 'email address' : 'Client ID'}`);
-                    document.getElementById('quickUpdateChecklist').style.display = 'none';
-                    actualClientId = null;
-                }
-            } catch (error) {
-                showAlert('error', 'Error loading client status');
-                console.error(error);
-                actualClientId = null;
-            }
-        }
-
-        // Save quick status updates
-        async function saveQuickUpdate() {
-            // Use the stored actual Client ID from the loadClientStatus function
-            if (!actualClientId) {
-                showAlert('warning', 'Please enter a Client ID or email address and wait for it to load');
-                return;
-            }
-            
-            const updates = {
-                action: 'quickUpdate',
-                clientId: actualClientId,  // Use the stored Client ID
-                updates: {
-                    application: document.getElementById('statusApplication').value,
-                    photos: document.getElementById('statusPhotos').value,
-                    priorInsurance: document.getElementById('statusPriorInsurance').value,
-                    inspection: document.getElementById('statusInspection').value,
-                    payment: document.getElementById('statusPayment').value,
-                    other: document.getElementById('statusOther').value
-                }
-            };
-            
-            showLoading();
-            
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(updates)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showAlert('success', `Document statuses updated successfully for Client ID: ${actualClientId}`);
-                    
-                    // Check if all documents are complete
-                    const allStatuses = Object.values(updates.updates);
-                    const hasNoMissing = !allStatuses.includes('Pending');
-                    
-                    if (hasNoMissing) {
-                        showAlert('success', '🎉 All documents complete for this client!');
-                    }
-                } else {
-                    showAlert('error', 'Failed to update statuses');
-                }
-            } catch (error) {
-                showAlert('error', 'Connection error');
-                console.error(error);
-            } finally {
-                hideLoading();
-            }
-        }
-    </script>
+  // Button + auto-load if URL has ?id=
+  $("#findBtn").addEventListener("click", handleFind);
+  const params = new URLSearchParams(location.search);
+  if (params.get("id")) {
+    $("#cid").value = params.get("id");
+    handleFind();
+  }
+</script>
 </body>
 </html>
