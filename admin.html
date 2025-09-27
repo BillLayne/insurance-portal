@@ -33,7 +33,7 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
   </div>
 
   <div class="card">
-    <h2 style="margin-top:0;color:var(--primary)">Add Client</h2>
+    <h2 style="margin-top:0;color:var(--primary)">Add Client (JSONP)</h2>
     <div class="grid">
       <div><label>Name</label><input id="name"></div>
       <div><label>Email</label><input id="email"></div>
@@ -60,7 +60,7 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
   </div>
 
   <div class="card">
-    <h2 style="margin-top:0;color:var(--primary)">Update Document Status</h2>
+    <h2 style="margin-top:0;color:var(--primary)">Update Document Status (JSONP)</h2>
     <div class="grid">
       <div><label>Client ID or Email</label><input id="qid"></div>
       <div>
@@ -91,29 +91,40 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
 
 <script>
   // >>>>>> PASTE YOUR NEW /exec URL HERE <<<<<<
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwUXWw8BWT8EJ_zQbwwu2iWHn5mDSTcZjTl0gAlVGEfqgFETHgIKUDrSrHh4dDI_88XLw/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwqw4W9kO1RgUi6Kvv5Eb8Oo5Liwe91hoLS3NPk88dbShIBMJ7ZyCCFwaaK5mPWnhoalA/exec";
 
-  async function getJSON(url){const r=await fetch(url);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
-  async function postJSON(body){
-    const r = await fetch(WEB_APP_URL,{
-      method:'POST',
-      headers:{'Content-Type':'text/plain'}, // avoids preflight
-      body: JSON.stringify(body)
+  // JSONP helper
+  function jsonp(url){
+    return new Promise((resolve, reject)=>{
+      const cb = 'cb_' + Math.random().toString(36).slice(2);
+      const s = document.createElement('script');
+      const sep = url.includes('?') ? '&' : '?';
+      s.src = `${url}${sep}callback=${cb}`;
+      window[cb] = (data)=>{ resolve(data); cleanup(); };
+      s.onerror = ()=>{ reject(new Error('JSONP load error')); cleanup(); };
+      document.head.appendChild(s);
+      function cleanup(){ delete window[cb]; s.remove(); }
     });
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return r.json();
   }
 
+  // Build query URL safely
+  function buildUrl(params){
+    const u = new URL(WEB_APP_URL);
+    Object.entries(params).forEach(([k,v])=>{ if(v!==undefined && v!==null) u.searchParams.set(k,String(v)); });
+    return u.toString();
+  }
+
+  // INIT
   document.getElementById('initBtn').onclick = async ()=>{
     try{
-      const url = WEB_APP_URL + '?action=init';
-      const res = await getJSON(url);
+      const res = await jsonp(buildUrl({ action:'init' }));
       document.getElementById('initOut').textContent = JSON.stringify(res,null,2);
     }catch(e){ document.getElementById('initOut').textContent = String(e); }
   };
 
+  // ADD CLIENT
   document.getElementById('addBtn').onclick = async ()=>{
-    const payload = {
+    const p = {
       action:'addClient',
       name: document.getElementById('name').value.trim(),
       email: document.getElementById('email').value.trim(),
@@ -122,36 +133,34 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
       product: document.getElementById('product').value.trim(),
       policyNumber: document.getElementById('policy').value.trim(),
       notes: document.getElementById('notes').value.trim(),
-      documentsReceived: {
-        application: document.getElementById('rcv_application').checked,
-        photos: document.getElementById('rcv_photos').checked,
-        mvr: document.getElementById('rcv_mvr').checked,
-        priorInsurance: document.getElementById('rcv_priorInsurance').checked,
-        inspection: document.getElementById('rcv_inspection').checked,
-        payment: document.getElementById('rcv_payment').checked
-      }
+      rcv_application: document.getElementById('rcv_application').checked,
+      rcv_photos: document.getElementById('rcv_photos').checked,
+      rcv_mvr: document.getElementById('rcv_mvr').checked,
+      rcv_priorInsurance: document.getElementById('rcv_priorInsurance').checked,
+      rcv_inspection: document.getElementById('rcv_inspection').checked,
+      rcv_payment: document.getElementById('rcv_payment').checked
     };
-    if(!payload.name || !payload.email || !payload.company || !payload.product){
+    if (!p.name || !p.email || !p.company || !p.product) {
       document.getElementById('addOut').textContent = 'Name, Email, Company, and Product are required.';
       return;
     }
     try{
-      const res = await postJSON(payload);
+      const res = await jsonp(buildUrl(p));
       document.getElementById('addOut').textContent = JSON.stringify(res,null,2);
     }catch(e){ document.getElementById('addOut').textContent = String(e); }
   };
 
+  // UPDATE STATUS
   document.getElementById('upBtn').onclick = async ()=>{
-    const clientIdOrEmail = document.getElementById('qid').value.trim();
-    if(!clientIdOrEmail){ document.getElementById('upOut').textContent = 'Enter Client ID or Email'; return; }
-    const body = {
+    const p = {
       action:'updateStatus',
-      clientId: clientIdOrEmail,
+      clientId: document.getElementById('qid').value.trim(),
       documentType: document.getElementById('dtype').value,
       status: document.getElementById('dstatus').value
     };
+    if (!p.clientId) { document.getElementById('upOut').textContent = 'Enter Client ID or Email'; return; }
     try{
-      const res = await postJSON(body);
+      const res = await jsonp(buildUrl(p));
       document.getElementById('upOut').textContent = JSON.stringify(res,null,2);
     }catch(e){ document.getElementById('upOut').textContent = String(e); }
   };
