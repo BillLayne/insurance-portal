@@ -27,9 +27,12 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
   </div>
 
   <div class="card">
-    <h2 style="margin-top:0;color:var(--primary)">Initialize / Verify Sheets</h2>
-    <button id="initBtn">Initialize System</button>
-    <pre id="initOut">Click to create headers/tabs if missing.</pre>
+    <h2 style="margin-top:0;color:var(--primary)">Health / Init</h2>
+    <div class="grid">
+      <button id="healthBtn">Health Check</button>
+      <button id="initBtn">Initialize System</button>
+    </div>
+    <pre id="initOut">Click Health to verify sheet access; Init to create tabs/headers.</pre>
   </div>
 
   <div class="card">
@@ -90,10 +93,9 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
 </div>
 
 <script>
-  // >>>>>> PASTE YOUR NEW /exec URL HERE <<<<<<
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwqw4W9kO1RgUi6Kvv5Eb8Oo5Liwe91hoLS3NPk88dbShIBMJ7ZyCCFwaaK5mPWnhoalA/exec";
+  // >>>>>> PASTE YOUR LIVE /exec URL HERE <<<<<<
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPB0kS1wc6l6fdNOZ89TtIOQv4CyIzrW8b8SRKpzwT-y2MGZrdM5PpWloLDcjGtxG3/exec";
 
-  // JSONP helper
   function jsonp(url){
     return new Promise((resolve, reject)=>{
       const cb = 'cb_' + Math.random().toString(36).slice(2);
@@ -106,23 +108,23 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
       function cleanup(){ delete window[cb]; s.remove(); }
     });
   }
-
-  // Build query URL safely
   function buildUrl(params){
     const u = new URL(WEB_APP_URL);
     Object.entries(params).forEach(([k,v])=>{ if(v!==undefined && v!==null) u.searchParams.set(k,String(v)); });
     return u.toString();
   }
 
-  // INIT
+  document.getElementById('healthBtn').onclick = async ()=>{
+    try{ const res = await jsonp(buildUrl({ action:'health' }));
+      document.getElementById('initOut').textContent = JSON.stringify(res,null,2);
+    }catch(e){ document.getElementById('initOut').textContent = String(e); }
+  };
   document.getElementById('initBtn').onclick = async ()=>{
-    try{
-      const res = await jsonp(buildUrl({ action:'init' }));
+    try{ const res = await jsonp(buildUrl({ action:'init' }));
       document.getElementById('initOut').textContent = JSON.stringify(res,null,2);
     }catch(e){ document.getElementById('initOut').textContent = String(e); }
   };
 
-  // ADD CLIENT
   document.getElementById('addBtn').onclick = async ()=>{
     const p = {
       action:'addClient',
@@ -150,7 +152,6 @@ pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-ra
     }catch(e){ document.getElementById('addOut').textContent = String(e); }
   };
 
-  // UPDATE STATUS
   document.getElementById('upBtn').onclick = async ()=>{
     const p = {
       action:'updateStatus',
