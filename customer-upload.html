@@ -7,10 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --primary:#1a5f7a; --secondary:#457b9d; --accent:#a8dadc;
-    --bg:#f8f9fa; --text:#2c3e50; --radius:12px; --shadow:0 8px 30px rgba(0,0,0,.08);
-  }
+  :root{ --primary:#1a5f7a; --secondary:#457b9d; --accent:#a8dadc; --bg:#f8f9fa; --text:#2c3e50; --radius:12px; --shadow:0 8px 30px rgba(0,0,0,.08) }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",system-ui,Segoe UI,Arial,sans-serif}
   header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;text-align:center;padding:18px 14px;box-shadow:var(--shadow)}
@@ -72,9 +69,7 @@
     <h3 style="margin:4px 0 10px 0">Your Case</h3>
     <div id="who" class="muted"></div>
     <div id="tags" class="list"></div>
-    <div style="margin-top:6px">
-      <strong>Status:</strong> <span id="status" class="pending">Pending</span>
-    </div>
+    <div style="margin-top:6px"><strong>Status:</strong> <span id="status" class="pending">Pending</span></div>
     <div class="muted" style="margin-top:6px">Items we may still need are shown below. You can upload files securely.</div>
   </section>
 
@@ -143,20 +138,17 @@ function renderCase(d){
   el("status").textContent = d.status || "Pending";
   el("status").className = d.status==="Complete" ? "ok" : "pending";
 
-  // tags: show all requirements with checkmarks
   const tags = REQUIREMENTS.map(r=>{
     const ok = REQ_STATUS[r.key]===true;
     return `<span class="pill">${ok?"✅ ":"⏳ "}${esc(r.label)}</span>`;
   }).join("");
   el("tags").innerHTML = tags;
 
-  // outstanding list (unchecked only)
   const outstanding = REQUIREMENTS.filter(r => REQ_STATUS[r.key]!==true);
   el("needList").innerHTML = outstanding.length
     ? outstanding.map(r=>`<span class="pill">${esc(r.label)}</span>`).join("")
     : `<span class="ok">You’re all set — nothing outstanding.</span>`;
 
-  // files list (links)
   renderFiles(d.files||[]);
 }
 function renderFiles(files){
@@ -173,7 +165,7 @@ async function openById(){
   if(!r.ok){ el("findMsg").textContent = "Case not found."; return; }
   renderCase(r);
   el("findMsg").textContent = "Case loaded.";
-  history.replaceState(null, "", location.pathname + "#case="+encodeURIComponent(id)); // keep linkable
+  history.replaceState(null, "", location.pathname + "#case="+encodeURIComponent(id));
 }
 async function openByEmail(){
   const email = el("email").value.trim();
@@ -183,7 +175,7 @@ async function openByEmail(){
   if(!r.ok){ el("findMsg").textContent = "No case found for that email."; return; }
   renderCase(r);
   el("findMsg").textContent = "Case loaded.";
-  history.replaceState(null, "", location.pathname + "#case="+encodeURIComponent(r.caseId));
+  history.replaceState(null, "", location.pathname + "#email="+encodeURIComponent(email));
 }
 async function uploadFiles(){
   if(!CASE_ID){ el("filesMsg").textContent = "Open your case first."; return; }
@@ -204,9 +196,24 @@ async function uploadFiles(){
 }
 
 /* ===== Deep link by hash ===== */
+function parseHash(){
+  const h = location.hash || "";
+  const mEmail = h.match(/email=([^&]+)/);
+  const mCase  = h.match(/case=([^&]+)/);
+  return {
+    email: mEmail ? decodeURIComponent(mEmail[1]) : "",
+    caseId: mCase ? decodeURIComponent(mCase[1]) : ""
+  };
+}
 window.addEventListener("load", async ()=>{
-  const m = location.hash.match(/case=([^&]+)/);
-  if(m){ el("caseId").value = decodeURIComponent(m[1]); openById(); }
+  const { email, caseId } = parseHash();
+  if(email){
+    el("email").value = email;
+    openByEmail();
+  }else if(caseId){
+    el("caseId").value = caseId;
+    openById();
+  }
 });
 
 /* ===== Events ===== */
