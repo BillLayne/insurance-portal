@@ -94,8 +94,17 @@
     <div class="upload-box">
       <label>Attach files (PDF, JPG, PNG) or take photos</label>
 
-      <input id="fFiles" type="file" multiple accept=".pdf,image/*" />
-      <input id="fCamera" type="file" accept="image/*" capture="environment" multiple style="display:none" />
+      <!-- Hidden iframe target (prevents CORS issues) -->
+      <iframe name="uploadTarget" style="display:none"></iframe>
+
+      <!-- The upload form posts directly to Apps Script -->
+      <form id="uploadForm" action="https://script.google.com/macros/s/AKfycby-9vCxMW1wtbKL_Q2i0TRSyFiTODCg_eTINdwC8Y55QjjL2Jm2MZSeaycfDLEXpOhjjA/exec" method="post" enctype="multipart/form-data" target="uploadTarget">
+        <input type="hidden" name="action" value="upload" />
+        <input type="hidden" name="caseId" id="hiddenCaseId" />
+        <!-- file pickers live INSIDE the form -->
+        <input id="fFiles" name="files" type="file" multiple accept=".pdf,image/*" />
+        <input id="fCamera" name="files" type="file" accept="image/*" capture="environment" multiple style="display:none" />
+      </form>
 
       <div class="left" style="margin-top:10px">
         <button class="btn btn-ghost" id="btnOpenFiles">Choose from device</button>
@@ -129,32 +138,35 @@ const API_URL = "https://script.google.com/macros/s/AKfycby-9vCxMW1wtbKL_Q2i0TRS
 let CASE_ID = "";
 let REQUIREMENTS = [];
 let REQ_STATUS = {};
-let pendingFiles = [];
-let isUploading = false;
+let filesCount = 0;
 
 /* --- helpers --- */
-async function postForm(data){
-  const fd = new FormData();
-  Object.entries(data).forEach(([k,v])=>{
-    if (v instanceof File || v instanceof Blob) fd.append(k,v);
-    else if (Array.isArray(v)) fd.append(k, JSON.stringify(v));
-    else fd.append(k, v ?? "");
-  });
-  const res = await fetch(API_URL, { method:"POST", body: fd, redirect:"follow" });
-  const txt = await res.text();
-  try { return JSON.parse(txt); } catch { return {ok:false,error:txt.slice(0,300)}; }
-}
 function el(id){return document.getElementById(id)}
 function esc(s){return (s||"").replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]))}
 function showModal(){ el("uploadModal").style.display = "flex"; }
 function hideModal(){ el("uploadModal").style.display = "none"; }
 function setModal(line, pct){ el("modalLine").textContent = line; el("modalBar").style.width = `${Math.max(0, Math.min(100, pct))}%`; }
 
+/* JSONP loader (bypasses CORS) */
+function jsonp(url){
+  return new Promise((resolve)=>{
+    const cb = 'cb_' + Math.random().toString(36).slice(2);
+    window[cb] = (data)=>{ try{ resolve(data);} finally{ delete window[cb]; s.remove(); } };
+    const s = document.createElement('script');
+    s.src = url + (url.includes('?')?'&':'?') + 'callback=' + cb;
+    s.onerror = ()=>{ resolve({ok:false,error:'jsonp_error'}); s.remove(); delete window[cb]; };
+    document.body.appendChild(s);
+  });
+}
+
 /* --- UI --- */
 function renderCase(d){
   CASE_ID = d.caseId;
   REQUIREMENTS = d.requirements || [];
   REQ_STATUS = d.reqStatus || {};
+  filesCount = (d.files||[]).length;
+
+  el("hiddenCaseId").value = CASE_ID;
 
   el("caseCard").style.display = "";
   el("needCard").style.display = "";
@@ -170,97 +182,18 @@ function renderCase(d){
   const outstanding = REQUIREMENTS.filter(r => REQ_STATUS[r.key]!==true);
   el("needList").innerHTML = outstanding.length ? outstanding.map(r=>`<span class="pill">${esc(r.label)}</span>`).join("") : `<span class="ok">You’re all set — nothing outstanding.</span>`;
 
-  // refresh files list
-  const again = { files: d.files || [] };
-  renderFiles(again.files);
+  renderFiles(d.files||[]);
 }
 function renderFiles(files){
   el("filesList").innerHTML = (!files || !files.length) ? `<span class="muted">No files uploaded yet.</span>` : files.map(f=>`<a class="pill" href="${f.url}" target="_blank">${esc(f.name)}</a>`).join("");
 }
 
-/* --- optional image downscale --- */
-async function maybeDownscale(file, maxDim=2000, quality=0.85){
-  if (!file.type.startsWith('image/')) return file;
-  return new Promise((resolve)=>{
-    const img = new Image();
-    img.onload = ()=>{
-      let w = img.width, h = img.height;
-      if (Math.max(w,h) <= maxDim) { resolve(file); return; }
-      const scale = maxDim / Math.max(w,h);
-      w = Math.round(w*scale); h = Math.round(h*scale);
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      canvas.toBlob((blob)=>{
-        if (!blob) { resolve(file); return; }
-        const renamed = new File([blob], (file.name||'photo').replace(/\.(heic|heif)$/i,'.jpg').replace(/\.(jpeg|jpg|png|webp)?$/i,'.jpg'), { type:'image/jpeg' });
-        resolve(renamed);
-      }, 'image/jpeg', quality);
-    };
-    img.onerror = ()=> resolve(file);
-    img.src = URL.createObjectURL(file);
-  });
-}
-
-/* --- XHR upload with long timeout + retries --- */
-function xhrUploadSingle(file, caseId, onProgress, timeoutMs=300000){ // 5 min
-  return new Promise((resolve, reject)=>{
-    const fd = new FormData();
-    fd.append("action","upload");
-    fd.append("caseId", caseId);
-    fd.append("files", file, file.name);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", API_URL);
-    xhr.timeout = timeoutMs;
-    xhr.upload.onprogress = (e)=>{
-      if (e.lengthComputable && typeof onProgress === 'function'){
-        const pct = Math.round((e.loaded / e.total) * 100);
-        onProgress(pct);
-      }
-    };
-    xhr.onerror = ()=> reject(new Error("Network error"));
-    xhr.ontimeout = ()=> reject(new Error("Upload timed out"));
-    xhr.onload = ()=>{
-      if (xhr.status >= 200 && xhr.status < 300){
-        try { resolve(JSON.parse(xhr.responseText)); }
-        catch { reject(new Error("Invalid server response")); }
-      } else {
-        reject(new Error(`HTTP ${xhr.status}`));
-      }
-    };
-    xhr.send(fd);
-  });
-}
-async function uploadWithRetry(file, caseIdx, total, attempt=1){
-  const maxAttempts = 3;
-  try{
-    setModal(`Uploading ${file.name} (${caseIdx}/${total})`, 0);
-    const res = await xhrUploadSingle(file, CASE_ID, (pct)=>{
-      const base = ((caseIdx-1)/total)*100;
-      const spread = (1/total)*pct;
-      setModal(`Uploading ${file.name} (${caseIdx}/${total}) — ${pct}%`, Math.min(99, base + spread));
-    });
-    if(!res.ok) throw new Error(res.error || "Server error");
-    return res;
-  }catch(err){
-    if (attempt < maxAttempts){
-      const backoff = Math.pow(2, attempt) * 1000; // 2s, 4s
-      setModal(`Retrying ${file.name}… (attempt ${attempt+1}/${maxAttempts})`, 0);
-      await new Promise(r=>setTimeout(r, backoff));
-      return uploadWithRetry(file, caseIdx, total, attempt+1);
-    }
-    throw err;
-  }
-}
-
-/* --- Actions --- */
+/* --- Actions (reads via JSONP) --- */
 async function openById(){
   const id = el("caseId").value.trim();
   if(!id){ el("findMsg").textContent = "Enter your Case ID."; return; }
   el("findMsg").textContent = "Loading…";
-  const r = await postForm({action:"loadById", caseId:id});
+  const r = await jsonp(`${API_URL}?action=loadById&caseId=${encodeURIComponent(id)}`);
   if(!r.ok){ el("findMsg").textContent = "Case not found."; return; }
   renderCase(r);
   el("findMsg").textContent = "Case loaded.";
@@ -270,58 +203,68 @@ async function openByEmail(){
   const email = el("email").value.trim();
   if(!email){ el("findMsg").textContent = "Enter your email."; return; }
   el("findMsg").textContent = "Searching…";
-  const r = await postForm({action:"loadByEmail", email});
+  const r = await jsonp(`${API_URL}?action=loadByEmail&email=${encodeURIComponent(email)}`);
   if(!r.ok){ el("findMsg").textContent = "No case found for that email."; return; }
   renderCase(r);
   el("findMsg").textContent = "Case loaded.";
   history.replaceState(null, "", location.pathname + "#email="+encodeURIComponent(email));
 }
-function queueFiles(fileList){
-  for(const f of fileList){ pendingFiles.push(f); }
-  el("filesMsg").textContent = pendingFiles.length ? `${pendingFiles.length} file(s) ready to upload.` : "";
-}
-async function uploadFiles(){
+
+/* --- Upload via hidden iframe form (no CORS) --- */
+function submitUploadForm(){
   if(!CASE_ID){ el("filesMsg").textContent = "Open your case first."; return; }
-  if(!pendingFiles.length){ el("filesMsg").textContent = "Choose or take a photo first."; return; }
+  const form = el("uploadForm");
+  const hasFiles = el("fFiles").files.length || el("fCamera").files.length;
+  if(!hasFiles){ el("filesMsg").textContent = "Choose or take a photo first."; return; }
 
-  isUploading = true;
-  const onBeforeUnload = (e)=>{ e.preventDefault(); e.returnValue = ""; };
-  window.addEventListener("beforeunload", onBeforeUnload);
-  setButtonsDisabled(true);
+  // Show blocking modal + “fake” progress (we’ll complete when poll sees files)
+  showModal();
+  setModal("Uploading… please wait", 25);
+  el("filesMsg").textContent = "Uploading… please wait";
 
-  try{
-    showModal();
-    setModal("Optimizing photos…", 0);
+  // Install a short onload listener on the iframe (fires when server responds)
+  const iframe = document.getElementsByName("uploadTarget")[0];
+  const onloadOnce = async ()=>{
+    // Start polling the case until files count increases or timeout reached
+    setModal("Processing files…", 65);
+    const ok = await pollForNewFiles(120000); // up to 2 minutes
+    if (ok){
+      setModal("All files uploaded ✔", 100);
+      el("filesMsg").textContent = "All files uploaded. Thank you!";
+    }else{
+      el("filesMsg").textContent = "Upload submitted, but confirmation timed out. Please check your connection and try again.";
+      setModal("Confirmation timed out — you may retry.", 0);
+    }
+    setTimeout(hideModal, 1200);
+    iframe.removeEventListener("load", onloadOnce);
+    // reset inputs
+    el("fFiles").value = ""; el("fCamera").value = "";
+  };
+  iframe.addEventListener("load", onloadOnce);
 
-    const prepared = [];
-    for (const f of pendingFiles){ prepared.push(await maybeDownscale(f)); }
+  // Ensure hidden caseId mirrors current case
+  el("hiddenCaseId").value = CASE_ID;
 
-    const total = prepared.length;
-    let idx = 1;
-    for (const f of prepared){ await uploadWithRetry(f, idx, total); idx++; }
-
-    const again = await postForm({action:"loadById", caseId: CASE_ID});
-    if (again.ok){ renderFiles(again.files||[]); }
-
-    setModal("All files uploaded ✔", 100);
-    el("filesMsg").textContent = "All files uploaded. Thank you!";
-  }catch(err){
-    el("filesMsg").textContent = "Upload failed – please try again. Details: " + (err?.message || err);
-    setModal("Upload failed. You can close this and retry.", 0);
-  }finally{
-    window.removeEventListener("beforeunload", onBeforeUnload);
-    isUploading = false;
-    setButtonsDisabled(false);
-    el("fFiles").value = "";
-    el("fCamera").value = "";
-    pendingFiles = [];
-    setTimeout(()=> hideModal(), 1200);
-  }
+  // Submit the multipart/form-data POST to Apps Script
+  form.submit();
 }
-function setButtonsDisabled(disabled){
-  ["btnOpenFiles","btnOpenCamera","btnUpload","btnFindById","btnFindByEmail"].forEach(id=>{
-    const b = el(id); if (b) b.disabled = disabled;
-  });
+
+/* Poll case via JSONP until we detect more files than before */
+async function pollForNewFiles(maxMs){
+  const start = Date.now();
+  let tries = 0;
+  while(Date.now() - start < maxMs){
+    await new Promise(r=>setTimeout(r, 1500));
+    tries++;
+    const r = await jsonp(`${API_URL}?action=loadById&caseId=${encodeURIComponent(CASE_ID)}`);
+    if(r.ok){
+      renderFiles(r.files||[]);
+      if ((r.files||[]).length > filesCount){ filesCount = (r.files||[]).length; return true; }
+    }
+    // nudge progress visually
+    setModal(`Processing files… (check ${tries})`, Math.min(95, 65 + tries*3));
+  }
+  return false;
 }
 
 /* --- Deep link --- */
@@ -341,11 +284,8 @@ window.addEventListener("load", async ()=>{
 el("btnFindById").addEventListener("click", openById);
 el("btnFindByEmail").addEventListener("click", openByEmail);
 el("btnOpenFiles").addEventListener("click", ()=> el("fFiles").click());
-el("fFiles").addEventListener("change", (e)=> queueFiles(e.target.files));
 el("btnOpenCamera").addEventListener("click", ()=> el("fCamera").click());
-el("fCamera").addEventListener("change", (e)=> queueFiles(e.target.files));
-el("btnUpload").addEventListener("click", uploadFiles);
+el("btnUpload").addEventListener("click", submitUploadForm);
 </script>
 </body>
 </html>
-
