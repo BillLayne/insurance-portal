@@ -89,20 +89,7 @@
   <!-- RIGHT: Email -->
   <section class="card">
     <h3 style="margin:4px 0 10px 0">Send Follow-Up Email</h3>
-    <div class="row row-3">
-      <div>
-        <label>Stage</label>
-        <select id="mStage">
-          <option>Initial</option>
-          <option>Reminder</option>
-          <option>Final</option>
-        </select>
-      </div>
-      <div class="right" style="align-items:end">
-        <button class="btn btn-ghost" id="btnLoadTpl">Load Template</button>
-      </div>
-    </div>
-    <div style="margin-top:6px"><span class="pill">Signed Apps</span><span class="pill">Photos</span><span class="pill">Prior Insurance</span><span class="pill">Lienholder</span></div>
+    <div><span class="pill">Signed Apps</span><span class="pill">Photos</span><span class="pill">Prior Insurance</span><span class="pill">Lienholder</span></div>
     <label style="margin-top:10px">Subject</label>
     <input id="mSubject" placeholder="Quick follow-up on your insurance application" />
     <label style="margin-top:8px">Message (HTML allowed)</label>
@@ -178,7 +165,6 @@ async function postForm(data){
 function el(id){return document.getElementById(id)}
 function htmlEscape(s){return (s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]))}
 
-/* ---------- UI builders ---------- */
 function renderReqs(reqs, statuses={}){
   const box = el("reqList"); box.innerHTML = "";
   if(!reqs?.length){ box.innerHTML = '<div class="muted">No requirements for selection.</div>'; return; }
@@ -221,7 +207,8 @@ function renderRows(rows){
   });
 }
 
-/* ---------- Actions ---------- */
+/* ========= Actions ========= */
+
 async function createOrUpdate(){
   el("createMsg").textContent = "Saving…";
   const payload = {
@@ -285,7 +272,7 @@ async function uploadFiles(){
   el("fFiles").value="";
 }
 
-/* ---------- Email helpers ---------- */
+/* ========= Email helpers ========= */
 function checklistText(all=true){
   const labels = [];
   (currentRequirements||[]).forEach(r=>{
@@ -297,9 +284,16 @@ function checklistText(all=true){
   });
   return labels.join(all ? ", " : ", ");
 }
+
+/* >>> CHANGE HERE: make link by EMAIL first (falls back to case) <<< */
 function makeUploadLink(){
-  return location.origin + location.pathname + `#case=${encodeURIComponent(currentCaseId)}`;
+  const base = "https://YOUR-GITHUB-PAGES-URL/customer-upload.html";
+  const email = (el("cEmail").value || "").trim();
+  if (email) return `${base}#email=${encodeURIComponent(email)}`;
+  // fallback if no email captured yet
+  return `${base}#case=${encodeURIComponent(currentCaseId)}`;
 }
+
 function fillPlaceholders(text){
   const firstName = (el("cName").value||"").split(" ")[0]||"there";
   const product = el("cProduct").value||"";
@@ -317,7 +311,6 @@ function fillPlaceholders(text){
     .replaceAll("{{Checklist}}", fullChecklist)
     .replaceAll("{{Outstanding}}", outstanding)
     .replaceAll("{{CaseId}}", currentCaseId||"")
-    // agency tokens (optional future-proof)
     .replaceAll("{{AgencyName}}", "Bill Layne Insurance Agency")
     .replaceAll("{{AgencyPhone}}", "336-835-1993")
     .replaceAll("{{AgencySite}}", `<a href="https://www.BillLayneInsurance.com" target="_blank">BillLayneInsurance.com</a>`);
@@ -341,20 +334,8 @@ async function sendEmail(){
   const res = await postForm({action:"sendEmail", caseId: currentCaseId, subject, html});
   el("mailMsg").textContent = res.ok ? "Email sent." : ("Error: "+(res.error||""));
 }
-async function loadEmailTemplate(){
-  const res = await postForm({
-    action:"getEmailTemplate",
-    product: el("cProduct").value,
-    company: el("cCompany").value,
-    stage: el("mStage").value
-  });
-  if(!res.ok || !res.subject){ el("mailMsg").textContent = "No template found. Edit and send manually."; return; }
-  el("mSubject").value = res.subject || "";
-  el("mBody").value = res.body || "";
-  el("mailMsg").textContent = "Template loaded. Use Preview before sending.";
-}
 
-/* ---------- Case open via URL hash ---------- */
+/* ========= Case Loading via hash ========= */
 async function loadCaseById(caseId){
   const res = await postForm({action:"loadById", caseId});
   if(!res.ok){ el("createMsg").textContent="Case not found."; return; }
@@ -379,7 +360,7 @@ window.addEventListener("load", ()=>{
   if(m) loadCaseById(decodeURIComponent(m[1]));
 });
 
-/* ---------- Events ---------- */
+/* ========= Events ========= */
 el("btnCreate").addEventListener("click", createOrUpdate);
 el("btnLoad").addEventListener("click", loadByEmail);
 el("btnSaveReqs").addEventListener("click", saveReqs);
@@ -390,7 +371,6 @@ el("btnSearch").addEventListener("click", async ()=>{
   const res = await postForm({action:"search", q: el("q").value, product: el("qProduct").value, status: el("qStatus").value});
   renderRows(res.rows||[]);
 });
-el("btnLoadTpl").addEventListener("click", loadEmailTemplate);
 </script>
 </body>
 </html>
