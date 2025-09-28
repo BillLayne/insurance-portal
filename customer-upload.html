@@ -94,17 +94,9 @@
     <div class="upload-box">
       <label>Attach files (PDF, JPG, PNG) or take photos</label>
 
-      <!-- Hidden iframe target (prevents CORS issues) -->
-      <iframe name="uploadTarget" style="display:none"></iframe>
-
-      <!-- The upload form posts directly to Apps Script -->
-      <form id="uploadForm" action="https://script.google.com/macros/s/AKfycby-9vCxMW1wtbKL_Q2i0TRSyFiTODCg_eTINdwC8Y55QjjL2Jm2MZSeaycfDLEXpOhjjA/exec" method="post" enctype="multipart/form-data" target="uploadTarget">
-        <input type="hidden" name="action" value="upload" />
-        <input type="hidden" name="caseId" id="hiddenCaseId" />
-        <!-- file pickers live INSIDE the form -->
-        <input id="fFiles" name="files" type="file" multiple accept=".pdf,image/*" />
-        <input id="fCamera" name="files" type="file" accept="image/*" capture="environment" multiple style="display:none" />
-      </form>
+      <!-- Single visible inputs; we’ll POST via fetch({mode:'no-cors'}) -->
+      <input id="fFiles" type="file" multiple accept=".pdf,image/*" />
+      <input id="fCamera" type="file" accept="image/*" capture="environment" multiple style="display:none" />
 
       <div class="left" style="margin-top:10px">
         <button class="btn btn-ghost" id="btnOpenFiles">Choose from device</button>
@@ -147,7 +139,7 @@ function showModal(){ el("uploadModal").style.display = "flex"; }
 function hideModal(){ el("uploadModal").style.display = "none"; }
 function setModal(line, pct){ el("modalLine").textContent = line; el("modalBar").style.width = `${Math.max(0, Math.min(100, pct))}%`; }
 
-/* JSONP loader (bypasses CORS) */
+/* JSONP loader (bypasses CORS for reads) */
 function jsonp(url){
   return new Promise((resolve)=>{
     const cb = 'cb_' + Math.random().toString(36).slice(2);
@@ -165,8 +157,6 @@ function renderCase(d){
   REQUIREMENTS = d.requirements || [];
   REQ_STATUS = d.reqStatus || {};
   filesCount = (d.files||[]).length;
-
-  el("hiddenCaseId").value = CASE_ID;
 
   el("caseCard").style.display = "";
   el("needCard").style.display = "";
@@ -210,46 +200,42 @@ async function openByEmail(){
   history.replaceState(null, "", location.pathname + "#email="+encodeURIComponent(email));
 }
 
-/* --- Upload via hidden iframe form (no CORS) --- */
-function submitUploadForm(){
+/* --- Upload via fetch no-cors, then confirm via JSONP poll --- */
+async function uploadFiles(){
   if(!CASE_ID){ el("filesMsg").textContent = "Open your case first."; return; }
-  const form = el("uploadForm");
-  const hasFiles = el("fFiles").files.length || el("fCamera").files.length;
-  if(!hasFiles){ el("filesMsg").textContent = "Choose or take a photo first."; return; }
+  const picks = [];
+  if (el("fFiles").files.length) picks.push(...el("fFiles").files);
+  if (el("fCamera").files.length) picks.push(...el("fCamera").files);
+  if (!picks.length){ el("filesMsg").textContent = "Choose or take a photo first."; return; }
 
-  // Show blocking modal + “fake” progress (we’ll complete when poll sees files)
+  // Build FormData: IMPORTANT — use 'file' repeated (Apps Script will expose file, file_1, file_2…)
+  const fd = new FormData();
+  fd.append("action","upload");
+  fd.append("caseId", CASE_ID);
+  picks.forEach((f, i)=> fd.append("file", f, f.name));
+
   showModal();
-  setModal("Uploading… please wait", 25);
+  setModal("Uploading… please wait", 40);
   el("filesMsg").textContent = "Uploading… please wait";
 
-  // Install a short onload listener on the iframe (fires when server responds)
-  const iframe = document.getElementsByName("uploadTarget")[0];
-  const onloadOnce = async ()=>{
-    // Start polling the case until files count increases or timeout reached
-    setModal("Processing files…", 65);
-    const ok = await pollForNewFiles(120000); // up to 2 minutes
-    if (ok){
-      setModal("All files uploaded ✔", 100);
-      el("filesMsg").textContent = "All files uploaded. Thank you!";
-    }else{
-      el("filesMsg").textContent = "Upload submitted, but confirmation timed out. Please check your connection and try again.";
-      setModal("Confirmation timed out — you may retry.", 0);
-    }
-    setTimeout(hideModal, 1200);
-    iframe.removeEventListener("load", onloadOnce);
-    // reset inputs
-    el("fFiles").value = ""; el("fCamera").value = "";
-  };
-  iframe.addEventListener("load", onloadOnce);
+  // Fire-and-forget: opaque response, no CORS needed
+  try{
+    await fetch(API_URL, { method:"POST", body: fd, mode: "no-cors" });
+  }catch(_){ /* ignore — we’ll verify by polling */ }
 
-  // Ensure hidden caseId mirrors current case
-  el("hiddenCaseId").value = CASE_ID;
-
-  // Submit the multipart/form-data POST to Apps Script
-  form.submit();
+  // Poll until Files count increases (server write confirmed)
+  setModal("Processing files…", 70);
+  const ok = await pollForNewFiles(120000); // up to 2 minutes
+  if (ok){
+    setModal("All files uploaded ✔", 100);
+    el("filesMsg").textContent = "All files uploaded. Thank you!";
+  }else{
+    el("filesMsg").textContent = "Upload submitted, but confirmation timed out. Please try again if you don’t see your file(s) above.";
+    setModal("Confirmation timed out — you may retry.", 0);
+  }
+  setTimeout(hideModal, 1200);
+  el("fFiles").value = ""; el("fCamera").value = "";
 }
-
-/* Poll case via JSONP until we detect more files than before */
 async function pollForNewFiles(maxMs){
   const start = Date.now();
   let tries = 0;
@@ -261,8 +247,7 @@ async function pollForNewFiles(maxMs){
       renderFiles(r.files||[]);
       if ((r.files||[]).length > filesCount){ filesCount = (r.files||[]).length; return true; }
     }
-    // nudge progress visually
-    setModal(`Processing files… (check ${tries})`, Math.min(95, 65 + tries*3));
+    setModal(`Processing files… (check ${tries})`, Math.min(95, 70 + tries*2));
   }
   return false;
 }
@@ -285,7 +270,7 @@ el("btnFindById").addEventListener("click", openById);
 el("btnFindByEmail").addEventListener("click", openByEmail);
 el("btnOpenFiles").addEventListener("click", ()=> el("fFiles").click());
 el("btnOpenCamera").addEventListener("click", ()=> el("fCamera").click());
-el("btnUpload").addEventListener("click", submitUploadForm);
+el("btnUpload").addEventListener("click", uploadFiles);
 </script>
 </body>
 </html>
