@@ -1,185 +1,431 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Check My Status • Bill Layne Insurance</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--primary:#1a5f7a;--secondary:#457b9d;--accent:#a8dadc;--bg:#f8f9fa;--text:#2c3e50;--radius:12px;--shadow:0 8px 30px rgba(0,0,0,.08)}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",sans-serif}
-.wrap{max-width:960px;margin:0 auto;padding:24px}
-.header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:var(--radius);padding:28px;text-align:center;margin-bottom:16px}
-h1{margin:0;font-size:2rem}
-.pill{display:inline-block;background:var(--accent);color:#084c61;border-radius:999px;padding:6px 12px;font-size:.875rem;margin-top:8px}
-.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
-.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-label{font-size:.875rem;margin-bottom:6px;display:block}
-input,button{width:100%;padding:12px;border-radius:10px;border:1px solid #d9e2ec;font-size:1rem}
-button{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;border:none;cursor:pointer}
-button:hover{filter:brightness(1.05)}
-.status{display:flex;gap:8px;flex-wrap:wrap}
-.chip{padding:8px 12px;border-radius:999px;background:#eef6f8;border:1px solid #d6eef2;font-size:.875rem}
-.ok{background:#e7f6ec;border-color:#ccebd7;color:#14532d}
-.need{background:#fff6e5;border-color:#ffe3b3;color:#7c3a00}
-.muted{opacity:.75}
-.err{color:#b00020}
-pre{white-space:pre-wrap;background:#0b1020;color:#e7e7e7;padding:12px;border-radius:10px;overflow:auto}
-@media print{.card{box-shadow:none} button{display:none}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Customer Follow-Up | Bill Layne Insurance</title>
+  <meta name="description" content="Follow up, request documents, track underwriting requirements, and email customers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --primary:#1a5f7a; --secondary:#457b9d; --accent:#a8dadc;
+      --bg:#f8f9fa; --text:#2c3e50;
+      --radius:12px; --shadow:0 8px 30px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",system-ui,Segoe UI,Arial,sans-serif}
+    header{
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color:#fff; padding:18px 14px; text-align:center; position:sticky; top:0; z-index:10;
+      box-shadow: var(--shadow);
+    }
+    .title{font-size:1.5rem;font-weight:700;letter-spacing:.2px;margin:2px 0}
+    .subtitle{opacity:.9;font-size:.95rem}
+    .wrap{max-width:1100px;margin:18px auto;padding:0 12px}
+    .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+    .grid{display:grid;gap:12px}
+    @media(min-width:900px){ .grid-2{grid-template-columns:1fr 1fr} .grid-3{grid-template-columns:1fr 1fr 1fr}}
+    label{font-size:.9rem;margin-bottom:6px;display:block;font-weight:600}
+    input,select,textarea{
+      width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;outline:none;font-size:1rem;background:#fff
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--secondary);box-shadow:0 0 0 3px rgba(69,123,157,.12)}
+    .row{display:grid;gap:10px}
+    @media(min-width:700px){ .row-4{grid-template-columns:2fr 1fr 1fr 1fr} .row-3{grid-template-columns:2fr 1fr 1fr}}
+    .btn{
+      border:0;border-radius:999px;padding:12px 16px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px
+    }
+    .btn-primary{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff}
+    .btn-ghost{background:#edf2f7;color:var(--text)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:.8rem;background:var(--accent);color:#0b3a4a;margin:4px 6px 0 0;font-weight:700}
+    .table{width:100%;border-collapse:separate;border-spacing:0}
+    .table th,.table td{padding:10px;border-bottom:1px solid #f0f2f5;text-align:left;font-size:.95rem}
+    .table th{background:#f5f8fb;font-weight:700}
+    .muted{opacity:.7}
+    .footer{padding:20px;text-align:center;color:#38505c}
+    .status-ok{color:#0a7a3a;font-weight:700}
+    .status-pending{color:#b45309;font-weight:700}
+    .tag{display:inline-flex;align-items:center;gap:6px;background:#eef6f8;border:1px solid #d7ecef;border-radius:999px;padding:6px 10px;font-size:.85rem;margin:3px 4px 0 0}
+    .tag input[type=checkbox]{accent-color:var(--secondary);width:16px;height:16px}
+    .upload-box{border:1.5px dashed #c7dfe6;border-radius:12px;padding:12px;background:#fbfeff}
+    .right{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+    .note{font-size:.85rem;opacity:.8}
+    .hidden{display:none}
+    @media print {
+      header{box-shadow:none}
+      .btn,.upload-box{display:none !important}
+      body{background:#fff}
+      .card{box-shadow:none;border:1px solid #e5e7eb}
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="header">
-    <h1>Customer Status Checker</h1>
-    <div class="pill">Bill Layne Insurance • 336-835-1993 • Save@BillLayneInsurance.com</div>
-  </div>
+<header>
+  <div class="title">Bill Layne Insurance — Customer Follow-Up</div>
+  <div class="subtitle">Track requirements, collect documents, and send reminders.</div>
+</header>
 
-  <div class="card">
-    <h2 style="margin-top:0">Find Your Account</h2>
-    <div class="grid">
+<div class="wrap grid grid-2">
+  <!-- LEFT: Create/Load Case -->
+  <section class="card">
+    <h3 style="margin:4px 0 10px 0">Create / Load Customer</h3>
+    <div class="row row-3">
       <div>
-        <label for="email">Email (preferred)</label>
-        <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+        <label>Customer Name</label>
+        <input id="cName" placeholder="Jane Doe" />
       </div>
       <div>
-        <label for="cid">Or Client ID</label>
-        <input id="cid" placeholder="e.g., CL1727392">
+        <label>Phone</label>
+        <input id="cPhone" placeholder="336-555-1212" />
       </div>
-      <div style="align-self:end">
-        <button id="findBtn">Check Status</button>
+      <div>
+        <label>Email</label>
+        <input id="cEmail" placeholder="jane@email.com" />
       </div>
     </div>
-    <p class="muted">Use the same email you gave the agency. We match by email or Client ID.</p>
-    <div id="error" class="err" style="display:none;margin-top:8px;"></div>
-  </div>
 
-  <div class="card" id="summary" style="display:none">
-    <h2 style="margin-top:0">Summary</h2>
-    <div class="grid">
-      <div><label>Client</label><div id="who" class="chip"></div></div>
-      <div><label>Company</label><div id="company" class="chip"></div></div>
-      <div><label>Product</label><div id="product" class="chip"></div></div>
-      <div><label>Policy #</label><div id="policy" class="chip"></div></div>
-      <div><label>Status</label><div id="status" class="chip"></div></div>
+    <div class="row row-3" style="margin-top:8px">
+      <div>
+        <label>Product</label>
+        <select id="cProduct">
+          <option value="">Select…</option>
+          <option>Auto</option>
+          <option>Home</option>
+          <option>Renters</option>
+          <option>Landlord</option>
+          <option>Umbrella</option>
+          <option>Boat</option>
+          <option>Commercial Auto</option>
+          <option>General Liability</option>
+        </select>
+      </div>
+      <div>
+        <label>Company</label>
+        <select id="cCompany">
+          <option value="">Select…</option>
+          <option>Progressive</option>
+          <option>Nationwide</option>
+          <option>NC Grange</option>
+          <option>Travelers</option>
+          <option>NatGen</option>
+          <option>Foremost</option>
+          <option>Safeco</option>
+        </select>
+      </div>
+      <div>
+        <label>Policy # (optional)</label>
+        <input id="cPolicy" placeholder="ABC123…" />
+      </div>
     </div>
-    <div style="margin-top:12px">
-      <label>Documents</label>
-      <div id="docs" class="status"></div>
-    </div>
-    <div style="margin-top:14px">
-      <button id="uploadBtn">Go to My Upload Page</button>
-      <p class="muted" style="margin-top:8px">Opens your secure upload link tied to your Client ID.</p>
-    </div>
-  </div>
 
-  <div class="card">
-    <h2 style="margin-top:0">Debug (for you)</h2>
-    <p class="muted">Raw response from Google Apps Script (JSONP).</p>
-    <pre id="raw">No request yet.</pre>
-  </div>
+    <div class="right" style="margin-top:12px">
+      <button class="btn btn-ghost" id="btnLoad">Load by Email</button>
+      <button class="btn btn-primary" id="btnCreate">Create / Update</button>
+    </div>
+    <div class="note" id="createMsg"></div>
+  </section>
+
+  <!-- RIGHT: Email -->
+  <section class="card">
+    <h3 style="margin:4px 0 10px 0">Send Follow-Up Email</h3>
+    <div><span class="pill">Signed Apps</span><span class="pill">Photos</span><span class="pill">Prior Insurance</span><span class="pill">Lienholder</span></div>
+    <label style="margin-top:10px">Subject</label>
+    <input id="mSubject" placeholder="Quick follow-up on your insurance application" />
+    <label style="margin-top:8px">Message (HTML allowed)</label>
+    <textarea id="mBody" rows="7" placeholder="Hi {{FirstName}},&#10;Thanks for choosing Bill Layne Insurance. To finish your policy, we still need: {{Checklist}}.&#10;You can reply to this email or upload securely here: {{UploadLink}}&#10;&#10;— Bill Layne Insurance"></textarea>
+    <div class="right" style="margin-top:10px">
+      <button class="btn btn-ghost" id="btnPreview">Preview</button>
+      <button class="btn btn-primary" id="btnSend">Send Email</button>
+    </div>
+    <div id="mailMsg" class="note" style="margin-top:6px"></div>
+  </section>
+
+  <!-- REQUIREMENTS -->
+  <section class="card">
+    <h3 style="margin:4px 0 10px 0">Requirements Checklist</h3>
+    <div id="reqTags" style="margin-bottom:6px" class="muted">Select Product & Company, then “Create / Update”.</div>
+    <div id="reqList"></div>
+    <div class="right" style="margin-top:10px">
+      <button class="btn btn-primary" id="btnSaveReqs" disabled>Save Status</button>
+    </div>
+    <div id="reqMsg" class="note"></div>
+  </section>
+
+  <!-- UPLOADS -->
+  <section class="card">
+    <h3 style="margin:4px 0 10px 0">Upload Documents</h3>
+    <div class="upload-box">
+      <label>Attach files (PDF, JPG, PNG)</label>
+      <input id="fFiles" type="file" multiple />
+      <div class="right" style="margin-top:10px">
+        <button class="btn btn-primary" id="btnUpload">Upload</button>
+      </div>
+    </div>
+    <div id="filesMsg" class="note" style="margin-top:6px"></div>
+    <table class="table" style="margin-top:10px">
+      <thead><tr><th>File</th><th>Type</th><th>Added</th><th>Link</th></tr></thead>
+      <tbody id="filesBody"><tr><td colspan="4" class="muted">No files yet.</td></tr></tbody>
+    </table>
+  </section>
+
+  <!-- CASES TABLE -->
+  <section class="card" style="grid-column:1/-1">
+    <h3 style="margin:4px 0 10px 0">Customers</h3>
+    <div class="row row-4">
+      <input id="q" placeholder="Search name/email/phone…" />
+      <select id="qProduct"><option value="">Any Product</option><option>Auto</option><option>Home</option><option>Renters</option><option>Umbrella</option><option>Boat</option><option>Commercial Auto</option><option>General Liability</option></select>
+      <select id="qStatus"><option value="">Any Status</option><option value="Pending">Pending</option><option value="Complete">Complete</option></select>
+      <button class="btn btn-ghost" id="btnSearch">Search</button>
+    </div>
+    <table class="table" style="margin-top:10px">
+      <thead><tr><th>Customer</th><th>Product</th><th>Company</th><th>Status</th><th>Updated</th><th>Open</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="6" class="muted">No results.</td></tr></tbody>
+    </table>
+  </section>
+</div>
+
+<div class="footer">
+  © Bill Layne Insurance • 1283 N Bridge St, Elkin NC • 336-835-1993 • <a href="https://www.billlayneinsurance.com" target="_blank">BillLayneInsurance.com</a>
 </div>
 
 <script>
-  // >>>>>> PASTE YOUR LIVE /exec URL HERE <<<<<<
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPB0kS1wc6l6fdNOZ89TtIOQv4CyIzrW8b8SRKpzwT-y2MGZrdM5PpWloLDcjGtxG3/exec";
+/* ========= CONFIG (use your deployed Web App URL) ========= */
+const API_URL = "https://script.google.com/macros/s/AKfycby-9vCxMW1wtbKL_Q2i0TRSyFiTODCg_eTINdwC8Y55QjjL2Jm2MZSeaycfDLEXpOhjjA/exec";
 
-  const $ = s => document.querySelector(s);
-  const show = (el, yes=true) => el.style.display = yes ? "" : "none";
+/* ========= State ========= */
+let currentCaseId = "";
+let currentRequirements = [];
 
-  function jsonp(url){
-    return new Promise((resolve, reject)=>{
-      const cb = 'cb_' + Math.random().toString(36).slice(2);
-      const s = document.createElement('script');
-      const sep = url.includes('?') ? '&' : '?';
-      s.src = `${url}${sep}callback=${cb}`;
-      window[cb] = (data)=>{ resolve(data); cleanup(); };
-      s.onerror = ()=>{ reject(new Error('JSONP load error')); cleanup(); };
-      document.head.appendChild(s);
-      function cleanup(){ delete window[cb]; s.remove(); }
+/* ========= Helpers: FormData POST (no custom headers → no preflight) ========= */
+async function postForm(data){
+  const fd = new FormData();
+  Object.entries(data).forEach(([k,v])=>{
+    if (v instanceof File || v instanceof Blob) fd.append(k,v);
+    else if (Array.isArray(v)) fd.append(k, JSON.stringify(v));
+    else fd.append(k, v ?? "");
+  });
+  const res = await fetch(API_URL, { method:"POST", body: fd, redirect:"follow" });
+  // The web app returns JSON; keep it robust in case of HTML error
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return {ok:false, error:text.slice(0,300)}; }
+}
+
+function el(id){return document.getElementById(id)}
+function htmlEscape(s){return (s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]))}
+
+/* ========= UI Builders ========= */
+function renderReqs(reqs, statuses={}){
+  const box = el("reqList"); box.innerHTML = "";
+  if(!reqs?.length){ box.innerHTML = '<div class="muted">No requirements for selection.</div>'; return; }
+  reqs.forEach(item=>{
+    const id = 'req_' + item.key;
+    const checked = statuses[item.key] === true;
+    const div = document.createElement("label");
+    div.className = "tag";
+    div.innerHTML = `<input type="checkbox" ${checked?"checked":""} data-key="${item.key}"/><span>${htmlEscape(item.label)}</span>`;
+    box.appendChild(div);
+  });
+  el("btnSaveReqs").disabled = false;
+  el("reqTags").innerHTML = reqs.map(r=>`<span class="pill">${htmlEscape(r.label)}</span>`).join("");
+}
+
+function renderFiles(files){
+  const tb = el("filesBody"); tb.innerHTML="";
+  if(!files?.length){ tb.innerHTML = '<tr><td colspan="4" class="muted">No files yet.</td></tr>'; return; }
+  files.forEach(f=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${htmlEscape(f.name)}</td><td>${htmlEscape(f.mimeType||"")}</td><td>${htmlEscape(f.created||"")}</td><td><a href="${f.url}" target="_blank">Open</a></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function renderRows(rows){
+  const tb = el("rows"); tb.innerHTML = "";
+  if(!rows?.length){ tb.innerHTML = '<tr><td colspan="6" class="muted">No results.</td></tr>'; return; }
+  rows.forEach(r=>{
+    const tr = document.createElement("tr");
+    const statusClass = r.status==="Complete"?"status-ok":"status-pending";
+    tr.innerHTML = `
+      <td>${htmlEscape(r.name)}<div class="muted" style="font-size:.85rem">${htmlEscape(r.email||"")} · ${htmlEscape(r.phone||"")}</div></td>
+      <td>${htmlEscape(r.product||"")}</td>
+      <td>${htmlEscape(r.company||"")}</td>
+      <td class="${statusClass}">${htmlEscape(r.status||"Pending")}</td>
+      <td>${htmlEscape(r.updated||"")}</td>
+      <td><button class="btn btn-ghost" data-open="${r.caseId}">Open</button></td>`;
+    tb.appendChild(tr);
+  });
+  // attach open
+  tb.querySelectorAll("button[data-open]").forEach(b=>{
+    b.addEventListener("click", async ()=>{
+      await loadCaseById(b.dataset.open);
+      window.scrollTo({top:0,behavior:"smooth"});
     });
-  }
+  });
+}
 
-  function chip(label, value, klass="") {
-    const d = document.createElement("div");
-    d.className = `chip ${klass}`;
-    d.textContent = `${label}: ${value ?? "N/A"}`;
-    return d;
-  }
+/* ========= Actions ========= */
 
-  function renderClient(data) {
-    const c = data.client;
-    $("#who").textContent = `${c.name || "—"} (${c.id})`;
-    $("#company").textContent = c.company || "—";
-    $("#product").textContent = c.product || "—";
-    $("#policy").textContent = c.policyNumber || "Pending";
-    $("#status").textContent = c.status || "New";
-    const docs = $("#docs");
-    docs.innerHTML = "";
-    const d = c.documents || {};
-    const s = (v)=> v==="Received" ? "ok" : (v==="Pending" ? "need" : "");
-    docs.appendChild(chip("Application", d.application, s(d.application)));
-    docs.appendChild(chip("Photos", d.photos, s(d.photos)));
-    docs.appendChild(chip("MVR", d.mvr, s(d.mvr)));
-    docs.appendChild(chip("Prior Ins", d.priorInsurance, s(d.priorInsurance)));
-    docs.appendChild(chip("Inspection", d.inspection, s(d.inspection)));
-    docs.appendChild(chip("Payment", d.payment, s(d.payment)));
-    if (d.other) docs.appendChild(chip("Other", d.other));
+async function createOrUpdate(){
+  el("createMsg").textContent = "Saving…";
+  const payload = {
+    action:"upsert",
+    name: el("cName").value.trim(),
+    phone: el("cPhone").value.trim(),
+    email: el("cEmail").value.trim(),
+    product: el("cProduct").value,
+    company: el("cCompany").value,
+    policy: el("cPolicy").value,
+    caseId: currentCaseId
+  };
+  const res = await postForm(payload);
+  if(!res.ok){ el("createMsg").textContent = "Error: "+(res.error||""); return; }
+  currentCaseId = res.caseId;
+  currentRequirements = res.requirements || [];
+  renderReqs(currentRequirements, res.reqStatus||{});
+  renderFiles(res.files||[]);
+  el("createMsg").textContent = `Saved. Case # ${currentCaseId}`;
+}
 
-    const uploadUrl = `https://billlayne.github.io/insurance-portal/customer.html?id=${encodeURIComponent(c.id)}#upload`;
-    $("#uploadBtn").onclick = () => window.open(uploadUrl, "_blank");
+async function loadByEmail(){
+  const email = el("cEmail").value.trim();
+  if(!email){ el("createMsg").textContent="Enter email to load."; return; }
+  el("createMsg").textContent = "Loading…";
+  const res = await postForm({action:"loadByEmail", email});
+  if(!res.ok){ el("createMsg").textContent = "Not found."; return; }
+  currentCaseId = res.caseId;
+  el("cName").value = res.name||"";
+  el("cPhone").value = res.phone||"";
+  el("cProduct").value = res.product||"";
+  el("cCompany").value = res.company||"";
+  el("cPolicy").value = res.policy||"";
+  renderReqs(res.requirements||[], res.reqStatus||{});
+  renderFiles(res.files||[]);
+  el("createMsg").textContent = `Loaded. Case # ${currentCaseId}`;
+}
 
-    show($("#summary"), true);
-  }
+async function saveReqs(){
+  if(!currentCaseId){ el("reqMsg").textContent="Create or load a case first."; return; }
+  const checks = Array.from(el("reqList").querySelectorAll("input[type=checkbox]"));
+  const status = {};
+  checks.forEach(ch => status[ch.dataset.key] = ch.checked);
+  const res = await postForm({action:"saveReqs", caseId: currentCaseId, reqStatus: JSON.stringify(status)});
+  el("reqMsg").textContent = res.ok ? "Saved checklist." : ("Error: "+(res.error||""));
+}
 
-  function showError(msg) {
-    $("#error").textContent = msg;
-    show($("#error"), true);
-    show($("#summary"), false);
-  }
+async function uploadFiles(){
+  if(!currentCaseId){ el("filesMsg").textContent="Create or load a case first."; return; }
+  const files = el("fFiles").files;
+  if(!files.length){ el("filesMsg").textContent="Choose files first."; return; }
+  el("filesMsg").textContent="Uploading…";
+  const fd = new FormData();
+  fd.append("action","upload");
+  fd.append("caseId", currentCaseId);
+  for(const f of files) fd.append("files", f, f.name);
+  const res = await fetch(API_URL, { method:"POST", body:fd });
+  const text = await res.text();
+  let json; try{ json = JSON.parse(text);}catch{ json = {ok:false,error:text};}
+  if(!json.ok){ el("filesMsg").textContent="Error: "+(json.error||""); return; }
+  renderFiles(json.files||[]);
+  el("filesMsg").textContent="Uploaded.";
+  el("fFiles").value="";
+}
 
-  async function handleFind() {
-    show($("#error"), false);
-    show($("#summary"), false);
-    $("#raw").textContent = "Loading…";
+function buildChecklistText(){
+  const labels = [];
+  (currentRequirements||[]).forEach(r=>{
+    const node = document.querySelector(`input[data-key="${r.key}"]`);
+    const mark = node?.checked ? "✅" : "⏳";
+    labels.push(`${mark} ${r.label}`);
+  });
+  return labels.join(", ");
+}
 
-    const email = $("#email").value.trim();
-    const cid = $("#cid").value.trim();
-    if (!email && !cid) {
-      showError("Enter your email or Client ID.");
-      $("#raw").textContent = "No input provided.";
-      return;
-    }
+function makeUploadLink(){
+  // Simple link back to this page with hash caseId; you can also serve a public “customer upload” page if desired.
+  const url = location.origin + location.pathname + `#case=${encodeURIComponent(currentCaseId)}`;
+  return url;
+}
 
-    try {
-      const url = new URL(WEB_APP_URL);
-      url.searchParams.set('action','getClient');
-      if (email) url.searchParams.set('email', email); else url.searchParams.set('id', cid);
+let previewHtml = "";
+function previewEmail(){
+  const subject = el("mSubject").value || "Quick follow-up on your insurance application";
+  const bodyTpl = el("mBody").value;
+  const firstName = (el("cName").value||"").split(" ")[0]||"there";
+  const checklist = buildChecklistText() || "Signed Application";
+  const uploadLink = makeUploadLink();
+  const html = bodyTpl
+    .replaceAll("{{FirstName}}", firstName)
+    .replaceAll("{{Checklist}}", checklist)
+    .replaceAll("{{UploadLink}}", `<a href="${uploadLink}" target="_blank">${uploadLink}</a>`);
+  previewHtml = `
+    <div class="card" style="margin:8px 0">
+      <div><strong>Subject:</strong> ${htmlEscape(subject)}</div>
+      <div style="margin-top:8px;border:1px solid #eef2f6;border-radius:10px;padding:10px">${html}</div>
+    </div>`;
+  el("mailMsg").innerHTML = "Preview generated below." + previewHtml;
+}
 
-      const res = await jsonp(url.toString());
-      $("#raw").textContent = JSON.stringify(res, null, 2);
+async function sendEmail(){
+  if(!currentCaseId){ el("mailMsg").textContent="Create or load a case first."; return; }
+  const subject = el("mSubject").value || "Quick follow-up on your insurance application";
+  const bodyTpl = el("mBody").value;
+  const firstName = (el("cName").value||"").split(" ")[0]||"there";
+  const checklist = buildChecklistText() || "Signed Application";
+  const uploadLink = makeUploadLink();
+  const html = bodyTpl
+    .replaceAll("{{FirstName}}", firstName)
+    .replaceAll("{{Checklist}}", checklist)
+    .replaceAll("{{UploadLink}}", `<a href="${uploadLink}" target="_blank">${uploadLink}</a>`);
+  el("mailMsg").textContent = "Sending…";
+  const res = await postForm({action:"sendEmail", caseId: currentCaseId, subject, html});
+  el("mailMsg").textContent = res.ok ? "Email sent." : ("Error: "+(res.error||""));
+}
 
-      if (!res || !res.success) {
-        showError(res?.error || "Client not found.");
-        return;
-      }
-      renderClient(res);
-    } catch (e) {
-      showError("Could not reach the server. Check Web App URL & deployment.");
-      $("#raw").textContent = String(e);
-    }
-  }
+async function search(){
+  const res = await postForm({
+    action:"search",
+    q: el("q").value,
+    product: el("qProduct").value,
+    status: el("qStatus").value
+  });
+  renderRows(res.rows||[]);
+}
 
-  $("#findBtn").addEventListener("click", handleFind);
+/* ========= Case Loading via hash (optional) ========= */
+async function loadCaseById(caseId){
+  const res = await postForm({action:"loadById", caseId});
+  if(!res.ok){ el("createMsg").textContent="Case not found."; return; }
+  currentCaseId = res.caseId;
+  el("cName").value = res.name||"";
+  el("cPhone").value = res.phone||"";
+  el("cEmail").value = res.email||"";
+  el("cProduct").value = res.product||"";
+  el("cCompany").value = res.company||"";
+  el("cPolicy").value = res.policy||"";
+  renderReqs(res.requirements||[], res.reqStatus||{});
+  renderFiles(res.files||[]);
+  el("createMsg").textContent = `Loaded. Case # ${currentCaseId}`;
+}
 
-  // Auto-load if ?id= is present
-  const params = new URLSearchParams(location.search);
-  if (params.get("id")) {
-    $("#cid").value = params.get("id");
-    handleFind();
-  }
+window.addEventListener("hashchange", ()=>{
+  const m = location.hash.match(/case=([^&]+)/);
+  if(m) loadCaseById(decodeURIComponent(m[1]));
+});
+window.addEventListener("load", ()=>{
+  const m = location.hash.match(/case=([^&]+)/);
+  if(m) loadCaseById(decodeURIComponent(m[1]));
+});
+
+/* ========= Events ========= */
+el("btnCreate").addEventListener("click", createOrUpdate);
+el("btnLoad").addEventListener("click", loadByEmail);
+el("btnSaveReqs").addEventListener("click", saveReqs);
+el("btnUpload").addEventListener("click", uploadFiles);
+el("btnPreview").addEventListener("click", previewEmail);
+el("btnSend").addEventListener("click", sendEmail);
+el("btnSearch").addEventListener("click", search);
 </script>
 </body>
 </html>
