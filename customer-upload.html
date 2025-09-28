@@ -35,14 +35,8 @@
   @media print {.btn,.upload-box{display:none !important} .card{box-shadow:none;border:1px solid #e5e7eb}}
 
   /* Modal */
-  .modal{
-    position:fixed; inset:0; background:rgba(0,0,0,.45);
-    display:none; align-items:center; justify-content:center; z-index:9999;
-  }
-  .modal .box{
-    width:min(520px,90vw); background:#fff; border-radius:12px; box-shadow:var(--shadow);
-    padding:18px; text-align:center;
-  }
+  .modal{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:9999; }
+  .modal .box{ width:min(520px,90vw); background:#fff; border-radius:12px; box-shadow:var(--shadow); padding:18px; text-align:center; }
   .bar-wrap{width:100%; background:#eef2f6; border-radius:999px; height:12px; margin:10px 0 6px 0; overflow:hidden}
   .bar{height:100%; width:0%; background:linear-gradient(90deg, var(--secondary), var(--primary))}
   .small{font-size:.9rem; opacity:.8}
@@ -100,10 +94,7 @@
     <div class="upload-box">
       <label>Attach files (PDF, JPG, PNG) or take photos</label>
 
-      <!-- Normal file picker -->
       <input id="fFiles" type="file" multiple accept=".pdf,image/*" />
-
-      <!-- Camera-only input (hidden, triggered by button). capture='environment' prefers rear camera -->
       <input id="fCamera" type="file" accept="image/*" capture="environment" multiple style="display:none" />
 
       <div class="left" style="margin-top:10px">
@@ -111,7 +102,7 @@
         <button class="btn btn-primary" id="btnOpenCamera">Take Photo</button>
         <button class="btn btn-primary" id="btnUpload">Upload</button>
       </div>
-      <div class="hint">Please wait for the confirmation after pressing Upload. Don’t close this page until you see “All files uploaded”. On mobile, “Take Photo” opens the camera.</div>
+      <div class="hint">Please wait for confirmation after pressing Upload. Don’t close this page until you see “All files uploaded”.</div>
     </div>
     <div id="filesMsg" class="muted" style="margin-top:6px"></div>
     <div id="filesList" class="list"></div>
@@ -133,18 +124,15 @@
 </div>
 
 <script>
-/* ===== CONFIG: your existing Web App URL ===== */
 const API_URL = "https://script.google.com/macros/s/AKfycby-9vCxMW1wtbKL_Q2i0TRSyFiTODCg_eTINdwC8Y55QjjL2Jm2MZSeaycfDLEXpOhjjA/exec";
 
-/* ===== State ===== */
 let CASE_ID = "";
 let REQUIREMENTS = [];
 let REQ_STATUS = {};
-let CASE_DATA = {};
-let pendingFiles = []; // queue to upload (can include camera captures)
+let pendingFiles = [];
 let isUploading = false;
 
-/* ===== Helpers ===== */
+/* --- helpers --- */
 async function postForm(data){
   const fd = new FormData();
   Object.entries(data).forEach(([k,v])=>{
@@ -160,17 +148,13 @@ function el(id){return document.getElementById(id)}
 function esc(s){return (s||"").replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]))}
 function showModal(){ el("uploadModal").style.display = "flex"; }
 function hideModal(){ el("uploadModal").style.display = "none"; }
-function setModal(line, pct){
-  el("modalLine").textContent = line;
-  el("modalBar").style.width = `${Math.max(0, Math.min(100, pct))}%`;
-}
+function setModal(line, pct){ el("modalLine").textContent = line; el("modalBar").style.width = `${Math.max(0, Math.min(100, pct))}%`; }
 
-/* ===== UI ===== */
+/* --- UI --- */
 function renderCase(d){
   CASE_ID = d.caseId;
   REQUIREMENTS = d.requirements || [];
   REQ_STATUS = d.reqStatus || {};
-  CASE_DATA = d;
 
   el("caseCard").style.display = "";
   el("needCard").style.display = "";
@@ -180,31 +164,27 @@ function renderCase(d){
   el("status").textContent = d.status || "Pending";
   el("status").className = d.status==="Complete" ? "ok" : "pending";
 
-  const tags = REQUIREMENTS.map(r=>{
-    const ok = REQ_STATUS[r.key]===true;
-    return `<span class="pill">${ok?"✅ ":"⏳ "}${esc(r.label)}</span>`;
-  }).join("");
+  const tags = REQUIREMENTS.map(r=>`<span class="pill">${REQ_STATUS[r.key]===true?"✅ ":"⏳ "}${esc(r.label)}</span>`).join("");
   el("tags").innerHTML = tags;
 
   const outstanding = REQUIREMENTS.filter(r => REQ_STATUS[r.key]!==true);
-  el("needList").innerHTML = outstanding.length
-    ? outstanding.map(r=>`<span class="pill">${esc(r.label)}</span>`).join("")
-    : `<span class="ok">You’re all set — nothing outstanding.</span>`;
+  el("needList").innerHTML = outstanding.length ? outstanding.map(r=>`<span class="pill">${esc(r.label)}</span>`).join("") : `<span class="ok">You’re all set — nothing outstanding.</span>`;
 
-  renderFiles(d.files||[]);
+  // refresh files list
+  const again = { files: d.files || [] };
+  renderFiles(again.files);
 }
 function renderFiles(files){
-  if(!files.length){ el("filesList").innerHTML = `<span class="muted">No files uploaded yet.</span>`; return; }
-  el("filesList").innerHTML = files.map(f=>`<a class="pill" href="${f.url}" target="_blank">${esc(f.name)}</a>`).join("");
+  el("filesList").innerHTML = (!files || !files.length) ? `<span class="muted">No files uploaded yet.</span>` : files.map(f=>`<a class="pill" href="${f.url}" target="_blank">${esc(f.name)}</a>`).join("");
 }
 
-/* ===== Image compression (optional; keeps quality but reduces huge images) ===== */
+/* --- optional image downscale --- */
 async function maybeDownscale(file, maxDim=2000, quality=0.85){
   if (!file.type.startsWith('image/')) return file;
   return new Promise((resolve)=>{
     const img = new Image();
     img.onload = ()=>{
-      let { width:w, height:h } = img;
+      let w = img.width, h = img.height;
       if (Math.max(w,h) <= maxDim) { resolve(file); return; }
       const scale = maxDim / Math.max(w,h);
       w = Math.round(w*scale); h = Math.round(h*scale);
@@ -223,8 +203,8 @@ async function maybeDownscale(file, maxDim=2000, quality=0.85){
   });
 }
 
-/* ===== Networking: sequential upload with progress + retries ===== */
-function xhrUploadSingle(file, caseId, onProgress, timeoutMs=120000){
+/* --- XHR upload with long timeout + retries --- */
+function xhrUploadSingle(file, caseId, onProgress, timeoutMs=300000){ // 5 min
   return new Promise((resolve, reject)=>{
     const fd = new FormData();
     fd.append("action","upload");
@@ -253,7 +233,6 @@ function xhrUploadSingle(file, caseId, onProgress, timeoutMs=120000){
     xhr.send(fd);
   });
 }
-
 async function uploadWithRetry(file, caseIdx, total, attempt=1){
   const maxAttempts = 3;
   try{
@@ -276,7 +255,7 @@ async function uploadWithRetry(file, caseIdx, total, attempt=1){
   }
 }
 
-/* ===== Actions ===== */
+/* --- Actions --- */
 async function openById(){
   const id = el("caseId").value.trim();
   if(!id){ el("findMsg").textContent = "Enter your Case ID."; return; }
@@ -297,77 +276,55 @@ async function openByEmail(){
   el("findMsg").textContent = "Case loaded.";
   history.replaceState(null, "", location.pathname + "#email="+encodeURIComponent(email));
 }
-
-/* Collect files from either input and queue them for upload */
 function queueFiles(fileList){
   for(const f of fileList){ pendingFiles.push(f); }
   el("filesMsg").textContent = pendingFiles.length ? `${pendingFiles.length} file(s) ready to upload.` : "";
 }
-
-/* Upload queued files with modal + retries + progress */
 async function uploadFiles(){
   if(!CASE_ID){ el("filesMsg").textContent = "Open your case first."; return; }
   if(!pendingFiles.length){ el("filesMsg").textContent = "Choose or take a photo first."; return; }
 
-  // Block navigation
   isUploading = true;
   const onBeforeUnload = (e)=>{ e.preventDefault(); e.returnValue = ""; };
   window.addEventListener("beforeunload", onBeforeUnload);
-
-  // Disable buttons
   setButtonsDisabled(true);
 
   try{
     showModal();
     setModal("Optimizing photos…", 0);
 
-    // Downscale images first to reduce upload time on weak connections
     const prepared = [];
     for (const f of pendingFiles){ prepared.push(await maybeDownscale(f)); }
 
-    // Sequentially upload each file with progress & retries
     const total = prepared.length;
     let idx = 1;
-    const allFilesAdded = [];
+    for (const f of prepared){ await uploadWithRetry(f, idx, total); idx++; }
 
-    for (const f of prepared){
-      const res = await uploadWithRetry(f, idx, total);
-      if (res?.files?.length) allFilesAdded.push(...res.files);
-      idx++;
-    }
-
-    // Refresh file list from server by reloading case (ensures UI matches Drive)
     const again = await postForm({action:"loadById", caseId: CASE_ID});
     if (again.ok){ renderFiles(again.files||[]); }
 
     setModal("All files uploaded ✔", 100);
     el("filesMsg").textContent = "All files uploaded. Thank you!";
   }catch(err){
-    el("filesMsg").textContent = "Upload failed – please try again or check your connection.";
+    el("filesMsg").textContent = "Upload failed – please try again. Details: " + (err?.message || err);
     setModal("Upload failed. You can close this and retry.", 0);
   }finally{
-    // Allow navigation again
     window.removeEventListener("beforeunload", onBeforeUnload);
     isUploading = false;
-
-    // Re-enable buttons and reset queues/inputs
     setButtonsDisabled(false);
     el("fFiles").value = "";
     el("fCamera").value = "";
     pendingFiles = [];
-
-    // Keep modal for 1.2s on success so they see confirmation
     setTimeout(()=> hideModal(), 1200);
   }
 }
-
 function setButtonsDisabled(disabled){
   ["btnOpenFiles","btnOpenCamera","btnUpload","btnFindById","btnFindByEmail"].forEach(id=>{
     const b = el(id); if (b) b.disabled = disabled;
   });
 }
 
-/* ===== Deep link by hash ===== */
+/* --- Deep link --- */
 function parseHash(){
   const h = location.hash || "";
   const mEmail = h.match(/email=([^&]+)/);
@@ -380,19 +337,15 @@ window.addEventListener("load", async ()=>{
   else if(caseId){ el("caseId").value = caseId; openById(); }
 });
 
-/* ===== Events ===== */
+/* --- Events --- */
 el("btnFindById").addEventListener("click", openById);
 el("btnFindByEmail").addEventListener("click", openByEmail);
-
-// Normal file chooser
 el("btnOpenFiles").addEventListener("click", ()=> el("fFiles").click());
 el("fFiles").addEventListener("change", (e)=> queueFiles(e.target.files));
-
-// Camera capture (mobile); capture='environment' prefers rear camera
 el("btnOpenCamera").addEventListener("click", ()=> el("fCamera").click());
 el("fCamera").addEventListener("change", (e)=> queueFiles(e.target.files));
-
 el("btnUpload").addEventListener("click", uploadFiles);
 </script>
 </body>
 </html>
+
