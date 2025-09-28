@@ -145,6 +145,7 @@
   <!-- REQUIREMENTS -->
   <section class="card">
     <h3 style="margin:4px 0 10px 0">Requirements Checklist</h3>
+    <div class="note" style="margin-bottom:6px">Checking a box = we’ve received/uploaded that item.</div>
     <div id="reqTags" style="margin-bottom:6px" class="muted">Select Product & Company, then “Create / Update”.</div>
     <div id="reqList"></div>
     <div class="right" style="margin-top:10px">
@@ -198,7 +199,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycby-9vCxMW1wtbKL_Q2i0TRS
 let currentCaseId = "";
 let currentRequirements = [];
 
-/* ========= Helpers: FormData POST (no custom headers → no preflight) ========= */
+/* ========= Helpers: FormData POST ========= */
 async function postForm(data){
   const fd = new FormData();
   Object.entries(data).forEach(([k,v])=>{
@@ -207,7 +208,6 @@ async function postForm(data){
     else fd.append(k, v ?? "");
   });
   const res = await fetch(API_URL, { method:"POST", body: fd, redirect:"follow" });
-  // The web app returns JSON; keep it robust in case of HTML error
   const text = await res.text();
   try { return JSON.parse(text); } catch { return {ok:false, error:text.slice(0,300)}; }
 }
@@ -220,10 +220,9 @@ function renderReqs(reqs, statuses={}){
   const box = el("reqList"); box.innerHTML = "";
   if(!reqs?.length){ box.innerHTML = '<div class="muted">No requirements for selection.</div>'; return; }
   reqs.forEach(item=>{
-    const id = 'req_' + item.key;
-    const checked = statuses[item.key] === true;
     const div = document.createElement("label");
     div.className = "tag";
+    const checked = statuses[item.key] === true;
     div.innerHTML = `<input type="checkbox" ${checked?"checked":""} data-key="${item.key}"/><span>${htmlEscape(item.label)}</span>`;
     box.appendChild(div);
   });
@@ -256,12 +255,8 @@ function renderRows(rows){
       <td><button class="btn btn-ghost" data-open="${r.caseId}">Open</button></td>`;
     tb.appendChild(tr);
   });
-  // attach open
   tb.querySelectorAll("button[data-open]").forEach(b=>{
-    b.addEventListener("click", async ()=>{
-      await loadCaseById(b.dataset.open);
-      window.scrollTo({top:0,behavior:"smooth"});
-    });
+    b.addEventListener("click", async ()=>{ await loadCaseById(b.dataset.open); window.scrollTo({top:0,behavior:"smooth"}); });
   });
 }
 
@@ -300,6 +295,7 @@ async function loadByEmail(){
   el("cProduct").value = res.product||"";
   el("cCompany").value = res.company||"";
   el("cPolicy").value = res.policy||"";
+  el("cEmail").value = res.email||"";
   renderReqs(res.requirements||[], res.reqStatus||{});
   renderFiles(res.files||[]);
   el("createMsg").textContent = `Loaded. Case # ${currentCaseId}`;
@@ -309,7 +305,7 @@ async function saveReqs(){
   if(!currentCaseId){ el("reqMsg").textContent="Create or load a case first."; return; }
   const checks = Array.from(el("reqList").querySelectorAll("input[type=checkbox]"));
   const status = {};
-  checks.forEach(ch => status[ch.dataset.key] = ch.checked);
+  checks.forEach(ch => status[ch.dataset.key] = ch.checked); // checked = received/uploaded
   const res = await postForm({action:"saveReqs", caseId: currentCaseId, reqStatus: JSON.stringify(status)});
   el("reqMsg").textContent = res.ok ? "Saved checklist." : ("Error: "+(res.error||""));
 }
@@ -343,7 +339,6 @@ function buildChecklistText(){
 }
 
 function makeUploadLink(){
-  // Simple link back to this page with hash caseId; you can also serve a public “customer upload” page if desired.
   const url = location.origin + location.pathname + `#case=${encodeURIComponent(currentCaseId)}`;
   return url;
 }
@@ -393,7 +388,7 @@ async function search(){
   renderRows(res.rows||[]);
 }
 
-/* ========= Case Loading via hash (optional) ========= */
+/* ========= Case Loading via hash ========= */
 async function loadCaseById(caseId){
   const res = await postForm({action:"loadById", caseId});
   if(!res.ok){ el("createMsg").textContent="Case not found."; return; }
