@@ -3,150 +3,553 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Customer Follow-Up | Bill Layne Insurance</title>
-  <meta name="description" content="Follow up, request documents, track underwriting requirements, and email customers." />
+  <title>Customer Portal | Bill Layne Insurance</title>
+  <meta name="description" content="Professional insurance document management and customer follow-up system" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
-    :root{ --primary:#1a5f7a; --secondary:#457b9d; --accent:#a8dadc; --bg:#f8f9fa; --text:#2c3e50; --radius:12px; --shadow:0 8px 30px rgba(0,0,0,.08) }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",system-ui,Segoe UI,Arial,sans-serif}
-    header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:18px 14px;text-align:center;position:sticky;top:0;z-index:10;box-shadow:var(--shadow)}
-    .title{font-size:1.5rem;font-weight:700;letter-spacing:.2px;margin:2px 0}
-    .subtitle{opacity:.9;font-size:.95rem}
-    .wrap{max-width:1100px;margin:18px auto;padding:0 12px}
-    .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
-    .grid{display:grid;gap:12px}
-    @media(min-width:900px){ .grid-2{grid-template-columns:1fr 1fr} .grid-3{grid-template-columns:1fr 1fr 1fr}}
-    label{font-size:.9rem;margin-bottom:6px;display:block;font-weight:600}
-    input,select,textarea{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;outline:none;font-size:1rem;background:#fff}
-    input:focus,select:focus,textarea:focus{border-color:var(--secondary);box-shadow:0 0 0 3px rgba(69,123,157,.12)}
-    .row{display:grid;gap:10px}
-    @media(min-width:700px){ .row-4{grid-template-columns:2fr 1fr 1fr 1fr} .row-3{grid-template-columns:2fr 1fr 1fr}}
-    .btn{border:0;border-radius:999px;padding:12px 16px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-    .btn-primary{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff}
-    .btn-ghost{background:#edf2f7;color:var(--text)}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-    .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:.8rem;background:var(--accent);color:#0b3a4a;margin:4px 6px 0 0;font-weight:700}
-    .table{width:100%;border-collapse:separate;border-spacing:0}
-    .table th,.table td{padding:10px;border-bottom:1px solid #f0f2f5;text-align:left;font-size:.95rem}
-    .table th{background:#f5f8fb;font-weight:700}
-    .muted{opacity:.7}
-    .footer{padding:20px;text-align:center;color:#38505c}
-    .status-ok{color:#0a7a3a;font-weight:700}
-    .status-pending{color:#b45309;font-weight:700}
-    .tag{display:inline-flex;align-items:center;gap:6px;background:#eef6f8;border:1px solid #d7ecef;border-radius:999px;padding:6px 10px;font-size:.85rem;margin:3px 4px 0 0}
-    .tag input[type=checkbox]{accent-color:var(--secondary);width:16px;height:16px}
-    .upload-box{border:1.5px dashed #c7dfe6;border-radius:12px;padding:12px;background:#fbfeff}
-    .right{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
-    .note{font-size:.85rem;opacity:.8}
-    .hidden{display:none}
-    .success-note{color:#0a7a3a;font-weight:600}
-    .error-note{color:#dc3545;font-weight:600}
-    @media print { header{box-shadow:none} .btn,.upload-box{display:none !important} body{background:#fff} .card{box-shadow:none;border:1px solid #e5e7eb} }
+    /* Clean Desktop Design System */
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --white: #ffffff;
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --radius: 8px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--gray-900);
+      background: var(--gray-50);
+      line-height: 1.6;
+    }
+    
+    /* Header */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 1.5rem 0;
+      box-shadow: var(--shadow);
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    
+    .logo-badge {
+      background: var(--primary);
+      color: var(--white);
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+    
+    .subtitle {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+    }
+    
+    /* Container */
+    .wrap {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    
+    .grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+    
+    @media (max-width: 1024px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    
+    .card h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    /* Form Elements */
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 0.375rem;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--gray-300);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      background: var(--white);
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-family: inherit;
+    }
+    
+    /* Buttons */
+    .btn {
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      font-size: 0.875rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    
+    .btn-ghost {
+      background: var(--gray-100);
+      color: var(--gray-700);
+    }
+    
+    .btn-ghost:hover {
+      background: var(--gray-200);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* Pills & Tags */
+    .pill {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin: 0.25rem;
+      background: var(--primary);
+      color: var(--white);
+    }
+    
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      border-radius: 6px;
+      padding: 0.375rem 0.625rem;
+      font-size: 0.875rem;
+      margin: 0.25rem;
+    }
+    
+    .tag input[type=checkbox] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    
+    /* Table */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--white);
+      overflow-x: auto;
+      display: block;
+    }
+    
+    .table table {
+      width: 100%;
+      min-width: 600px;
+    }
+    
+    .table th {
+      background: var(--gray-100);
+      padding: 0.75rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-600);
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.875rem;
+    }
+    
+    .table tr:hover td {
+      background: var(--gray-50);
+    }
+    
+    .table a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .table a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Status */
+    .status-ok {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    .status-pending {
+      color: var(--warning);
+      font-weight: 600;
+    }
+    
+    /* Upload Box */
+    .upload-box {
+      border: 2px dashed var(--gray-300);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      background: var(--gray-50);
+      text-align: center;
+    }
+    
+    .upload-box:hover {
+      border-color: var(--primary);
+      background: var(--gray-100);
+    }
+    
+    /* Layout Utilities */
+    .row {
+      display: grid;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .row-3 {
+      grid-template-columns: 2fr 1fr 1fr;
+    }
+    
+    .row-4 {
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+    }
+    
+    @media (max-width: 768px) {
+      .row-3, .row-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .right {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      margin-top: 0.75rem;
+    }
+    
+    .note {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      margin-top: 0.5rem;
+    }
+    
+    .muted {
+      color: var(--gray-500);
+    }
+    
+    .success-note {
+      color: var(--success);
+      font-weight: 500;
+    }
+    
+    .error-note {
+      color: var(--danger);
+      font-weight: 500;
+    }
+    
+    /* Footer */
+    .footer {
+      margin-top: 3rem;
+      padding: 2rem;
+      background: var(--gray-900);
+      color: var(--gray-300);
+      text-align: center;
+      font-size: 0.875rem;
+    }
+    
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Desktop Specific */
+    @media (min-width: 1024px) {
+      .card {
+        padding: 2rem;
+      }
+      
+      .table {
+        display: table;
+      }
+    }
   </style>
 </head>
 <body>
+<!-- HEADER -->
 <header>
-  <div class="title">Bill Layne Insurance — Customer Follow-Up</div>
-  <div class="subtitle">Track requirements, collect documents, and send reminders.</div>
+  <div class="header-content">
+    <div class="logo-badge">BL</div>
+    <div>
+      <div class="title">Bill Layne Insurance — Customer Portal</div>
+      <div class="subtitle">Professional Document Management & Follow-Up System</div>
+    </div>
+  </div>
 </header>
 
-<div class="wrap grid grid-2">
-  <!-- LEFT: Create/Load Case -->
-  <section class="card">
-    <h3 style="margin:4px 0 10px 0">Create / Load Customer</h3>
-    <div class="row row-3">
-      <div><label>Customer Name</label><input id="cName" placeholder="Jane Doe" /></div>
-      <div><label>Phone</label><input id="cPhone" placeholder="336-555-1212" /></div>
-      <div><label>Email</label><input id="cEmail" placeholder="jane@email.com" /></div>
-    </div>
-    <div class="row row-3" style="margin-top:8px">
-      <div>
-        <label>Product</label>
-        <select id="cProduct">
-          <option value="">Select…</option>
-          <option>Auto</option><option>Home</option><option>Renters</option>
-          <option>Landlord</option><option>Umbrella</option><option>Boat</option>
-          <option>Commercial Auto</option><option>General Liability</option>
-        </select>
+<!-- MAIN CONTENT -->
+<div class="wrap">
+  <div class="grid grid-2">
+    <!-- LEFT: Create/Load Case -->
+    <section class="card">
+      <h3>Customer Information</h3>
+      <div class="row row-3">
+        <div>
+          <label>Customer Name</label>
+          <input id="cName" placeholder="Jane Doe" />
+        </div>
+        <div>
+          <label>Phone</label>
+          <input id="cPhone" placeholder="336-555-1212" />
+        </div>
+        <div>
+          <label>Email</label>
+          <input id="cEmail" placeholder="jane@email.com" />
+        </div>
       </div>
-      <div>
-        <label>Company</label>
-        <select id="cCompany">
-          <option value="">Select…</option>
-          <option>Progressive</option><option>Nationwide</option><option>NC Grange</option>
-          <option>Travelers</option><option>NatGen</option><option>Foremost</option><option>Safeco</option>
-        </select>
+      <div class="row row-3">
+        <div>
+          <label>Product</label>
+          <select id="cProduct">
+            <option value="">Select…</option>
+            <option>Auto</option>
+            <option>Home</option>
+            <option>Renters</option>
+            <option>Landlord</option>
+            <option>Umbrella</option>
+            <option>Boat</option>
+            <option>Commercial Auto</option>
+            <option>General Liability</option>
+          </select>
+        </div>
+        <div>
+          <label>Company</label>
+          <select id="cCompany">
+            <option value="">Select…</option>
+            <option>Progressive</option>
+            <option>Nationwide</option>
+            <option>NC Grange</option>
+            <option>Travelers</option>
+            <option>NatGen</option>
+            <option>Foremost</option>
+            <option>Safeco</option>
+          </select>
+        </div>
+        <div>
+          <label>Policy # (optional)</label>
+          <input id="cPolicy" placeholder="ABC123…" />
+        </div>
       </div>
-      <div><label>Policy # (optional)</label><input id="cPolicy" placeholder="ABC123…" /></div>
-    </div>
-    <div class="right" style="margin-top:12px">
-      <button class="btn btn-ghost" id="btnLoad">Load by Email</button>
-      <button class="btn btn-primary" id="btnCreate">Create / Update</button>
-    </div>
-    <div class="note" id="createMsg"></div>
-  </section>
+      <div class="right">
+        <button class="btn btn-ghost" id="btnLoad">Load by Email</button>
+        <button class="btn btn-primary" id="btnCreate">Create / Update</button>
+      </div>
+      <div class="note" id="createMsg"></div>
+    </section>
 
-  <!-- RIGHT: Email -->
-  <section class="card">
-    <h3 style="margin:4px 0 10px 0">Send Follow-Up Email</h3>
-    <div><span class="pill">Signed Apps</span><span class="pill">Photos</span><span class="pill">Prior Insurance</span><span class="pill">Lienholder</span></div>
-    <label style="margin-top:10px">Subject</label>
-    <input id="mSubject" placeholder="Quick follow-up on your insurance application" />
-    <label style="margin-top:8px">Message (HTML allowed)</label>
-    <textarea id="mBody" rows="7" placeholder="Hi {{FirstName}},&#10;Thanks for choosing Bill Layne Insurance. To finish your policy, we still need: {{Outstanding}}.&#10;You can reply to this email or upload securely here: {{UploadLink}}&#10;&#10;— Bill Layne Insurance"></textarea>
-    <div class="right" style="margin-top:10px">
-      <button class="btn btn-ghost" id="btnPreview">Preview</button>
-      <button class="btn btn-primary" id="btnSend">Send Email</button>
-    </div>
-    <div id="mailMsg" class="note" style="margin-top:6px"></div>
-  </section>
+    <!-- RIGHT: Email -->
+    <section class="card">
+      <h3>Send Follow-Up Email</h3>
+      <div>
+        <span class="pill">Signed Apps</span>
+        <span class="pill">Photos</span>
+        <span class="pill">Prior Insurance</span>
+        <span class="pill">Lienholder</span>
+      </div>
+      <label style="margin-top:10px">Subject</label>
+      <input id="mSubject" placeholder="Quick follow-up on your insurance application" />
+      <label style="margin-top:8px">Message (HTML allowed)</label>
+      <textarea id="mBody" rows="7" placeholder="Hi {{FirstName}},&#10;Thanks for choosing Bill Layne Insurance. To finish your policy, we still need: {{Outstanding}}.&#10;You can reply to this email or upload securely here: {{UploadLink}}&#10;&#10;— Bill Layne Insurance"></textarea>
+      <div class="right">
+        <button class="btn btn-ghost" id="btnPreview">Preview</button>
+        <button class="btn btn-primary" id="btnSend">Send Email</button>
+      </div>
+      <div id="mailMsg" class="note"></div>
+    </section>
 
-  <!-- REQUIREMENTS -->
-  <section class="card">
-    <h3 style="margin:4px 0 10px 0">Requirements Checklist</h3>
-    <div class="note" style="margin-bottom:6px">Checking a box = we've received/uploaded that item.</div>
-    <div id="reqTags" style="margin-bottom:6px" class="muted">Select Product & Company, then "Create / Update".</div>
-    <div id="reqList"></div>
-    <div class="right" style="margin-top:10px"><button class="btn btn-primary" id="btnSaveReqs" disabled>Save Status</button></div>
-    <div id="reqMsg" class="note"></div>
-  </section>
+    <!-- REQUIREMENTS -->
+    <section class="card">
+      <h3>Requirements Checklist</h3>
+      <div class="note">Checking a box = we've received/uploaded that item.</div>
+      <div id="reqTags" class="muted">Select Product & Company, then "Create / Update".</div>
+      <div id="reqList"></div>
+      <div class="right">
+        <button class="btn btn-primary" id="btnSaveReqs" disabled>Save Status</button>
+      </div>
+      <div id="reqMsg" class="note"></div>
+    </section>
 
-  <!-- UPLOADS -->
-  <section class="card">
-    <h3 style="margin:4px 0 10px 0">Upload Documents</h3>
-    <div class="upload-box">
-      <label>Attach files (PDF, JPG, PNG)</label>
-      <input id="fFiles" type="file" multiple accept=".pdf,image/*" />
-      <div class="note" style="margin-top:6px">Files will be converted to base64 and uploaded securely (max 10MB per file)</div>
-      <div class="right" style="margin-top:10px"><button class="btn btn-primary" id="btnUpload">Upload</button></div>
-    </div>
-    <div id="filesMsg" class="note" style="margin-top:6px"></div>
-    <table class="table" style="margin-top:10px">
-      <thead><tr><th>File</th><th>Type</th><th>Added</th><th>Link</th></tr></thead>
-      <tbody id="filesBody"><tr><td colspan="4" class="muted">No files yet.</td></tr></tbody>
-    </table>
-  </section>
+    <!-- UPLOADS -->
+    <section class="card">
+      <h3>Upload Documents</h3>
+      <div class="upload-box">
+        <label>Attach files (PDF, JPG, PNG)</label>
+        <input id="fFiles" type="file" multiple accept=".pdf,image/*" />
+        <div class="note">Files will be converted to base64 and uploaded securely (max 10MB per file)</div>
+        <div class="right">
+          <button class="btn btn-primary" id="btnUpload">Upload Files</button>
+        </div>
+      </div>
+      <div id="filesMsg" class="note"></div>
+      <div style="overflow-x: auto; margin-top: 1rem;">
+        <table class="table" style="width: 100%; display: table;">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Type</th>
+              <th>Added</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody id="filesBody">
+            <tr><td colspan="4" class="muted">No files yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 
-  <!-- CASES TABLE -->
-  <section class="card" style="grid-column:1/-1">
-    <h3 style="margin:4px 0 10px 0">Customers</h3>
+  <!-- CUSTOMER DATABASE (Full Width) -->
+  <section class="card" style="margin-top: 1.5rem;">
+    <h3>Customer Database</h3>
     <div class="row row-4">
       <input id="q" placeholder="Search name/email/phone…" />
-      <select id="qProduct"><option value="">Any Product</option><option>Auto</option><option>Home</option><option>Renters</option><option>Umbrella</option><option>Boat</option><option>Commercial Auto</option><option>General Liability</option></select>
-      <select id="qStatus"><option value="">Any Status</option><option value="Pending">Pending</option><option value="Complete">Complete</option></select>
+      <select id="qProduct">
+        <option value="">Any Product</option>
+        <option>Auto</option>
+        <option>Home</option>
+        <option>Renters</option>
+        <option>Umbrella</option>
+        <option>Boat</option>
+        <option>Commercial Auto</option>
+        <option>General Liability</option>
+      </select>
+      <select id="qStatus">
+        <option value="">Any Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Complete">Complete</option>
+      </select>
       <button class="btn btn-ghost" id="btnSearch">Search</button>
     </div>
-    <table class="table" style="margin-top:10px">
-      <thead><tr><th>Customer</th><th>Product</th><th>Company</th><th>Status</th><th>Updated</th><th>Open</th></tr></thead>
-      <tbody id="rows"><tr><td colspan="6" class="muted">No results.</td></tr></tbody>
-    </table>
+    <div style="overflow-x: auto; margin-top: 1rem;">
+      <table class="table" style="width: 100%; display: table;">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Company</th>
+            <th>Status</th>
+            <th>Updated</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="6" class="muted">No results.</td></tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 </div>
 
 <div class="footer">
-  © Bill Layne Insurance • 1283 N Bridge St, Elkin NC • 336-835-1993 • <a href="https://www.billlayneinsurance.com" target="_blank">BillLayneInsurance.com</a>
+  <strong>Bill Layne Insurance Agency</strong><br>
+  1283 N Bridge St, Elkin NC 28621 • 336-835-1993<br>
+  <a href="https://www.billlayneinsurance.com" target="_blank">www.BillLayneInsurance.com</a>
 </div>
 
 <script>
@@ -207,7 +610,7 @@ function renderFiles(files){
   const tb = el("filesBody"); 
   tb.innerHTML="";
   
-  console.log("Files received:", files); // Debug log to see what's coming from backend
+  console.log("Files received:", files); // Debug log
   
   if(!files?.length){ 
     tb.innerHTML = '<tr><td colspan="4" class="muted">No files yet.</td></tr>'; 
@@ -215,35 +618,41 @@ function renderFiles(files){
   }
   
   files.forEach(f=>{
-    console.log("File object:", f); // Debug each file object
+    console.log("File object:", f); // Debug each file
     
     const tr = document.createElement("tr");
     
-    // Create the link HTML with better handling
+    // Create the link HTML
     let linkHtml = '';
     if (f.url) {
-      // URL exists, use it
-      linkHtml = `<a href="${f.url}" target="_blank" style="color:#0066cc;text-decoration:underline;font-weight:600">📁 Open</a>`;
+      linkHtml = `<a href="${f.url}" target="_blank">📁 Open</a>`;
     } else if (f.id) {
-      // Fallback: construct Google Drive URL from file ID
       const driveUrl = `https://drive.google.com/file/d/${f.id}/view`;
-      linkHtml = `<a href="${driveUrl}" target="_blank" style="color:#0066cc;text-decoration:underline;font-weight:600">📁 Open</a>`;
+      linkHtml = `<a href="${driveUrl}" target="_blank">📁 Open</a>`;
     } else if (f.webViewLink) {
-      // Another possible property from Google Drive API
-      linkHtml = `<a href="${f.webViewLink}" target="_blank" style="color:#0066cc;text-decoration:underline;font-weight:600">📁 Open</a>`;
+      linkHtml = `<a href="${f.webViewLink}" target="_blank">📁 Open</a>`;
     } else {
-      // No URL available yet
       linkHtml = `<span style="color:#999">Processing...</span>`;
     }
     
-    tr.innerHTML = `<td>${htmlEscape(f.name||"Unnamed")}</td><td>${htmlEscape(f.mimeType||f.type||"")}</td><td>${htmlEscape(f.created||f.createdTime||"")}</td><td>${linkHtml}</td>`;
+    tr.innerHTML = `
+      <td>${htmlEscape(f.name||"Unnamed")}</td>
+      <td>${htmlEscape(f.mimeType||f.type||"")}</td>
+      <td>${htmlEscape(f.created||f.createdTime||"")}</td>
+      <td>${linkHtml}</td>`;
     tb.appendChild(tr);
   });
 }
 
 function renderRows(rows){
-  const tb = el("rows"); tb.innerHTML = "";
-  if(!rows?.length){ tb.innerHTML = '<tr><td colspan="6" class="muted">No results.</td></tr>'; return; }
+  const tb = el("rows"); 
+  tb.innerHTML = "";
+  
+  if(!rows?.length){ 
+    tb.innerHTML = '<tr><td colspan="6" class="muted">No results.</td></tr>'; 
+    return; 
+  }
+  
   rows.forEach(r=>{
     const tr = document.createElement("tr");
     const statusClass = r.status==="Complete"?"status-ok":"status-pending";
@@ -256,8 +665,12 @@ function renderRows(rows){
       <td><button class="btn btn-ghost" data-open="${r.caseId}">Open</button></td>`;
     tb.appendChild(tr);
   });
+  
   tb.querySelectorAll("button[data-open]").forEach(b=>{
-    b.addEventListener("click", async ()=>{ await loadCaseById(b.dataset.open); window.scrollTo({top:0,behavior:"smooth"}); });
+    b.addEventListener("click", async ()=>{ 
+      await loadCaseById(b.dataset.open); 
+      window.scrollTo({top:0,behavior:"smooth"}); 
+    });
   });
 }
 
@@ -304,15 +717,55 @@ async function loadByEmail(){
 }
 
 async function saveReqs(){
-  if(!currentCaseId){ el("reqMsg").textContent="Create or load a case first."; return; }
+  if(!currentCaseId){ 
+    el("reqMsg").textContent="Create or load a case first."; 
+    return; 
+  }
+  
+  el("reqMsg").textContent = "Saving...";
+  el("btnSaveReqs").disabled = true;
+  
   const checks = Array.from(el("reqList").querySelectorAll("input[type=checkbox]"));
   const status = {};
   checks.forEach(ch => status[ch.dataset.key] = ch.checked);
+  
   const res = await postForm({action:"saveReqs", caseId: currentCaseId, reqStatus: JSON.stringify(status)});
-  el("reqMsg").textContent = res.ok ? "Saved checklist." : ("Error: "+(res.error||""));
+  
+  if(res.ok){
+    el("reqMsg").innerHTML = '<span class="success-note">✅ Requirements saved!</span>';
+    
+    const newStatus = res.status || "Pending";
+    const statusElement = document.querySelector("#status");
+    if(statusElement) {
+      statusElement.textContent = newStatus;
+      statusElement.className = newStatus === "Complete" ? "status-ok" : "status-pending";
+    }
+    
+    setTimeout(async () => {
+      const reloadRes = await postForm({action:"loadById", caseId: currentCaseId});
+      if(reloadRes.ok){
+        currentRequirements = reloadRes.requirements || [];
+        renderReqs(currentRequirements, reloadRes.reqStatus || {});
+        
+        const reqTags = currentRequirements.map(r => {
+          const isChecked = reloadRes.reqStatus[r.key] === true;
+          return `<span class="pill">${isChecked ? "✅" : "⏳"} ${htmlEscape(r.label)}</span>`;
+        }).join("");
+        el("reqTags").innerHTML = reqTags;
+        
+        setTimeout(() => {
+          el("reqMsg").textContent = "";
+        }, 3000);
+      }
+    }, 500);
+    
+  } else {
+    el("reqMsg").innerHTML = `<span class="error-note">❌ Error: ${res.error || "Failed to save"}</span>`;
+    el("btnSaveReqs").disabled = false;
+  }
 }
 
-/* ========= FIXED Upload with Base64 (same as customer page) ========= */
+/* ========= Upload with Base64 ========= */
 async function uploadFiles(){
   if(!currentCaseId){ 
     el("filesMsg").innerHTML = '<span class="error-note">Create or load a case first.</span>'; 
@@ -325,7 +778,6 @@ async function uploadFiles(){
     return; 
   }
   
-  // Check file sizes
   const maxSize = 10 * 1024 * 1024; // 10MB
   for(let file of files) {
     if(file.size > maxSize) {
@@ -340,16 +792,13 @@ async function uploadFiles(){
   let failedFiles = [];
   
   try {
-    // Upload each file individually as base64 (same method as customer upload)
     for(let i = 0; i < files.length; i++) {
       const file = files[i];
       el("filesMsg").textContent = `Uploading ${file.name} (${i+1}/${files.length})...`;
       
       try {
-        // Convert to base64
         const base64 = await fileToBase64(file);
         
-        // Send as FormData with base64
         const fd = new FormData();
         fd.append('action', 'upload');
         fd.append('caseId', currentCaseId);
@@ -372,7 +821,6 @@ async function uploadFiles(){
       }
     }
     
-    // Show results
     if (successCount === files.length) {
       el("filesMsg").innerHTML = `<span class="success-note">✅ All ${successCount} file(s) uploaded successfully!</span>`;
     } else if (successCount > 0) {
@@ -381,7 +829,6 @@ async function uploadFiles(){
       el("filesMsg").innerHTML = `<span class="error-note">❌ Upload failed: ${failedFiles.join(', ')}</span>`;
     }
     
-    // Reload files list after short delay
     if(successCount > 0) {
       setTimeout(async () => {
         console.log("Reloading files after upload...");
@@ -390,10 +837,8 @@ async function uploadFiles(){
         if(res.ok && res.files) {
           console.log("Files from reload:", res.files);
           renderFiles(res.files);
-        } else {
-          console.log("No files in reload response or response not OK");
         }
-      }, 1500); // Increased delay to ensure backend processing is complete
+      }, 1500);
     }
     
   } catch (err) {
@@ -419,7 +864,6 @@ function checklistText(all=true){
 function makeUploadLink(){
   const email = (el("cEmail").value || "").trim();
   if (email) return `${CUSTOMER_UPLOAD_URL}#email=${encodeURIComponent(email)}`;
-  // fallback if no email captured yet
   return `${CUSTOMER_UPLOAD_URL}#case=${encodeURIComponent(currentCaseId)}`;
 }
 
@@ -466,7 +910,7 @@ async function sendEmail(){
   el("mailMsg").textContent = res.ok ? "Email sent." : ("Error: "+(res.error||""));
 }
 
-/* ========= Case Loading via hash ========= */
+/* ========= Case Loading ========= */
 async function loadCaseById(caseId){
   const res = await postForm({action:"loadById", caseId});
   if(!res.ok){ el("createMsg").textContent="Case not found."; return; }
@@ -492,7 +936,6 @@ window.addEventListener("load", ()=>{
   const m = location.hash.match(/case=([^&]+)/);
   if(m) loadCaseById(decodeURIComponent(m[1]));
   
-  // Show reminder if customer upload URL not configured
   if(CUSTOMER_UPLOAD_URL.includes("YOUR-GITHUB-USERNAME")) {
     el("mailMsg").innerHTML = '<span style="color:#dc3545">⚠️ Remember to update CUSTOMER_UPLOAD_URL in this file with your GitHub Pages URL!</span>';
   }
