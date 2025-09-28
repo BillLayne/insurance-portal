@@ -875,12 +875,62 @@ async function loadByEmail(){
 }
 
 async function saveReqs(){
-  if(!currentCaseId){ el("reqMsg").textContent="Create or load a case first."; return; }
+  if(!currentCaseId){ 
+    el("reqMsg").textContent="Create or load a case first."; 
+    return; 
+  }
+  
+  // Show saving message
+  el("reqMsg").textContent = "Saving...";
+  el("btnSaveReqs").disabled = true;
+  
+  // Collect checkbox states
   const checks = Array.from(el("reqList").querySelectorAll("input[type=checkbox]"));
   const status = {};
   checks.forEach(ch => status[ch.dataset.key] = ch.checked);
+  
+  // Save to server
   const res = await postForm({action:"saveReqs", caseId: currentCaseId, reqStatus: JSON.stringify(status)});
-  el("reqMsg").textContent = res.ok ? "Saved checklist." : ("Error: "+(res.error||""));
+  
+  if(res.ok){
+    // Success - reload the case to get updated data
+    el("reqMsg").innerHTML = '<span class="success-note">✅ Requirements saved!</span>';
+    
+    // Update the overall status display
+    const newStatus = res.status || "Pending";
+    const statusElement = document.querySelector("#status");
+    if(statusElement) {
+      statusElement.textContent = newStatus;
+      statusElement.className = newStatus === "Complete" ? "status-ok" : "status-pending";
+    }
+    
+    // Reload the full case data to refresh everything
+    setTimeout(async () => {
+      const reloadRes = await postForm({action:"loadById", caseId: currentCaseId});
+      if(reloadRes.ok){
+        // Update requirements display with new status
+        currentRequirements = reloadRes.requirements || [];
+        renderReqs(currentRequirements, reloadRes.reqStatus || {});
+        
+        // Update the requirement tags/pills display
+        const reqTags = currentRequirements.map(r => {
+          const isChecked = reloadRes.reqStatus[r.key] === true;
+          return `<span class="pill">${isChecked ? "✅" : "⏳"} ${htmlEscape(r.label)}</span>`;
+        }).join("");
+        el("reqTags").innerHTML = reqTags;
+        
+        // Clear success message after a moment
+        setTimeout(() => {
+          el("reqMsg").textContent = "";
+        }, 3000);
+      }
+    }, 500);
+    
+  } else {
+    // Error
+    el("reqMsg").innerHTML = `<span class="error-note">❌ Error: ${res.error || "Failed to save"}</span>`;
+    el("btnSaveReqs").disabled = false;
+  }
 }
 
 /* ========= FIXED Upload with Base64 (same as customer page) ========= */
