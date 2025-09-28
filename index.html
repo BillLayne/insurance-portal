@@ -3,655 +3,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Customer Follow-Up System | Bill Layne Insurance</title>
-  <meta name="description" content="Professional insurance document management and customer follow-up system" />
+  <title>Customer Follow-Up | Bill Layne Insurance</title>
+  <meta name="description" content="Follow up, request documents, track underwriting requirements, and email customers." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* =============== PROFESSIONAL INSURANCE THEME =============== */
-    :root {
-      /* Professional Color Palette */
-      --primary: #003d7a;        /* Deep Trust Blue */
-      --primary-dark: #002855;    /* Darker Blue */
-      --secondary: #0066cc;       /* Bright Action Blue */
-      --accent: #00a6fb;          /* Sky Blue Accent */
-      --success: #00c896;         /* Success Green */
-      --warning: #ffb413;         /* Warning Amber */
-      --danger: #ff4757;          /* Alert Red */
-      
-      /* Neutral Colors */
-      --gray-900: #1a202c;        /* Almost Black */
-      --gray-800: #2d3748;        /* Dark Gray */
-      --gray-700: #4a5568;        /* Medium Dark Gray */
-      --gray-600: #718096;        /* Medium Gray */
-      --gray-500: #a0aec0;        /* Light Gray */
-      --gray-400: #cbd5e0;        /* Lighter Gray */
-      --gray-300: #e2e8f0;        /* Very Light Gray */
-      --gray-200: #edf2f7;        /* Off White */
-      --gray-100: #f7fafc;        /* Nearly White */
-      --white: #ffffff;
-      
-      /* Shadows & Effects */
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      
-      /* Borders & Radius */
-      --radius-sm: 0.375rem;
-      --radius: 0.5rem;
-      --radius-lg: 0.75rem;
-      --radius-xl: 1rem;
-      --border-color: #e2e8f0;
-      
-      /* Transitions */
-      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* =============== RESET & BASE =============== */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      color: var(--gray-900);
-      background: linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-    
-    /* =============== HEADER - PREMIUM STYLE =============== */
-    header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: var(--white);
-      padding: 1.5rem 0;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: var(--shadow-lg);
-      backdrop-filter: blur(10px);
-      border-bottom: 3px solid var(--accent);
-    }
-    
-    header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-      opacity: 0.1;
-      pointer-events: none;
-    }
-    
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1.5rem;
-      position: relative;
-    }
-    
-    .logo-section {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    
-    .logo-badge {
-      background: var(--white);
-      color: var(--primary);
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.5rem;
-      box-shadow: var(--shadow-md);
-    }
-    
-    .title {
-      font-size: 1.75rem;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    
-    .subtitle {
-      font-size: 0.95rem;
-      opacity: 0.9;
-      margin-top: 0.25rem;
-      font-weight: 400;
-    }
-    
-    /* =============== MAIN CONTAINER =============== */
-    .wrap {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1.5rem;
-    }
-    
-    /* =============== CARDS - ELEVATED DESIGN =============== */
-    .card {
-      background: var(--white);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-md);
-      padding: 1.75rem;
-      margin-bottom: 1.5rem;
-      border: 1px solid var(--border-color);
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--primary), var(--accent));
-      opacity: 0;
-      transition: var(--transition);
-    }
-    
-    .card:hover {
-      box-shadow: var(--shadow-xl);
-      transform: translateY(-2px);
-    }
-    
-    .card:hover::before {
-      opacity: 1;
-    }
-    
-    .card h3 {
-      color: var(--gray-900);
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    
-    .card h3::before {
-      content: '';
-      width: 4px;
-      height: 24px;
-      background: linear-gradient(180deg, var(--primary), var(--accent));
-      border-radius: 2px;
-    }
-    
-    /* =============== FORM ELEMENTS - MODERN STYLE =============== */
-    label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--gray-700);
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-      letter-spacing: 0.025em;
-    }
-    
-    input, select, textarea {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 2px solid var(--gray-300);
-      border-radius: var(--radius);
-      font-size: 1rem;
-      background: var(--white);
-      transition: var(--transition);
-      font-family: 'Inter', sans-serif;
-    }
-    
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(0, 61, 122, 0.1);
-      background: var(--gray-100);
-    }
-    
-    input:hover, select:hover, textarea:hover {
-      border-color: var(--gray-400);
-    }
-    
-    /* =============== BUTTONS - PREMIUM STYLE =============== */
-    .btn {
-      border: none;
-      border-radius: var(--radius);
-      padding: 0.75rem 1.5rem;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: var(--transition);
-      text-transform: uppercase;
-      letter-spacing: 0.025em;
-      position: relative;
-      overflow: hidden;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      transform: translate(-50%, -50%);
-      transition: width 0.3s, height 0.3s;
-    }
-    
-    .btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: var(--white);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-    
-    .btn-ghost {
-      background: var(--gray-100);
-      color: var(--gray-700);
-      border: 2px solid var(--gray-300);
-    }
-    
-    .btn-ghost:hover {
-      background: var(--gray-200);
-      border-color: var(--gray-400);
-      transform: translateY(-1px);
-    }
-    
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    
-    /* =============== PILLS & TAGS - REFINED =============== */
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.375rem 0.875rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin: 0.25rem;
-      background: linear-gradient(135deg, var(--accent), var(--secondary));
-      color: var(--white);
-      box-shadow: var(--shadow-sm);
-      letter-spacing: 0.025em;
-    }
-    
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--gray-100);
-      border: 2px solid var(--gray-300);
-      border-radius: var(--radius);
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-      margin: 0.25rem;
-      transition: var(--transition);
-    }
-    
-    .tag:hover {
-      background: var(--white);
-      border-color: var(--primary);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .tag input[type=checkbox] {
-      accent-color: var(--primary);
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-    
-    /* =============== TABLE - CLEAN DESIGN =============== */
-    .table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      overflow: hidden;
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-    }
-    
-    .table th {
-      background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
-      padding: 1rem;
-      text-align: left;
-      font-weight: 700;
-      font-size: 0.875rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--gray-700);
-      border-bottom: 2px solid var(--gray-300);
-    }
-    
-    .table td {
-      padding: 1rem;
-      background: var(--white);
-      border-bottom: 1px solid var(--gray-200);
-      font-size: 0.95rem;
-      transition: var(--transition);
-    }
-    
-    .table tr:hover td {
-      background: var(--gray-50);
-    }
-    
-    .table tr:last-child td {
-      border-bottom: none;
-    }
-    
-    /* =============== STATUS INDICATORS =============== */
-    .status-ok {
-      color: var(--success);
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-    
-    .status-ok::before {
-      content: '✓';
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      background: var(--success);
-      color: var(--white);
-      border-radius: 50%;
-      text-align: center;
-      line-height: 20px;
-      font-size: 0.75rem;
-    }
-    
-    .status-pending {
-      color: var(--warning);
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-    
-    .status-pending::before {
-      content: '⏱';
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      background: var(--warning);
-      color: var(--white);
-      border-radius: 50%;
-      text-align: center;
-      line-height: 20px;
-      font-size: 0.75rem;
-    }
-    
-    /* =============== UPLOAD BOX - INTERACTIVE =============== */
-    .upload-box {
-      border: 2px dashed var(--gray-400);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
-      text-align: center;
-      transition: var(--transition);
-      position: relative;
-    }
-    
-    .upload-box:hover {
-      border-color: var(--primary);
-      background: linear-gradient(135deg, var(--gray-100) 0%, var(--white) 100%);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .upload-box::before {
-      content: '📁';
-      font-size: 2rem;
-      display: block;
-      margin-bottom: 1rem;
-      opacity: 0.5;
-    }
-    
-    /* =============== GRID LAYOUTS =============== */
-    .grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-    
-    .grid-2 {
-      grid-template-columns: 1fr;
-    }
-    
-    @media (min-width: 900px) {
-      .grid-2 {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-    
-    .row {
-      display: grid;
-      gap: 1rem;
-    }
-    
-    .row-3 {
-      grid-template-columns: 1fr;
-    }
-    
-    .row-4 {
-      grid-template-columns: 1fr;
-    }
-    
-    @media (min-width: 768px) {
-      .row-3 {
-        grid-template-columns: 2fr 1fr 1fr;
-      }
-      .row-4 {
-        grid-template-columns: 2fr 1fr 1fr 1fr;
-      }
-    }
-    
-    /* =============== UTILITY CLASSES =============== */
-    .right {
-      display: flex;
-      gap: 0.75rem;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-    
-    .note {
-      font-size: 0.875rem;
-      color: var(--gray-600);
-      margin-top: 0.5rem;
-      font-style: italic;
-    }
-    
-    .muted {
-      opacity: 0.7;
-      color: var(--gray-600);
-    }
-    
-    .success-note {
-      color: var(--success);
-      font-weight: 600;
-      background: rgba(0, 200, 150, 0.1);
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius);
-      display: inline-block;
-    }
-    
-    .error-note {
-      color: var(--danger);
-      font-weight: 600;
-      background: rgba(255, 71, 87, 0.1);
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius);
-      display: inline-block;
-    }
-    
-    /* =============== FOOTER - PROFESSIONAL =============== */
-    .footer {
-      margin-top: 4rem;
-      padding: 2rem;
-      background: linear-gradient(135deg, var(--gray-900), var(--gray-800));
-      color: var(--white);
-      text-align: center;
-      font-size: 0.9rem;
-      box-shadow: var(--shadow-2xl);
-    }
-    
-    .footer a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-      transition: var(--transition);
-    }
-    
-    .footer a:hover {
-      color: var(--white);
-      text-decoration: underline;
-    }
-    
-    /* =============== ANIMATIONS =============== */
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .card {
-      animation: slideIn 0.3s ease-out;
-    }
-    
-    /* =============== RESPONSIVE IMPROVEMENTS =============== */
-    @media (max-width: 768px) {
-      .title {
-        font-size: 1.25rem;
-      }
-      
-      .card {
-        padding: 1.25rem;
-      }
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-      
-      .table {
-        font-size: 0.875rem;
-      }
-      
-      .table th, .table td {
-        padding: 0.75rem;
-      }
-    }
-    
-    /* =============== LOADING STATES =============== */
-    .loading {
-      position: relative;
-      color: transparent !important;
-    }
-    
-    .loading::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 20px;
-      height: 20px;
-      border: 3px solid var(--gray-300);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      transform: translate(-50%, -50%);
-    }
-    
-    @keyframes spin {
-      to {
-        transform: translate(-50%, -50%) rotate(360deg);
-      }
-    }
-    
-    /* =============== FOCUS INDICATORS FOR ACCESSIBILITY =============== */
-    *:focus-visible {
-      outline: 3px solid var(--accent);
-      outline-offset: 2px;
-    }
-    
-    /* =============== PRINT STYLES =============== */
-    @media print {
-      header {
-        position: static;
-        box-shadow: none;
-      }
-      
-      .btn, .upload-box {
-        display: none !important;
-      }
-      
-      body {
-        background: var(--white);
-      }
-      
-      .card {
-        box-shadow: none;
-        border: 1px solid var(--gray-400);
-        page-break-inside: avoid;
-      }
-    }
+    :root{ --primary:#1a5f7a; --secondary:#457b9d; --accent:#a8dadc; --bg:#f8f9fa; --text:#2c3e50; --radius:12px; --shadow:0 8px 30px rgba(0,0,0,.08) }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",system-ui,Segoe UI,Arial,sans-serif}
+    header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:18px 14px;text-align:center;position:sticky;top:0;z-index:10;box-shadow:var(--shadow)}
+    .title{font-size:1.5rem;font-weight:700;letter-spacing:.2px;margin:2px 0}
+    .subtitle{opacity:.9;font-size:.95rem}
+    .wrap{max-width:1100px;margin:18px auto;padding:0 12px}
+    .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+    .grid{display:grid;gap:12px}
+    @media(min-width:900px){ .grid-2{grid-template-columns:1fr 1fr} .grid-3{grid-template-columns:1fr 1fr 1fr}}
+    label{font-size:.9rem;margin-bottom:6px;display:block;font-weight:600}
+    input,select,textarea{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;outline:none;font-size:1rem;background:#fff}
+    input:focus,select:focus,textarea:focus{border-color:var(--secondary);box-shadow:0 0 0 3px rgba(69,123,157,.12)}
+    .row{display:grid;gap:10px}
+    @media(min-width:700px){ .row-4{grid-template-columns:2fr 1fr 1fr 1fr} .row-3{grid-template-columns:2fr 1fr 1fr}}
+    .btn{border:0;border-radius:999px;padding:12px 16px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+    .btn-primary{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff}
+    .btn-ghost{background:#edf2f7;color:var(--text)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:.8rem;background:var(--accent);color:#0b3a4a;margin:4px 6px 0 0;font-weight:700}
+    .table{width:100%;border-collapse:separate;border-spacing:0}
+    .table th,.table td{padding:10px;border-bottom:1px solid #f0f2f5;text-align:left;font-size:.95rem}
+    .table th{background:#f5f8fb;font-weight:700}
+    .muted{opacity:.7}
+    .footer{padding:20px;text-align:center;color:#38505c}
+    .status-ok{color:#0a7a3a;font-weight:700}
+    .status-pending{color:#b45309;font-weight:700}
+    .tag{display:inline-flex;align-items:center;gap:6px;background:#eef6f8;border:1px solid #d7ecef;border-radius:999px;padding:6px 10px;font-size:.85rem;margin:3px 4px 0 0}
+    .tag input[type=checkbox]{accent-color:var(--secondary);width:16px;height:16px}
+    .upload-box{border:1.5px dashed #c7dfe6;border-radius:12px;padding:12px;background:#fbfeff}
+    .right{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+    .note{font-size:.85rem;opacity:.8}
+    .hidden{display:none}
+    .success-note{color:#0a7a3a;font-weight:600}
+    .error-note{color:#dc3545;font-weight:600}
+    @media print { header{box-shadow:none} .btn,.upload-box{display:none !important} body{background:#fff} .card{box-shadow:none;border:1px solid #e5e7eb} }
   </style>
 </head>
 <body>
-<!-- HEADER WITH BRANDING -->
 <header>
-  <div class="header-content">
-    <div class="logo-section">
-      <div class="logo-badge">BL</div>
-      <div>
-        <div class="title">Bill Layne Insurance — Customer Portal</div>
-        <div class="subtitle">Professional Document Management & Follow-Up System</div>
-      </div>
-    </div>
-  </div>
+  <div class="title">Bill Layne Insurance — Customer Follow-Up</div>
+  <div class="subtitle">Track requirements, collect documents, and send reminders.</div>
 </header>
 
-<!-- ALL YOUR ORIGINAL HTML CONTENT BELOW - NO CHANGES TO FUNCTIONALITY -->
 <div class="wrap grid grid-2">
   <!-- LEFT: Create/Load Case -->
   <section class="card">
-    <h3>Customer Information</h3>
+    <h3 style="margin:4px 0 10px 0">Create / Load Customer</h3>
     <div class="row row-3">
       <div><label>Customer Name</label><input id="cName" placeholder="Jane Doe" /></div>
       <div><label>Phone</label><input id="cPhone" placeholder="336-555-1212" /></div>
@@ -686,7 +90,7 @@
 
   <!-- RIGHT: Email -->
   <section class="card">
-    <h3>Send Follow-Up Email</h3>
+    <h3 style="margin:4px 0 10px 0">Send Follow-Up Email</h3>
     <div><span class="pill">Signed Apps</span><span class="pill">Photos</span><span class="pill">Prior Insurance</span><span class="pill">Lienholder</span></div>
     <label style="margin-top:10px">Subject</label>
     <input id="mSubject" placeholder="Quick follow-up on your insurance application" />
@@ -701,7 +105,7 @@
 
   <!-- REQUIREMENTS -->
   <section class="card">
-    <h3>Requirements Checklist</h3>
+    <h3 style="margin:4px 0 10px 0">Requirements Checklist</h3>
     <div class="note" style="margin-bottom:6px">Checking a box = we've received/uploaded that item.</div>
     <div id="reqTags" style="margin-bottom:6px" class="muted">Select Product & Company, then "Create / Update".</div>
     <div id="reqList"></div>
@@ -711,12 +115,12 @@
 
   <!-- UPLOADS -->
   <section class="card">
-    <h3>Upload Documents</h3>
+    <h3 style="margin:4px 0 10px 0">Upload Documents</h3>
     <div class="upload-box">
       <label>Attach files (PDF, JPG, PNG)</label>
       <input id="fFiles" type="file" multiple accept=".pdf,image/*" />
       <div class="note" style="margin-top:6px">Files will be converted to base64 and uploaded securely (max 10MB per file)</div>
-      <div class="right" style="margin-top:10px"><button class="btn btn-primary" id="btnUpload">Upload Files</button></div>
+      <div class="right" style="margin-top:10px"><button class="btn btn-primary" id="btnUpload">Upload</button></div>
     </div>
     <div id="filesMsg" class="note" style="margin-top:6px"></div>
     <table class="table" style="margin-top:10px">
@@ -727,7 +131,7 @@
 
   <!-- CASES TABLE -->
   <section class="card" style="grid-column:1/-1">
-    <h3>Customer Database</h3>
+    <h3 style="margin:4px 0 10px 0">Customers</h3>
     <div class="row row-4">
       <input id="q" placeholder="Search name/email/phone…" />
       <select id="qProduct"><option value="">Any Product</option><option>Auto</option><option>Home</option><option>Renters</option><option>Umbrella</option><option>Boat</option><option>Commercial Auto</option><option>General Liability</option></select>
@@ -735,20 +139,17 @@
       <button class="btn btn-ghost" id="btnSearch">Search</button>
     </div>
     <table class="table" style="margin-top:10px">
-      <thead><tr><th>Customer</th><th>Product</th><th>Company</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Customer</th><th>Product</th><th>Company</th><th>Status</th><th>Updated</th><th>Open</th></tr></thead>
       <tbody id="rows"><tr><td colspan="6" class="muted">No results.</td></tr></tbody>
     </table>
   </section>
 </div>
 
 <div class="footer">
-  <strong>Bill Layne Insurance Agency</strong><br>
-  1283 N Bridge St, Elkin NC 28621 • 336-835-1993<br>
-  <a href="https://www.billlayneinsurance.com" target="_blank">www.BillLayneInsurance.com</a>
+  © Bill Layne Insurance • 1283 N Bridge St, Elkin NC • 336-835-1993 • <a href="https://www.billlayneinsurance.com" target="_blank">BillLayneInsurance.com</a>
 </div>
 
 <script>
-// ============= YOUR EXACT SAME JAVASCRIPT - NO CHANGES =============
 // Your deployed Web App URL
 const API_URL = "https://script.google.com/macros/s/AKfycbwfSB6SG_fiZ3R81FUU1qmBEjER0ydXwxXYkVDp-bbLzxjGPywgSdcU4p0MnrfAQYb42g/exec";
 
@@ -804,27 +205,38 @@ function renderReqs(reqs, statuses={}){
 
 function renderFiles(files){
   const tb = el("filesBody"); 
-  tb.innerHTML = "";
+  tb.innerHTML="";
+  
+  console.log("Files received:", files); // Debug log to see what's coming from backend
   
   if(!files?.length){ 
     tb.innerHTML = '<tr><td colspan="4" class="muted">No files yet.</td></tr>'; 
     return; 
   }
   
-  files.forEach(f => {
+  files.forEach(f=>{
+    console.log("File object:", f); // Debug each file object
+    
     const tr = document.createElement("tr");
-    // Make sure the Google Drive link is properly displayed and styled
-    tr.innerHTML = `
-      <td>${htmlEscape(f.name)}</td>
-      <td>${htmlEscape(f.mimeType || "")}</td>
-      <td>${htmlEscape(f.created || "")}</td>
-      <td>
-        <a href="${f.url}" 
-           target="_blank" 
-           style="color: #0066cc; font-weight: 600; text-decoration: underline;">
-          📁 Open
-        </a>
-      </td>`;
+    
+    // Create the link HTML with better handling
+    let linkHtml = '';
+    if (f.url) {
+      // URL exists, use it
+      linkHtml = `<a href="${f.url}" target="_blank" style="color:#0066cc;text-decoration:underline;font-weight:600">📁 Open</a>`;
+    } else if (f.id) {
+      // Fallback: construct Google Drive URL from file ID
+      const driveUrl = `https://drive.google.com/file/d/${f.id}/view`;
+      linkHtml = `<a href="${driveUrl}" target="_blank" style="color:#0066cc;text-decoration:underline;font-weight:600">📁 Open</a>`;
+    } else if (f.webViewLink) {
+      // Another possible property from Google Drive API
+      linkHtml = `<a href="${f.webViewLink}" target="_blank" style="color:#0066cc;text-decoration:underline;font-weight:600">📁 Open</a>`;
+    } else {
+      // No URL available yet
+      linkHtml = `<span style="color:#999">Processing...</span>`;
+    }
+    
+    tr.innerHTML = `<td>${htmlEscape(f.name||"Unnamed")}</td><td>${htmlEscape(f.mimeType||f.type||"")}</td><td>${htmlEscape(f.created||f.createdTime||"")}</td><td>${linkHtml}</td>`;
     tb.appendChild(tr);
   });
 }
@@ -892,62 +304,12 @@ async function loadByEmail(){
 }
 
 async function saveReqs(){
-  if(!currentCaseId){ 
-    el("reqMsg").textContent="Create or load a case first."; 
-    return; 
-  }
-  
-  // Show saving message
-  el("reqMsg").textContent = "Saving...";
-  el("btnSaveReqs").disabled = true;
-  
-  // Collect checkbox states
+  if(!currentCaseId){ el("reqMsg").textContent="Create or load a case first."; return; }
   const checks = Array.from(el("reqList").querySelectorAll("input[type=checkbox]"));
   const status = {};
   checks.forEach(ch => status[ch.dataset.key] = ch.checked);
-  
-  // Save to server
   const res = await postForm({action:"saveReqs", caseId: currentCaseId, reqStatus: JSON.stringify(status)});
-  
-  if(res.ok){
-    // Success - reload the case to get updated data
-    el("reqMsg").innerHTML = '<span class="success-note">✅ Requirements saved!</span>';
-    
-    // Update the overall status display
-    const newStatus = res.status || "Pending";
-    const statusElement = document.querySelector("#status");
-    if(statusElement) {
-      statusElement.textContent = newStatus;
-      statusElement.className = newStatus === "Complete" ? "status-ok" : "status-pending";
-    }
-    
-    // Reload the full case data to refresh everything
-    setTimeout(async () => {
-      const reloadRes = await postForm({action:"loadById", caseId: currentCaseId});
-      if(reloadRes.ok){
-        // Update requirements display with new status
-        currentRequirements = reloadRes.requirements || [];
-        renderReqs(currentRequirements, reloadRes.reqStatus || {});
-        
-        // Update the requirement tags/pills display
-        const reqTags = currentRequirements.map(r => {
-          const isChecked = reloadRes.reqStatus[r.key] === true;
-          return `<span class="pill">${isChecked ? "✅" : "⏳"} ${htmlEscape(r.label)}</span>`;
-        }).join("");
-        el("reqTags").innerHTML = reqTags;
-        
-        // Clear success message after a moment
-        setTimeout(() => {
-          el("reqMsg").textContent = "";
-        }, 3000);
-      }
-    }, 500);
-    
-  } else {
-    // Error
-    el("reqMsg").innerHTML = `<span class="error-note">❌ Error: ${res.error || "Failed to save"}</span>`;
-    el("btnSaveReqs").disabled = false;
-  }
+  el("reqMsg").textContent = res.ok ? "Saved checklist." : ("Error: "+(res.error||""));
 }
 
 /* ========= FIXED Upload with Base64 (same as customer page) ========= */
@@ -1022,9 +384,16 @@ async function uploadFiles(){
     // Reload files list after short delay
     if(successCount > 0) {
       setTimeout(async () => {
+        console.log("Reloading files after upload...");
         const res = await postForm({action:"loadById", caseId: currentCaseId});
-        if(res.ok && res.files) renderFiles(res.files);
-      }, 1000);
+        console.log("Reload response:", res);
+        if(res.ok && res.files) {
+          console.log("Files from reload:", res.files);
+          renderFiles(res.files);
+        } else {
+          console.log("No files in reload response or response not OK");
+        }
+      }, 1500); // Increased delay to ensure backend processing is complete
     }
     
   } catch (err) {
@@ -1125,7 +494,7 @@ window.addEventListener("load", ()=>{
   
   // Show reminder if customer upload URL not configured
   if(CUSTOMER_UPLOAD_URL.includes("YOUR-GITHUB-USERNAME")) {
-    el("mailMsg").innerHTML = '<span style="color:#ff4757">⚠️ Remember to update CUSTOMER_UPLOAD_URL in this file with your GitHub Pages URL!</span>';
+    el("mailMsg").innerHTML = '<span style="color:#dc3545">⚠️ Remember to update CUSTOMER_UPLOAD_URL in this file with your GitHub Pages URL!</span>';
   }
 });
 
