@@ -803,11 +803,28 @@ function renderReqs(reqs, statuses={}){
 }
 
 function renderFiles(files){
-  const tb = el("filesBody"); tb.innerHTML="";
-  if(!files?.length){ tb.innerHTML = '<tr><td colspan="4" class="muted">No files yet.</td></tr>'; return; }
-  files.forEach(f=>{
+  const tb = el("filesBody"); 
+  tb.innerHTML = "";
+  
+  if(!files?.length){ 
+    tb.innerHTML = '<tr><td colspan="4" class="muted">No files yet.</td></tr>'; 
+    return; 
+  }
+  
+  files.forEach(f => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${htmlEscape(f.name)}</td><td>${htmlEscape(f.mimeType||"")}</td><td>${htmlEscape(f.created||"")}</td><td><a href="${f.url}" target="_blank">Open</a></td>`;
+    // Make sure the Google Drive link is properly displayed and styled
+    tr.innerHTML = `
+      <td>${htmlEscape(f.name)}</td>
+      <td>${htmlEscape(f.mimeType || "")}</td>
+      <td>${htmlEscape(f.created || "")}</td>
+      <td>
+        <a href="${f.url}" 
+           target="_blank" 
+           style="color: #0066cc; font-weight: 600; text-decoration: underline;">
+          📁 Open
+        </a>
+      </td>`;
     tb.appendChild(tr);
   });
 }
