@@ -20,6 +20,7 @@
   .btn{border:0;border-radius:999px;padding:12px 16px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
   .btn-primary{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff}
   .btn-ghost{background:#edf2f7;color:var(--text)}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
   .row{display:grid;gap:10px}
   @media(min-width:700px){ .row-2{grid-template-columns:2fr 1fr} }
   .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:.8rem;background:var(--accent);color:#0b3a4a;margin:3px 6px 0 0;font-weight:700}
@@ -38,8 +39,37 @@
   .modal{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:9999; }
   .modal .box{ width:min(520px,90vw); background:#fff; border-radius:12px; box-shadow:var(--shadow); padding:18px; text-align:center; }
   .bar-wrap{width:100%; background:#eef2f6; border-radius:999px; height:12px; margin:10px 0 6px 0; overflow:hidden}
-  .bar{height:100%; width:0%; background:linear-gradient(90deg, var(--secondary), var(--primary))}
+  .bar{height:100%; width:0%; background:linear-gradient(90deg, var(--secondary), var(--primary)); transition: width 0.3s ease}
   .small{font-size:.9rem; opacity:.8}
+  
+  /* File preview */
+  .file-preview {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #f7f9fc;
+    border-radius: 8px;
+    margin-top: 6px;
+  }
+  .file-preview .name {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #2c3e50;
+  }
+  .file-preview .size {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+  .file-preview .remove {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
 </style>
 </head>
 <body>
@@ -93,17 +123,20 @@
     <h3 style="margin:4px 0 10px 0">Upload Documents</h3>
     <div class="upload-box">
       <label>Attach files (PDF, JPG, PNG) or take photos</label>
-
-      <!-- Single visible inputs; we’ll POST via fetch({mode:'no-cors'}) -->
+      
+      <!-- File inputs -->
       <input id="fFiles" type="file" multiple accept=".pdf,image/*" />
       <input id="fCamera" type="file" accept="image/*" capture="environment" multiple style="display:none" />
+
+      <!-- File preview area -->
+      <div id="filePreviewArea"></div>
 
       <div class="left" style="margin-top:10px">
         <button class="btn btn-ghost" id="btnOpenFiles">Choose from device</button>
         <button class="btn btn-primary" id="btnOpenCamera">Take Photo</button>
-        <button class="btn btn-primary" id="btnUpload">Upload</button>
+        <button class="btn btn-primary" id="btnUpload" disabled>Upload Selected Files</button>
       </div>
-      <div class="hint">Please wait for confirmation after pressing Upload. Don’t close this page until you see “All files uploaded”.</div>
+      <div class="hint">Files will be securely uploaded to your case. Maximum file size: 10MB per file.</div>
     </div>
     <div id="filesMsg" class="muted" style="margin-top:6px"></div>
     <div id="filesList" class="list"></div>
@@ -114,9 +147,9 @@
 <div id="uploadModal" class="modal" role="dialog" aria-modal="true" aria-live="assertive">
   <div class="box">
     <div style="font-weight:800; font-size:1.1rem">Uploading… please wait</div>
-    <div id="modalLine" class="small" style="margin-top:6px">Preparing</div>
+    <div id="modalLine" class="small" style="margin-top:6px">Preparing files...</div>
     <div class="bar-wrap"><div id="modalBar" class="bar"></div></div>
-    <div id="modalHint" class="small">Do not close this page until confirmation.</div>
+    <div id="modalHint" class="small">Processing <span id="fileCount">0</span> file(s)</div>
   </div>
 </div>
 
@@ -125,21 +158,35 @@
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycby-9vCxMW1wtbKL_Q2i0TRSyFiTODCg_eTINdwC8Y55QjjL2Jm2MZSeaycfDLEXpOhjjA/exec";
+// REPLACE WITH YOUR DEPLOYED WEB APP URL
+const API_URL = "https://script.google.com/macros/s/AKfycbwfSB6SG_fiZ3R81FUU1qmBEjER0ydXwxXYkVDp-bbLzxjGPywgSdcU4p0MnrfAQYb42g/exec";
 
 let CASE_ID = "";
 let REQUIREMENTS = [];
 let REQ_STATUS = {};
-let filesCount = 0;
+let selectedFiles = [];
 
 /* --- helpers --- */
 function el(id){return document.getElementById(id)}
 function esc(s){return (s||"").replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]))}
 function showModal(){ el("uploadModal").style.display = "flex"; }
 function hideModal(){ el("uploadModal").style.display = "none"; }
-function setModal(line, pct){ el("modalLine").textContent = line; el("modalBar").style.width = `${Math.max(0, Math.min(100, pct))}%`; }
+function setModal(line, pct, count){ 
+  el("modalLine").textContent = line; 
+  el("modalBar").style.width = `${Math.max(0, Math.min(100, pct))}%`;
+  if(count !== undefined) el("fileCount").textContent = count;
+}
 
-/* JSONP loader (bypasses CORS for reads) */
+/* File size formatter */
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+/* JSONP loader for GET requests */
 function jsonp(url){
   return new Promise((resolve)=>{
     const cb = 'cb_' + Math.random().toString(36).slice(2);
@@ -151,12 +198,61 @@ function jsonp(url){
   });
 }
 
+/* --- File Selection Management --- */
+function updateFilePreview() {
+  const previewArea = el("filePreviewArea");
+  previewArea.innerHTML = "";
+  
+  if (selectedFiles.length === 0) {
+    el("btnUpload").disabled = true;
+    el("btnUpload").textContent = "Upload Selected Files";
+    return;
+  }
+  
+  el("btnUpload").disabled = false;
+  el("btnUpload").textContent = `Upload ${selectedFiles.length} File(s)`;
+  
+  selectedFiles.forEach((file, index) => {
+    const preview = document.createElement("div");
+    preview.className = "file-preview";
+    preview.innerHTML = `
+      <span class="name">${esc(file.name)}</span>
+      <span class="size">${formatBytes(file.size)}</span>
+      <button class="remove" data-index="${index}">Remove</button>
+    `;
+    previewArea.appendChild(preview);
+  });
+  
+  // Add remove handlers
+  previewArea.querySelectorAll(".remove").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const idx = parseInt(e.target.dataset.index);
+      selectedFiles.splice(idx, 1);
+      updateFilePreview();
+    });
+  });
+}
+
+function handleFileSelection(files) {
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  Array.from(files).forEach(file => {
+    if (file.size > maxSize) {
+      el("filesMsg").textContent = `${file.name} is too large (max 10MB)`;
+      return;
+    }
+    // Avoid duplicates
+    if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+      selectedFiles.push(file);
+    }
+  });
+  updateFilePreview();
+}
+
 /* --- UI --- */
 function renderCase(d){
   CASE_ID = d.caseId;
   REQUIREMENTS = d.requirements || [];
   REQ_STATUS = d.reqStatus || {};
-  filesCount = (d.files||[]).length;
 
   el("caseCard").style.display = "";
   el("needCard").style.display = "";
@@ -170,15 +266,20 @@ function renderCase(d){
   el("tags").innerHTML = tags;
 
   const outstanding = REQUIREMENTS.filter(r => REQ_STATUS[r.key]!==true);
-  el("needList").innerHTML = outstanding.length ? outstanding.map(r=>`<span class="pill">${esc(r.label)}</span>`).join("") : `<span class="ok">You’re all set — nothing outstanding.</span>`;
+  el("needList").innerHTML = outstanding.length ? 
+    outstanding.map(r=>`<span class="pill">${esc(r.label)}</span>`).join("") : 
+    `<span class="ok">You're all set — nothing outstanding.</span>`;
 
   renderFiles(d.files||[]);
 }
+
 function renderFiles(files){
-  el("filesList").innerHTML = (!files || !files.length) ? `<span class="muted">No files uploaded yet.</span>` : files.map(f=>`<a class="pill" href="${f.url}" target="_blank">${esc(f.name)}</a>`).join("");
+  el("filesList").innerHTML = (!files || !files.length) ? 
+    `<span class="muted">No files uploaded yet.</span>` : 
+    files.map(f=>`<a class="pill" href="${f.url}" target="_blank">${esc(f.name)}</a>`).join("");
 }
 
-/* --- Actions (reads via JSONP) --- */
+/* --- Actions --- */
 async function openById(){
   const id = el("caseId").value.trim();
   if(!id){ el("findMsg").textContent = "Enter your Case ID."; return; }
@@ -189,6 +290,7 @@ async function openById(){
   el("findMsg").textContent = "Case loaded.";
   history.replaceState(null, "", location.pathname + "#case="+encodeURIComponent(id));
 }
+
 async function openByEmail(){
   const email = el("email").value.trim();
   if(!email){ el("findMsg").textContent = "Enter your email."; return; }
@@ -200,54 +302,127 @@ async function openByEmail(){
   history.replaceState(null, "", location.pathname + "#email="+encodeURIComponent(email));
 }
 
-/* --- Upload via fetch no-cors, then confirm via JSONP poll --- */
+/* --- Improved Upload with Direct Submission --- */
 async function uploadFiles(){
-  if(!CASE_ID){ el("filesMsg").textContent = "Open your case first."; return; }
-  const picks = [];
-  if (el("fFiles").files.length) picks.push(...el("fFiles").files);
-  if (el("fCamera").files.length) picks.push(...el("fCamera").files);
-  if (!picks.length){ el("filesMsg").textContent = "Choose or take a photo first."; return; }
-
-  // Build FormData: IMPORTANT — use 'file' repeated (Apps Script will expose file, file_1, file_2…)
-  const fd = new FormData();
-  fd.append("action","upload");
-  fd.append("caseId", CASE_ID);
-  picks.forEach((f, i)=> fd.append("file", f, f.name));
+  if(!CASE_ID){ 
+    el("filesMsg").textContent = "Open your case first."; 
+    return; 
+  }
+  
+  if (!selectedFiles.length){ 
+    el("filesMsg").textContent = "Select files to upload first."; 
+    return; 
+  }
 
   showModal();
-  setModal("Uploading… please wait", 40);
+  setModal("Preparing upload...", 10, selectedFiles.length);
   el("filesMsg").textContent = "Uploading… please wait";
 
-  // Fire-and-forget: opaque response, no CORS needed
-  try{
-    await fetch(API_URL, { method:"POST", body: fd, mode: "no-cors" });
-  }catch(_){ /* ignore — we’ll verify by polling */ }
+  try {
+    // Use a standard FormData submission
+    const fd = new FormData();
+    fd.append("action", "upload");
+    fd.append("caseId", CASE_ID);
+    
+    // Append each file with indexed names for better Apps Script handling
+    selectedFiles.forEach((file, i) => {
+      // Use indexed naming for clarity
+      fd.append(`file`, file, file.name);
+    });
 
-  // Poll until Files count increases (server write confirmed)
-  setModal("Processing files…", 70);
-  const ok = await pollForNewFiles(120000); // up to 2 minutes
-  if (ok){
-    setModal("All files uploaded ✔", 100);
-    el("filesMsg").textContent = "All files uploaded. Thank you!";
-  }else{
-    el("filesMsg").textContent = "Upload submitted, but confirmation timed out. Please try again if you don’t see your file(s) above.";
-    setModal("Confirmation timed out — you may retry.", 0);
+    setModal("Uploading files to server...", 30, selectedFiles.length);
+    
+    // Try standard fetch first (may work depending on CORS settings)
+    let response;
+    let result;
+    
+    try {
+      response = await fetch(API_URL, {
+        method: "POST",
+        body: fd,
+        redirect: "follow"
+      });
+      
+      if (response.ok) {
+        const text = await response.text();
+        try {
+          result = JSON.parse(text);
+        } catch {
+          result = { ok: false, error: "Invalid server response" };
+        }
+      } else {
+        result = { ok: false, error: `Server error: ${response.status}` };
+      }
+    } catch (fetchError) {
+      // If standard fetch fails, try no-cors mode
+      console.log("Standard fetch failed, trying no-cors mode:", fetchError);
+      
+      setModal("Sending files (alternative method)...", 40, selectedFiles.length);
+      
+      await fetch(API_URL, {
+        method: "POST",
+        body: fd,
+        mode: "no-cors"
+      });
+      
+      // Since no-cors doesn't give us a response, poll to verify
+      setModal("Verifying upload...", 60, selectedFiles.length);
+      
+      // Poll for confirmation
+      const uploaded = await pollForNewFiles(30000); // 30 seconds timeout
+      
+      if (uploaded) {
+        result = { ok: true };
+      } else {
+        result = { ok: false, error: "Upload verification timed out" };
+      }
+    }
+    
+    if (result.ok) {
+      setModal("Upload complete!", 100, selectedFiles.length);
+      el("filesMsg").textContent = `Successfully uploaded ${selectedFiles.length} file(s)`;
+      selectedFiles = [];
+      updateFilePreview();
+      
+      // Reload case to show new files
+      setTimeout(async () => {
+        const r = await jsonp(`${API_URL}?action=loadById&caseId=${encodeURIComponent(CASE_ID)}`);
+        if (r.ok) renderFiles(r.files || []);
+      }, 1000);
+    } else {
+      setModal("Upload failed", 0, 0);
+      el("filesMsg").textContent = "Upload failed: " + (result.error || "Unknown error");
+    }
+    
+  } catch (err) {
+    console.error("Upload error:", err);
+    setModal("Upload error", 0, 0);
+    el("filesMsg").textContent = "Upload error: " + err.message;
+  } finally {
+    setTimeout(hideModal, 1500);
+    el("fFiles").value = "";
+    el("fCamera").value = "";
   }
-  setTimeout(hideModal, 1200);
-  el("fFiles").value = ""; el("fCamera").value = "";
 }
+
 async function pollForNewFiles(maxMs){
   const start = Date.now();
+  const initialCount = parseInt(el("filesList").querySelectorAll("a").length) || 0;
   let tries = 0;
+  
   while(Date.now() - start < maxMs){
-    await new Promise(r=>setTimeout(r, 1500));
+    await new Promise(r=>setTimeout(r, 2000));
     tries++;
+    
     const r = await jsonp(`${API_URL}?action=loadById&caseId=${encodeURIComponent(CASE_ID)}`);
     if(r.ok){
       renderFiles(r.files||[]);
-      if ((r.files||[]).length > filesCount){ filesCount = (r.files||[]).length; return true; }
+      const newCount = (r.files||[]).length;
+      if (newCount > initialCount){
+        return true;
+      }
     }
-    setModal(`Processing files… (check ${tries})`, Math.min(95, 70 + tries*2));
+    setModal(`Verifying upload... (check ${tries})`, Math.min(95, 60 + tries*5), selectedFiles.length);
   }
   return false;
 }
@@ -257,12 +432,21 @@ function parseHash(){
   const h = location.hash || "";
   const mEmail = h.match(/email=([^&]+)/);
   const mCase  = h.match(/case=([^&]+)/);
-  return { email: mEmail ? decodeURIComponent(mEmail[1]) : "", caseId: mCase ? decodeURIComponent(mCase[1]) : "" };
+  return { 
+    email: mEmail ? decodeURIComponent(mEmail[1]) : "", 
+    caseId: mCase ? decodeURIComponent(mCase[1]) : "" 
+  };
 }
+
 window.addEventListener("load", async ()=>{
   const { email, caseId } = parseHash();
-  if(email){ el("email").value = email; openByEmail(); }
-  else if(caseId){ el("caseId").value = caseId; openById(); }
+  if(email){ 
+    el("email").value = email; 
+    await openByEmail(); 
+  } else if(caseId){ 
+    el("caseId").value = caseId; 
+    await openById(); 
+  }
 });
 
 /* --- Events --- */
@@ -271,6 +455,24 @@ el("btnFindByEmail").addEventListener("click", openByEmail);
 el("btnOpenFiles").addEventListener("click", ()=> el("fFiles").click());
 el("btnOpenCamera").addEventListener("click", ()=> el("fCamera").click());
 el("btnUpload").addEventListener("click", uploadFiles);
+
+// File input change handlers
+el("fFiles").addEventListener("change", (e) => {
+  handleFileSelection(e.target.files);
+});
+
+el("fCamera").addEventListener("change", (e) => {
+  handleFileSelection(e.target.files);
+});
+
+// Enter key support
+el("caseId").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") openById();
+});
+
+el("email").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") openByEmail();
+});
 </script>
 </body>
 </html>
