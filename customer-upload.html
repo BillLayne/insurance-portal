@@ -70,6 +70,16 @@
     cursor: pointer;
     font-size: 0.8rem;
   }
+  
+  /* Success message */
+  .success-msg {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
 </style>
 </head>
 <body>
@@ -158,13 +168,14 @@
 </div>
 
 <script>
-// REPLACE WITH YOUR DEPLOYED WEB APP URL
+// Your deployed Web App URL
 const API_URL = "https://script.google.com/macros/s/AKfycbwfSB6SG_fiZ3R81FUU1qmBEjER0ydXwxXYkVDp-bbLzxjGPywgSdcU4p0MnrfAQYb42g/exec";
 
 let CASE_ID = "";
 let REQUIREMENTS = [];
 let REQ_STATUS = {};
 let selectedFiles = [];
+let uploadedCount = 0;
 
 /* --- helpers --- */
 function el(id){return document.getElementById(id)}
@@ -186,15 +197,17 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
-/* JSONP loader for GET requests */
-function jsonp(url){
-  return new Promise((resolve)=>{
-    const cb = 'cb_' + Math.random().toString(36).slice(2);
-    window[cb] = (data)=>{ try{ resolve(data);} finally{ delete window[cb]; s.remove(); } };
-    const s = document.createElement('script');
-    s.src = url + (url.includes('?')?'&':'?') + 'callback=' + cb;
-    s.onerror = ()=>{ resolve({ok:false,error:'jsonp_error'}); s.remove(); delete window[cb]; };
-    document.body.appendChild(s);
+/* Convert file to base64 */
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      // Remove the data:type;base64, prefix
+      const base64String = reader.result.split(',')[1];
+      resolve(base64String);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
 }
 
@@ -235,9 +248,11 @@ function updateFilePreview() {
 
 function handleFileSelection(files) {
   const maxSize = 10 * 1024 * 1024; // 10MB
+  let errorMsg = "";
+  
   Array.from(files).forEach(file => {
     if (file.size > maxSize) {
-      el("filesMsg").textContent = `${file.name} is too large (max 10MB)`;
+      errorMsg += `${file.name} is too large (max 10MB)<br>`;
       return;
     }
     // Avoid duplicates
@@ -245,14 +260,20 @@ function handleFileSelection(files) {
       selectedFiles.push(file);
     }
   });
+  
+  if (errorMsg) {
+    el("filesMsg").innerHTML = `<span class="error">${errorMsg}</span>`;
+  }
+  
   updateFilePreview();
 }
 
-/* --- UI --- */
+/* --- UI Rendering --- */
 function renderCase(d){
   CASE_ID = d.caseId;
   REQUIREMENTS = d.requirements || [];
   REQ_STATUS = d.reqStatus || {};
+  uploadedCount = (d.files || []).length;
 
   el("caseCard").style.display = "";
   el("needCard").style.display = "";
@@ -284,25 +305,55 @@ async function openById(){
   const id = el("caseId").value.trim();
   if(!id){ el("findMsg").textContent = "Enter your Case ID."; return; }
   el("findMsg").textContent = "Loading…";
-  const r = await jsonp(`${API_URL}?action=loadById&caseId=${encodeURIComponent(id)}`);
-  if(!r.ok){ el("findMsg").textContent = "Case not found."; return; }
-  renderCase(r);
-  el("findMsg").textContent = "Case loaded.";
-  history.replaceState(null, "", location.pathname + "#case="+encodeURIComponent(id));
+  
+  try {
+    const fd = new FormData();
+    fd.append('action', 'loadById');
+    fd.append('caseId', id);
+    
+    const response = await fetch(API_URL, { method: 'POST', body: fd });
+    const r = await response.json();
+    
+    if(!r.ok){ 
+      el("findMsg").textContent = "Case not found."; 
+      return; 
+    }
+    
+    renderCase(r);
+    el("findMsg").textContent = "Case loaded.";
+    history.replaceState(null, "", location.pathname + "#case="+encodeURIComponent(id));
+  } catch (err) {
+    el("findMsg").textContent = "Error loading case: " + err.message;
+  }
 }
 
 async function openByEmail(){
   const email = el("email").value.trim();
   if(!email){ el("findMsg").textContent = "Enter your email."; return; }
   el("findMsg").textContent = "Searching…";
-  const r = await jsonp(`${API_URL}?action=loadByEmail&email=${encodeURIComponent(email)}`);
-  if(!r.ok){ el("findMsg").textContent = "No case found for that email."; return; }
-  renderCase(r);
-  el("findMsg").textContent = "Case loaded.";
-  history.replaceState(null, "", location.pathname + "#email="+encodeURIComponent(email));
+  
+  try {
+    const fd = new FormData();
+    fd.append('action', 'loadByEmail');
+    fd.append('email', email);
+    
+    const response = await fetch(API_URL, { method: 'POST', body: fd });
+    const r = await response.json();
+    
+    if(!r.ok){ 
+      el("findMsg").textContent = "No case found for that email."; 
+      return; 
+    }
+    
+    renderCase(r);
+    el("findMsg").textContent = "Case loaded.";
+    history.replaceState(null, "", location.pathname + "#email="+encodeURIComponent(email));
+  } catch (err) {
+    el("findMsg").textContent = "Error searching: " + err.message;
+  }
 }
 
-/* --- Improved Upload with Direct Submission --- */
+/* --- WORKING Base64 Upload Method --- */
 async function uploadFiles(){
   if(!CASE_ID){ 
     el("filesMsg").textContent = "Open your case first."; 
@@ -318,80 +369,76 @@ async function uploadFiles(){
   setModal("Preparing upload...", 10, selectedFiles.length);
   el("filesMsg").textContent = "Uploading… please wait";
 
-  try {
-    // Use a standard FormData submission
-    const fd = new FormData();
-    fd.append("action", "upload");
-    fd.append("caseId", CASE_ID);
-    
-    // Append each file with indexed names for better Apps Script handling
-    selectedFiles.forEach((file, i) => {
-      // Use indexed naming for clarity
-      fd.append(`file`, file, file.name);
-    });
+  let successCount = 0;
+  let failedFiles = [];
 
-    setModal("Uploading files to server...", 30, selectedFiles.length);
-    
-    // Try standard fetch first (may work depending on CORS settings)
-    let response;
-    let result;
-    
-    try {
-      response = await fetch(API_URL, {
-        method: "POST",
-        body: fd,
-        redirect: "follow"
-      });
+  try {
+    // Upload each file individually as base64
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      setModal(`Uploading ${file.name}...`, 20 + (i / selectedFiles.length * 60), selectedFiles.length);
       
-      if (response.ok) {
-        const text = await response.text();
-        try {
-          result = JSON.parse(text);
-        } catch {
-          result = { ok: false, error: "Invalid server response" };
+      try {
+        // Convert to base64
+        const base64 = await fileToBase64(file);
+        
+        // Send as FormData with base64
+        const fd = new FormData();
+        fd.append('action', 'upload');
+        fd.append('caseId', CASE_ID);
+        fd.append('file', base64);
+        fd.append('file.name', file.name);
+        fd.append('file.contentType', file.type || 'application/octet-stream');
+        
+        const response = await fetch(API_URL, { method: 'POST', body: fd });
+        const data = await response.json();
+        
+        if (data.ok) {
+          successCount++;
+        } else {
+          failedFiles.push(file.name);
+          console.error(`Failed to upload ${file.name}:`, data.error);
         }
-      } else {
-        result = { ok: false, error: `Server error: ${response.status}` };
-      }
-    } catch (fetchError) {
-      // If standard fetch fails, try no-cors mode
-      console.log("Standard fetch failed, trying no-cors mode:", fetchError);
-      
-      setModal("Sending files (alternative method)...", 40, selectedFiles.length);
-      
-      await fetch(API_URL, {
-        method: "POST",
-        body: fd,
-        mode: "no-cors"
-      });
-      
-      // Since no-cors doesn't give us a response, poll to verify
-      setModal("Verifying upload...", 60, selectedFiles.length);
-      
-      // Poll for confirmation
-      const uploaded = await pollForNewFiles(30000); // 30 seconds timeout
-      
-      if (uploaded) {
-        result = { ok: true };
-      } else {
-        result = { ok: false, error: "Upload verification timed out" };
+      } catch (err) {
+        failedFiles.push(file.name);
+        console.error(`Error uploading ${file.name}:`, err);
       }
     }
     
-    if (result.ok) {
-      setModal("Upload complete!", 100, selectedFiles.length);
-      el("filesMsg").textContent = `Successfully uploaded ${selectedFiles.length} file(s)`;
+    // Show results
+    setModal("Upload complete!", 100, selectedFiles.length);
+    
+    if (successCount === selectedFiles.length) {
+      el("filesMsg").innerHTML = `<div class="success-msg">✅ All ${successCount} file(s) uploaded successfully!</div>`;
+    } else if (successCount > 0) {
+      el("filesMsg").innerHTML = `<div class="success-msg">✅ ${successCount} file(s) uploaded. ❌ ${failedFiles.length} failed: ${failedFiles.join(', ')}</div>`;
+    } else {
+      el("filesMsg").innerHTML = `<div class="error">Upload failed. Please try again.</div>`;
+    }
+    
+    // Clear selection if successful
+    if (successCount > 0) {
       selectedFiles = [];
       updateFilePreview();
+      el("fFiles").value = "";
+      el("fCamera").value = "";
       
       // Reload case to show new files
       setTimeout(async () => {
-        const r = await jsonp(`${API_URL}?action=loadById&caseId=${encodeURIComponent(CASE_ID)}`);
-        if (r.ok) renderFiles(r.files || []);
+        const fd = new FormData();
+        fd.append('action', 'loadById');
+        fd.append('caseId', CASE_ID);
+        
+        try {
+          const response = await fetch(API_URL, { method: 'POST', body: fd });
+          const r = await response.json();
+          if (r.ok) {
+            renderFiles(r.files || []);
+          }
+        } catch (err) {
+          console.error('Error reloading files:', err);
+        }
       }, 1000);
-    } else {
-      setModal("Upload failed", 0, 0);
-      el("filesMsg").textContent = "Upload failed: " + (result.error || "Unknown error");
     }
     
   } catch (err) {
@@ -399,35 +446,11 @@ async function uploadFiles(){
     setModal("Upload error", 0, 0);
     el("filesMsg").textContent = "Upload error: " + err.message;
   } finally {
-    setTimeout(hideModal, 1500);
-    el("fFiles").value = "";
-    el("fCamera").value = "";
+    setTimeout(hideModal, 2000);
   }
 }
 
-async function pollForNewFiles(maxMs){
-  const start = Date.now();
-  const initialCount = parseInt(el("filesList").querySelectorAll("a").length) || 0;
-  let tries = 0;
-  
-  while(Date.now() - start < maxMs){
-    await new Promise(r=>setTimeout(r, 2000));
-    tries++;
-    
-    const r = await jsonp(`${API_URL}?action=loadById&caseId=${encodeURIComponent(CASE_ID)}`);
-    if(r.ok){
-      renderFiles(r.files||[]);
-      const newCount = (r.files||[]).length;
-      if (newCount > initialCount){
-        return true;
-      }
-    }
-    setModal(`Verifying upload... (check ${tries})`, Math.min(95, 60 + tries*5), selectedFiles.length);
-  }
-  return false;
-}
-
-/* --- Deep link --- */
+/* --- Deep link parsing --- */
 function parseHash(){
   const h = location.hash || "";
   const mEmail = h.match(/email=([^&]+)/);
@@ -438,6 +461,7 @@ function parseHash(){
   };
 }
 
+/* --- Page load --- */
 window.addEventListener("load", async ()=>{
   const { email, caseId } = parseHash();
   if(email){ 
@@ -449,7 +473,7 @@ window.addEventListener("load", async ()=>{
   }
 });
 
-/* --- Events --- */
+/* --- Event Listeners --- */
 el("btnFindById").addEventListener("click", openById);
 el("btnFindByEmail").addEventListener("click", openByEmail);
 el("btnOpenFiles").addEventListener("click", ()=> el("fFiles").click());
