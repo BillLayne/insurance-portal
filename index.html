@@ -368,6 +368,25 @@
         display: table;
       }
     }
+    
+    /* Template Selector Styles */
+    .template-selector {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin: 0.75rem 0;
+    }
+    
+    .template-selector select {
+      flex: 1;
+    }
+    
+    .template-hint {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      font-style: italic;
+      margin-top: 0.25rem;
+    }
   </style>
 </head>
 <body>
@@ -442,7 +461,7 @@
       <div class="note" id="createMsg"></div>
     </section>
 
-    <!-- RIGHT: Email -->
+    <!-- RIGHT: Email with Templates -->
     <section class="card">
       <h3>Send Follow-Up Email</h3>
       <div>
@@ -451,6 +470,22 @@
         <span class="pill">Prior Insurance</span>
         <span class="pill">Lienholder</span>
       </div>
+      
+      <!-- Template Selector -->
+      <div class="template-selector">
+        <label style="margin: 0;">Template:</label>
+        <select id="emailTemplate" onchange="loadEmailTemplate()">
+          <option value="">-- Choose Template --</option>
+          <option value="initial">Initial Document Request</option>
+          <option value="reminder">Friendly Reminder</option>
+          <option value="urgent">Urgent Follow-Up</option>
+          <option value="thankyou">Thank You - Almost Complete</option>
+          <option value="formal">Professional/Formal</option>
+          <option value="custom">Custom Message</option>
+        </select>
+      </div>
+      <div class="template-hint">Select a template or choose "Custom Message" to write your own</div>
+      
       <label style="margin-top:10px">Subject</label>
       <input id="mSubject" placeholder="Quick follow-up on your insurance application" />
       <label style="margin-top:8px">Message (HTML allowed)</label>
@@ -562,6 +597,318 @@ const CUSTOMER_UPLOAD_URL = "https://billlayne.github.io/insurance-portal/custom
 
 let currentCaseId = "";
 let currentRequirements = [];
+
+// Email Templates
+const emailTemplates = {
+  initial: {
+    subject: "Documents Needed for Your {{Product}} Insurance Quote - {{FirstName}}",
+    body: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <div style="background: linear-gradient(135deg, #003d7a 0%, #002855 100%); color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+    <h2 style="margin: 0;">Bill Layne Insurance Agency</h2>
+    <p style="margin: 5px 0 0 0;">Your Trusted Insurance Partner</p>
+  </div>
+  
+  <div style="background: #f8f9fa; padding: 30px; border: 1px solid #e0e0e0; border-top: none;">
+    <p style="font-size: 16px; color: #333;">Hi {{FirstName}},</p>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      Thank you for choosing Bill Layne Insurance for your {{Product}} insurance needs{{Company}} 
+      {{Policy}}.
+    </p>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      To complete your quote and get you the best possible rate, we still need the following documents:
+    </p>
+    
+    <div style="background: white; border: 2px solid #003d7a; border-radius: 6px; padding: 15px; margin: 20px 0;">
+      <p style="font-weight: bold; color: #003d7a; margin: 0 0 10px 0;">📋 Documents Needed:</p>
+      <p style="color: #333; margin: 0;">{{Outstanding}}</p>
+    </div>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      It's easy to upload your documents securely online:
+    </p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{UploadLink}}" style="background: linear-gradient(135deg, #003d7a, #002855); color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">
+        📤 Upload Documents Securely
+      </a>
+    </div>
+    
+    <p style="font-size: 14px; color: #777; line-height: 1.6;">
+      <strong>Why we need these documents:</strong> These help us ensure you get all applicable discounts 
+      and the most accurate quote for your coverage needs.
+    </p>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      If you have any questions or prefer to send documents another way, just reply to this email or 
+      give us a call at {{AgencyPhone}}.
+    </p>
+    
+    <p style="font-size: 15px; color: #555;">
+      Best regards,<br>
+      <strong>{{AgencyName}}</strong>
+    </p>
+  </div>
+  
+  <div style="background: #003d7a; color: white; padding: 20px; text-align: center; font-size: 13px; border-radius: 0 0 8px 8px;">
+    <p style="margin: 5px 0;">{{AgencyName}} | {{AgencyPhone}}</p>
+    <p style="margin: 5px 0;">1283 N Bridge St, Elkin, NC 28621</p>
+    <p style="margin: 5px 0;">{{AgencySite}}</p>
+  </div>
+</div>`
+  },
+  
+  reminder: {
+    subject: "Quick Reminder: Your {{Product}} Insurance Documents - {{FirstName}}",
+    body: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+  <div style="background: #00a6fb; color: white; padding: 25px; text-align: center;">
+    <h2 style="margin: 0;">Just a Friendly Reminder! 📨</h2>
+  </div>
+  
+  <div style="padding: 30px;">
+    <p style="font-size: 16px; color: #333;">Hi {{FirstName}}! 👋</p>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      We're still working on getting you the best rate for your {{Product}} insurance{{Company}}!
+    </p>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      We're just waiting on a few items to finalize everything:
+    </p>
+    
+    <div style="background: #fff9e6; border-left: 4px solid #ffb413; padding: 15px; margin: 20px 0;">
+      <p style="color: #333; margin: 0; font-weight: 500;">
+        ⏳ Still needed: {{Outstanding}}
+      </p>
+    </div>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      No worries - it only takes a minute to upload them:
+    </p>
+    
+    <div style="text-align: center; margin: 25px 0;">
+      <a href="{{UploadLink}}" style="background: #00a6fb; color: white; padding: 12px 35px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        Click Here to Upload 📎
+      </a>
+    </div>
+    
+    <p style="font-size: 14px; color: #777; font-style: italic; text-align: center;">
+      💡 Tip: You can snap photos with your phone - they don't need to be perfect!
+    </p>
+    
+    <hr style="border: none; border-top: 1px solid #eee; margin: 25px 0;">
+    
+    <p style="font-size: 15px; color: #555;">
+      Thanks for your patience!<br>
+      <strong>The {{AgencyName}} Team</strong>
+    </p>
+    
+    <p style="font-size: 13px; color: #999; margin-top: 20px;">
+      Questions? Just reply to this email or call us at {{AgencyPhone}}
+    </p>
+  </div>
+</div>`
+  },
+  
+  urgent: {
+    subject: "Action Required: Complete Your {{Product}} Insurance Application",
+    body: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <div style="background: #ff4757; color: white; padding: 15px; text-align: center; border-radius: 8px 8px 0 0;">
+    <h3 style="margin: 0;">⚠️ Action Required - Documents Needed</h3>
+  </div>
+  
+  <div style="background: white; border: 1px solid #ddd; border-top: none; padding: 25px;">
+    <p style="font-size: 16px; color: #333;">Dear {{FirstName}},</p>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      <strong>Your {{Product}} insurance quote is about to expire.</strong> We want to make sure you don't miss out on your coverage.
+    </p>
+    
+    <div style="background: #ffe6e6; border: 2px solid #ff4757; border-radius: 6px; padding: 15px; margin: 20px 0;">
+      <p style="color: #d63031; font-weight: bold; margin: 0 0 10px 0;">
+        ⏰ Documents needed within 48 hours:
+      </p>
+      <p style="color: #333; margin: 0;">{{Outstanding}}</p>
+    </div>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      Please upload these documents as soon as possible to avoid any delays:
+    </p>
+    
+    <div style="text-align: center; margin: 25px 0;">
+      <a href="{{UploadLink}}" style="background: #ff4757; color: white; padding: 14px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; font-size: 16px;">
+        Upload Now →
+      </a>
+    </div>
+    
+    <p style="font-size: 14px; color: #666; line-height: 1.6;">
+      <strong>Why this is urgent:</strong> Your current rate quote is locked in, but we can only hold it for a limited time. 
+      Once we receive your documents, we can finalize your policy immediately.
+    </p>
+    
+    <p style="font-size: 15px; color: #555; margin-top: 20px;">
+      Need help? Call us directly at <strong>{{AgencyPhone}}</strong>
+    </p>
+    
+    <p style="font-size: 15px; color: #555;">
+      Thank you,<br>
+      <strong>{{AgencyName}}</strong>
+    </p>
+  </div>
+  
+  <div style="background: #f8f9fa; padding: 15px; text-align: center; font-size: 13px; color: #666; border-radius: 0 0 8px 8px;">
+    Case ID: {{CaseId}} | {{AgencyPhone}} | {{AgencySite}}
+  </div>
+</div>`
+  },
+  
+  thankyou: {
+    subject: "Thank You {{FirstName}} - Just One More Step for Your {{Product}} Insurance",
+    body: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 25px; text-align: center; border-radius: 8px 8px 0 0;">
+    <h2 style="margin: 0;">✅ Almost There!</h2>
+    <p style="margin: 5px 0 0 0;">You're just one step away from great coverage</p>
+  </div>
+  
+  <div style="background: white; border: 1px solid #e0e0e0; border-top: none; padding: 30px;">
+    <p style="font-size: 16px; color: #333;">Hi {{FirstName}},</p>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      <strong>Great news!</strong> We've received most of your documents for your {{Product}} insurance{{Company}}. 
+      Thank you for being so prompt!
+    </p>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      We just need this final item to complete your application:
+    </p>
+    
+    <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 6px; padding: 15px; margin: 20px 0; text-align: center;">
+      <p style="color: #059669; font-size: 18px; font-weight: bold; margin: 0;">
+        Last item needed: {{Outstanding}}
+      </p>
+    </div>
+    
+    <p style="font-size: 15px; color: #555; line-height: 1.6;">
+      Once we receive this, we can finalize your quote immediately and get your coverage started!
+    </p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{UploadLink}}" style="background: #10b981; color: white; padding: 14px 35px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        Complete My Application ✓
+      </a>
+    </div>
+    
+    <div style="background: #f3f4f6; border-radius: 6px; padding: 15px; margin: 20px 0;">
+      <p style="font-size: 14px; color: #666; margin: 0;">
+        <strong>📊 Your Progress:</strong><br>
+        {{Checklist}}
+      </p>
+    </div>
+    
+    <p style="font-size: 15px; color: #555;">
+      Thanks for choosing {{AgencyName}}!<br>
+      We're looking forward to serving you.
+    </p>
+    
+    <p style="font-size: 14px; color: #999; margin-top: 20px;">
+      Questions? Reply to this email or call {{AgencyPhone}}
+    </p>
+  </div>
+  
+  <div style="background: #f9fafb; padding: 20px; text-align: center; font-size: 13px; color: #666; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px;">
+    {{AgencyName}} | 1283 N Bridge St, Elkin, NC 28621<br>
+    {{AgencySite}}
+  </div>
+</div>`
+  },
+  
+  formal: {
+    subject: "Documentation Required - {{Product}} Insurance Application #{{CaseId}}",
+    body: `<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd;">
+  <div style="background: white; padding: 30px;">
+    <div style="text-align: center; border-bottom: 3px solid #003d7a; padding-bottom: 20px; margin-bottom: 30px;">
+      <h1 style="color: #003d7a; margin: 0; font-size: 24px; font-weight: normal;">BILL LAYNE INSURANCE AGENCY</h1>
+      <p style="color: #666; margin: 5px 0 0 0; font-size: 14px; letter-spacing: 2px;">ESTABLISHED PROTECTION SINCE 1993</p>
+    </div>
+    
+    <p style="font-size: 15px; color: #333; line-height: 1.8;">Dear {{FirstName}},</p>
+    
+    <p style="font-size: 15px; color: #333; line-height: 1.8;">
+      Re: {{Product}} Insurance Application{{Company}}{{Policy}}
+    </p>
+    
+    <p style="font-size: 15px; color: #333; line-height: 1.8;">
+      Thank you for selecting Bill Layne Insurance Agency for your insurance needs. To proceed with your 
+      application and ensure accurate underwriting, we require the following documentation:
+    </p>
+    
+    <div style="margin: 25px 0; padding: 20px; background: #fafafa; border-left: 4px solid #003d7a;">
+      <p style="font-size: 14px; color: #333; line-height: 1.8; margin: 0;">
+        <strong>Required Documentation:</strong><br>
+        {{Outstanding}}
+      </p>
+    </div>
+    
+    <p style="font-size: 15px; color: #333; line-height: 1.8;">
+      For your convenience, we have established a secure online portal for document submission:
+    </p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="{{UploadLink}}" style="color: #003d7a; font-size: 15px; text-decoration: underline;">
+        Access Secure Upload Portal
+      </a>
+    </div>
+    
+    <p style="font-size: 15px; color: #333; line-height: 1.8;">
+      Please note that all document submissions are encrypted and handled in accordance with insurance 
+      industry privacy standards.
+    </p>
+    
+    <p style="font-size: 15px; color: #333; line-height: 1.8;">
+      Should you require assistance or prefer alternative submission methods, please contact our office 
+      at {{AgencyPhone}}.
+    </p>
+    
+    <p style="font-size: 15px; color: #333; line-height: 1.8; margin-top: 30px;">
+      Respectfully,
+    </p>
+    
+    <p style="font-size: 15px; color: #333; line-height: 1.8;">
+      <strong>{{AgencyName}}</strong><br>
+      Licensed Insurance Professionals
+    </p>
+    
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; line-height: 1.6;">
+      <p style="margin: 0;">
+        Reference: {{CaseId}}<br>
+        {{AgencyName}}<br>
+        1283 N Bridge St, Elkin, NC 28621<br>
+        Tel: {{AgencyPhone}} | Web: {{AgencySite}}
+      </p>
+    </div>
+  </div>
+</div>`
+  }
+};
+
+// Function to load selected template
+function loadEmailTemplate() {
+  const templateSelect = el("emailTemplate");
+  const selectedTemplate = templateSelect.value;
+  
+  if (selectedTemplate && selectedTemplate !== "custom") {
+    const template = emailTemplates[selectedTemplate];
+    if (template) {
+      el("mSubject").value = template.subject;
+      el("mBody").value = template.body;
+    }
+  } else if (selectedTemplate === "custom") {
+    // Clear for custom message
+    el("mSubject").value = "";
+    el("mBody").value = "";
+  }
+}
 
 async function postForm(data){
   const fd = new FormData();
@@ -875,18 +1222,23 @@ function fillPlaceholders(text){
   const uploadLink = makeUploadLink();
   const fullChecklist = checklistText(true) || "Signed Application";
   const outstanding = checklistText(false) || "Nothing — you're all set!";
+  
+  // Handle company and policy formatting
+  const companyText = company ? ` with ${company}` : "";
+  const policyText = policy ? ` (Policy: ${policy})` : "";
+  
   return (text||"")
     .replaceAll("{{FirstName}}", firstName)
     .replaceAll("{{Product}}", product)
-    .replaceAll("{{Company}}", company)
-    .replaceAll("{{Policy}}", policy)
-    .replaceAll("{{UploadLink}}", `<a href="${uploadLink}" target="_blank">${uploadLink}</a>`)
+    .replaceAll("{{Company}}", companyText)
+    .replaceAll("{{Policy}}", policyText)
+    .replaceAll("{{UploadLink}}", `${uploadLink}`)
     .replaceAll("{{Checklist}}", fullChecklist)
     .replaceAll("{{Outstanding}}", outstanding)
     .replaceAll("{{CaseId}}", currentCaseId||"")
     .replaceAll("{{AgencyName}}", "Bill Layne Insurance Agency")
     .replaceAll("{{AgencyPhone}}", "336-835-1993")
-    .replaceAll("{{AgencySite}}", `<a href="https://www.BillLayneInsurance.com" target="_blank">BillLayneInsurance.com</a>`);
+    .replaceAll("{{AgencySite}}", `<a href="https://www.BillLayneInsurance.com" target="_blank" style="color: white;">BillLayneInsurance.com</a>`);
 }
 
 let previewHtml = "";
@@ -895,7 +1247,7 @@ function previewEmail(){
   const html = fillPlaceholders(el("mBody").value);
   previewHtml = `
     <div class="card" style="margin:8px 0">
-      <div><strong>Subject:</strong> ${htmlEscape(subject)}</div>
+      <div><strong>Subject:</strong> ${fillPlaceholders(htmlEscape(subject))}</div>
       <div style="margin-top:8px;border:1px solid #eef2f6;border-radius:10px;padding:10px">${html}</div>
     </div>`;
   el("mailMsg").innerHTML = "Preview generated below." + previewHtml;
@@ -906,7 +1258,7 @@ async function sendEmail(){
   const subject = el("mSubject").value || "Quick follow-up on your insurance application";
   const html = fillPlaceholders(el("mBody").value);
   el("mailMsg").textContent = "Sending…";
-  const res = await postForm({action:"sendEmail", caseId: currentCaseId, subject, html});
+  const res = await postForm({action:"sendEmail", caseId: currentCaseId, subject: fillPlaceholders(subject), html});
   el("mailMsg").textContent = res.ok ? "Email sent." : ("Error: "+(res.error||""));
 }
 
