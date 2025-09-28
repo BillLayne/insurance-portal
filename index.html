@@ -104,8 +104,8 @@
   <!-- REQUIREMENTS -->
   <section class="card">
     <h3 style="margin:4px 0 10px 0">Requirements Checklist</h3>
-    <div class="note" style="margin-bottom:6px">Checking a box = we’ve received/uploaded that item.</div>
-    <div id="reqTags" style="margin-bottom:6px" class="muted">Select Product & Company, then “Create / Update”.</div>
+    <div class="note" style="margin-bottom:6px">Checking a box = we've received/uploaded that item.</div>
+    <div id="reqTags" style="margin-bottom:6px" class="muted">Select Product & Company, then "Create / Update".</div>
     <div id="reqList"></div>
     <div class="right" style="margin-top:10px"><button class="btn btn-primary" id="btnSaveReqs" disabled>Save Status</button></div>
     <div id="reqMsg" class="note"></div>
@@ -147,7 +147,8 @@
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycby-9vCxMW1wtbKL_Q2i0TRSyFiTODCg_eTINdwC8Y55QjjL2Jm2MZSeaycfDLEXpOhjjA/exec";
+// Your deployed Web App URL
+const API_URL = "https://script.google.com/macros/s/AKfycbwfSB6SG_fiZ3R81FUU1qmBEjER0ydXwxXYkVDp-bbLzxjGPywgSdcU4p0MnrfAQYb42g/exec";
 let currentCaseId = "";
 let currentRequirements = [];
 
@@ -285,9 +286,9 @@ function checklistText(all=true){
   return labels.join(all ? ", " : ", ");
 }
 
-/* >>> CHANGE HERE: make link by EMAIL first (falls back to case) <<< */
 function makeUploadLink(){
-  const base = "https://YOUR-GITHUB-PAGES-URL/customer-upload.html";
+  // UPDATE THIS with your actual GitHub Pages URL
+  const base = "https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME/customer-upload-fixed.html";
   const email = (el("cEmail").value || "").trim();
   if (email) return `${base}#email=${encodeURIComponent(email)}`;
   // fallback if no email captured yet
@@ -301,7 +302,7 @@ function fillPlaceholders(text){
   const policy = el("cPolicy").value||"";
   const uploadLink = makeUploadLink();
   const fullChecklist = checklistText(true) || "Signed Application";
-  const outstanding = checklistText(false) || "Nothing — you’re all set!";
+  const outstanding = checklistText(false) || "Nothing — you're all set!";
   return (text||"")
     .replaceAll("{{FirstName}}", firstName)
     .replaceAll("{{Product}}", product)
