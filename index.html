@@ -41,6 +41,8 @@
     .right{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
     .note{font-size:.85rem;opacity:.8}
     .hidden{display:none}
+    .success-note{color:#0a7a3a;font-weight:600}
+    .error-note{color:#dc3545;font-weight:600}
     @media print { header{box-shadow:none} .btn,.upload-box{display:none !important} body{background:#fff} .card{box-shadow:none;border:1px solid #e5e7eb} }
   </style>
 </head>
@@ -116,7 +118,8 @@
     <h3 style="margin:4px 0 10px 0">Upload Documents</h3>
     <div class="upload-box">
       <label>Attach files (PDF, JPG, PNG)</label>
-      <input id="fFiles" type="file" multiple />
+      <input id="fFiles" type="file" multiple accept=".pdf,image/*" />
+      <div class="note" style="margin-top:6px">Files will be converted to base64 and uploaded securely (max 10MB per file)</div>
       <div class="right" style="margin-top:10px"><button class="btn btn-primary" id="btnUpload">Upload</button></div>
     </div>
     <div id="filesMsg" class="note" style="margin-top:6px"></div>
@@ -149,6 +152,11 @@
 <script>
 // Your deployed Web App URL
 const API_URL = "https://script.google.com/macros/s/AKfycbwfSB6SG_fiZ3R81FUU1qmBEjER0ydXwxXYkVDp-bbLzxjGPywgSdcU4p0MnrfAQYb42g/exec";
+
+// TODO: UPDATE THIS with your actual GitHub Pages URL
+const CUSTOMER_UPLOAD_URL = "https://billlayne.github.io/insurance-portal/customer-upload.html";
+// Example: "https://billlayne.github.io/insurance-portal/customer-upload.html"
+
 let currentCaseId = "";
 let currentRequirements = [];
 
@@ -163,8 +171,23 @@ async function postForm(data){
   const text = await res.text();
   try { return JSON.parse(text); } catch { return {ok:false, error:text.slice(0,300)}; }
 }
+
 function el(id){return document.getElementById(id)}
 function htmlEscape(s){return (s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]))}
+
+// Convert file to base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      // Remove the data:type;base64, prefix
+      const base64String = reader.result.split(',')[1];
+      resolve(base64String);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 function renderReqs(reqs, statuses={}){
   const box = el("reqList"); box.innerHTML = "";
@@ -179,6 +202,7 @@ function renderReqs(reqs, statuses={}){
   el("btnSaveReqs").disabled = false;
   el("reqTags").innerHTML = reqs.map(r=>`<span class="pill">${htmlEscape(r.label)}</span>`).join("");
 }
+
 function renderFiles(files){
   const tb = el("filesBody"); tb.innerHTML="";
   if(!files?.length){ tb.innerHTML = '<tr><td colspan="4" class="muted">No files yet.</td></tr>'; return; }
@@ -188,6 +212,7 @@ function renderFiles(files){
     tb.appendChild(tr);
   });
 }
+
 function renderRows(rows){
   const tb = el("rows"); tb.innerHTML = "";
   if(!rows?.length){ tb.innerHTML = '<tr><td colspan="6" class="muted">No results.</td></tr>'; return; }
@@ -230,6 +255,7 @@ async function createOrUpdate(){
   renderFiles(res.files||[]);
   el("createMsg").textContent = `Saved. Case # ${currentCaseId}`;
 }
+
 async function loadByEmail(){
   const email = el("cEmail").value.trim();
   if(!email){ el("createMsg").textContent="Enter email to load."; return; }
@@ -248,6 +274,7 @@ async function loadByEmail(){
   renderFiles(res.files||[]);
   el("createMsg").textContent = `Loaded. Case # ${currentCaseId}`;
 }
+
 async function saveReqs(){
   if(!currentCaseId){ el("reqMsg").textContent="Create or load a case first."; return; }
   const checks = Array.from(el("reqList").querySelectorAll("input[type=checkbox]"));
@@ -256,21 +283,89 @@ async function saveReqs(){
   const res = await postForm({action:"saveReqs", caseId: currentCaseId, reqStatus: JSON.stringify(status)});
   el("reqMsg").textContent = res.ok ? "Saved checklist." : ("Error: "+(res.error||""));
 }
+
+/* ========= FIXED Upload with Base64 (same as customer page) ========= */
 async function uploadFiles(){
-  if(!currentCaseId){ el("filesMsg").textContent="Create or load a case first."; return; }
+  if(!currentCaseId){ 
+    el("filesMsg").innerHTML = '<span class="error-note">Create or load a case first.</span>'; 
+    return; 
+  }
+  
   const files = el("fFiles").files;
-  if(!files.length){ el("filesMsg").textContent="Choose files first."; return; }
-  el("filesMsg").textContent="Uploading…";
-  const fd = new FormData();
-  fd.append("action","upload"); fd.append("caseId", currentCaseId);
-  for(const f of files) fd.append("files", f, f.name);
-  const res = await fetch(API_URL, { method:"POST", body:fd });
-  const text = await res.text();
-  let json; try{ json = JSON.parse(text);}catch{ json = {ok:false,error:text};}
-  if(!json.ok){ el("filesMsg").textContent="Error: "+(json.error||""); return; }
-  renderFiles(json.files||[]);
-  el("filesMsg").textContent="Uploaded.";
-  el("fFiles").value="";
+  if(!files.length){ 
+    el("filesMsg").innerHTML = '<span class="error-note">Choose files first.</span>'; 
+    return; 
+  }
+  
+  // Check file sizes
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  for(let file of files) {
+    if(file.size > maxSize) {
+      el("filesMsg").innerHTML = `<span class="error-note">${file.name} is too large (max 10MB)</span>`;
+      return;
+    }
+  }
+  
+  el("filesMsg").textContent = "Uploading…";
+  
+  let successCount = 0;
+  let failedFiles = [];
+  
+  try {
+    // Upload each file individually as base64 (same method as customer upload)
+    for(let i = 0; i < files.length; i++) {
+      const file = files[i];
+      el("filesMsg").textContent = `Uploading ${file.name} (${i+1}/${files.length})...`;
+      
+      try {
+        // Convert to base64
+        const base64 = await fileToBase64(file);
+        
+        // Send as FormData with base64
+        const fd = new FormData();
+        fd.append('action', 'upload');
+        fd.append('caseId', currentCaseId);
+        fd.append('file', base64);
+        fd.append('file.name', file.name);
+        fd.append('file.contentType', file.type || 'application/octet-stream');
+        
+        const response = await fetch(API_URL, { method: 'POST', body: fd });
+        const json = await response.json();
+        
+        if (json.ok) {
+          successCount++;
+        } else {
+          failedFiles.push(file.name);
+          console.error(`Failed to upload ${file.name}:`, json.error);
+        }
+      } catch (err) {
+        failedFiles.push(file.name);
+        console.error(`Error uploading ${file.name}:`, err);
+      }
+    }
+    
+    // Show results
+    if (successCount === files.length) {
+      el("filesMsg").innerHTML = `<span class="success-note">✅ All ${successCount} file(s) uploaded successfully!</span>`;
+    } else if (successCount > 0) {
+      el("filesMsg").innerHTML = `<span class="success-note">✅ ${successCount} uploaded</span> <span class="error-note">❌ ${failedFiles.length} failed: ${failedFiles.join(', ')}</span>`;
+    } else {
+      el("filesMsg").innerHTML = `<span class="error-note">❌ Upload failed: ${failedFiles.join(', ')}</span>`;
+    }
+    
+    // Reload files list after short delay
+    if(successCount > 0) {
+      setTimeout(async () => {
+        const res = await postForm({action:"loadById", caseId: currentCaseId});
+        if(res.ok && res.files) renderFiles(res.files);
+      }, 1000);
+    }
+    
+  } catch (err) {
+    el("filesMsg").innerHTML = `<span class="error-note">Upload error: ${err.message}</span>`;
+  } finally {
+    el("fFiles").value = "";
+  }
 }
 
 /* ========= Email helpers ========= */
@@ -287,12 +382,10 @@ function checklistText(all=true){
 }
 
 function makeUploadLink(){
-  // UPDATE THIS with your actual GitHub Pages URL
-  const base = "https://github.com/BillLayne/insurance-portal/blob/main/customer-upload.html";
   const email = (el("cEmail").value || "").trim();
-  if (email) return `${base}#email=${encodeURIComponent(email)}`;
+  if (email) return `${CUSTOMER_UPLOAD_URL}#email=${encodeURIComponent(email)}`;
   // fallback if no email captured yet
-  return `${base}#case=${encodeURIComponent(currentCaseId)}`;
+  return `${CUSTOMER_UPLOAD_URL}#case=${encodeURIComponent(currentCaseId)}`;
 }
 
 function fillPlaceholders(text){
@@ -316,6 +409,7 @@ function fillPlaceholders(text){
     .replaceAll("{{AgencyPhone}}", "336-835-1993")
     .replaceAll("{{AgencySite}}", `<a href="https://www.BillLayneInsurance.com" target="_blank">BillLayneInsurance.com</a>`);
 }
+
 let previewHtml = "";
 function previewEmail(){
   const subject = el("mSubject").value || "Quick follow-up on your insurance application";
@@ -327,6 +421,7 @@ function previewEmail(){
     </div>`;
   el("mailMsg").innerHTML = "Preview generated below." + previewHtml;
 }
+
 async function sendEmail(){
   if(!currentCaseId){ el("mailMsg").textContent="Create or load a case first."; return; }
   const subject = el("mSubject").value || "Quick follow-up on your insurance application";
@@ -352,13 +447,20 @@ async function loadCaseById(caseId){
   renderFiles(res.files||[]);
   el("createMsg").textContent = `Loaded. Case # ${currentCaseId}`;
 }
+
 window.addEventListener("hashchange", ()=>{
   const m = location.hash.match(/case=([^&]+)/);
   if(m) loadCaseById(decodeURIComponent(m[1]));
 });
+
 window.addEventListener("load", ()=>{
   const m = location.hash.match(/case=([^&]+)/);
   if(m) loadCaseById(decodeURIComponent(m[1]));
+  
+  // Show reminder if customer upload URL not configured
+  if(CUSTOMER_UPLOAD_URL.includes("YOUR-GITHUB-USERNAME")) {
+    el("mailMsg").innerHTML = '<span style="color:#dc3545">⚠️ Remember to update CUSTOMER_UPLOAD_URL in this file with your GitHub Pages URL!</span>';
+  }
 });
 
 /* ========= Events ========= */
