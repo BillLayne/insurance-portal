@@ -288,7 +288,7 @@ function checklistText(all=true){
 
 function makeUploadLink(){
   // UPDATE THIS with your actual GitHub Pages URL
-  const base = "https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME/customer-upload-fixed.html";
+  const base = "https://github.com/BillLayne/insurance-portal/blob/main/customer-upload.html";
   const email = (el("cEmail").value || "").trim();
   if (email) return `${base}#email=${encodeURIComponent(email)}`;
   // fallback if no email captured yet
