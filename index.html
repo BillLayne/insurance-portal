@@ -8,18 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --primary:#1a5f7a; --secondary:#457b9d; --accent:#a8dadc;
-      --bg:#f8f9fa; --text:#2c3e50;
-      --radius:12px; --shadow:0 8px 30px rgba(0,0,0,.08);
-    }
+    :root{ --primary:#1a5f7a; --secondary:#457b9d; --accent:#a8dadc; --bg:#f8f9fa; --text:#2c3e50; --radius:12px; --shadow:0 8px 30px rgba(0,0,0,.08) }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font-family:"Plus Jakarta Sans",system-ui,Segoe UI,Arial,sans-serif}
-    header{
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color:#fff; padding:18px 14px; text-align:center; position:sticky; top:0; z-index:10;
-      box-shadow: var(--shadow);
-    }
+    header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:18px 14px;text-align:center;position:sticky;top:0;z-index:10;box-shadow:var(--shadow)}
     .title{font-size:1.5rem;font-weight:700;letter-spacing:.2px;margin:2px 0}
     .subtitle{opacity:.9;font-size:.95rem}
     .wrap{max-width:1100px;margin:18px auto;padding:0 12px}
@@ -27,15 +19,11 @@
     .grid{display:grid;gap:12px}
     @media(min-width:900px){ .grid-2{grid-template-columns:1fr 1fr} .grid-3{grid-template-columns:1fr 1fr 1fr}}
     label{font-size:.9rem;margin-bottom:6px;display:block;font-weight:600}
-    input,select,textarea{
-      width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;outline:none;font-size:1rem;background:#fff
-    }
+    input,select,textarea{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;outline:none;font-size:1rem;background:#fff}
     input:focus,select:focus,textarea:focus{border-color:var(--secondary);box-shadow:0 0 0 3px rgba(69,123,157,.12)}
     .row{display:grid;gap:10px}
     @media(min-width:700px){ .row-4{grid-template-columns:2fr 1fr 1fr 1fr} .row-3{grid-template-columns:2fr 1fr 1fr}}
-    .btn{
-      border:0;border-radius:999px;padding:12px 16px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px
-    }
+    .btn{border:0;border-radius:999px;padding:12px 16px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
     .btn-primary{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff}
     .btn-ghost{background:#edf2f7;color:var(--text)}
     .btn:disabled{opacity:.6;cursor:not-allowed}
@@ -53,12 +41,7 @@
     .right{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
     .note{font-size:.85rem;opacity:.8}
     .hidden{display:none}
-    @media print {
-      header{box-shadow:none}
-      .btn,.upload-box{display:none !important}
-      body{background:#fff}
-      .card{box-shadow:none;border:1px solid #e5e7eb}
-    }
+    @media print { header{box-shadow:none} .btn,.upload-box{display:none !important} body{background:#fff} .card{box-shadow:none;border:1px solid #e5e7eb} }
   </style>
 </head>
 <body>
@@ -72,54 +55,30 @@
   <section class="card">
     <h3 style="margin:4px 0 10px 0">Create / Load Customer</h3>
     <div class="row row-3">
-      <div>
-        <label>Customer Name</label>
-        <input id="cName" placeholder="Jane Doe" />
-      </div>
-      <div>
-        <label>Phone</label>
-        <input id="cPhone" placeholder="336-555-1212" />
-      </div>
-      <div>
-        <label>Email</label>
-        <input id="cEmail" placeholder="jane@email.com" />
-      </div>
+      <div><label>Customer Name</label><input id="cName" placeholder="Jane Doe" /></div>
+      <div><label>Phone</label><input id="cPhone" placeholder="336-555-1212" /></div>
+      <div><label>Email</label><input id="cEmail" placeholder="jane@email.com" /></div>
     </div>
-
     <div class="row row-3" style="margin-top:8px">
       <div>
         <label>Product</label>
         <select id="cProduct">
           <option value="">Select…</option>
-          <option>Auto</option>
-          <option>Home</option>
-          <option>Renters</option>
-          <option>Landlord</option>
-          <option>Umbrella</option>
-          <option>Boat</option>
-          <option>Commercial Auto</option>
-          <option>General Liability</option>
+          <option>Auto</option><option>Home</option><option>Renters</option>
+          <option>Landlord</option><option>Umbrella</option><option>Boat</option>
+          <option>Commercial Auto</option><option>General Liability</option>
         </select>
       </div>
       <div>
         <label>Company</label>
         <select id="cCompany">
           <option value="">Select…</option>
-          <option>Progressive</option>
-          <option>Nationwide</option>
-          <option>NC Grange</option>
-          <option>Travelers</option>
-          <option>NatGen</option>
-          <option>Foremost</option>
-          <option>Safeco</option>
+          <option>Progressive</option><option>Nationwide</option><option>NC Grange</option>
+          <option>Travelers</option><option>NatGen</option><option>Foremost</option><option>Safeco</option>
         </select>
       </div>
-      <div>
-        <label>Policy # (optional)</label>
-        <input id="cPolicy" placeholder="ABC123…" />
-      </div>
+      <div><label>Policy # (optional)</label><input id="cPolicy" placeholder="ABC123…" /></div>
     </div>
-
     <div class="right" style="margin-top:12px">
       <button class="btn btn-ghost" id="btnLoad">Load by Email</button>
       <button class="btn btn-primary" id="btnCreate">Create / Update</button>
@@ -130,11 +89,24 @@
   <!-- RIGHT: Email -->
   <section class="card">
     <h3 style="margin:4px 0 10px 0">Send Follow-Up Email</h3>
-    <div><span class="pill">Signed Apps</span><span class="pill">Photos</span><span class="pill">Prior Insurance</span><span class="pill">Lienholder</span></div>
+    <div class="row row-3">
+      <div>
+        <label>Stage</label>
+        <select id="mStage">
+          <option>Initial</option>
+          <option>Reminder</option>
+          <option>Final</option>
+        </select>
+      </div>
+      <div class="right" style="align-items:end">
+        <button class="btn btn-ghost" id="btnLoadTpl">Load Template</button>
+      </div>
+    </div>
+    <div style="margin-top:6px"><span class="pill">Signed Apps</span><span class="pill">Photos</span><span class="pill">Prior Insurance</span><span class="pill">Lienholder</span></div>
     <label style="margin-top:10px">Subject</label>
     <input id="mSubject" placeholder="Quick follow-up on your insurance application" />
     <label style="margin-top:8px">Message (HTML allowed)</label>
-    <textarea id="mBody" rows="7" placeholder="Hi {{FirstName}},&#10;Thanks for choosing Bill Layne Insurance. To finish your policy, we still need: {{Checklist}}.&#10;You can reply to this email or upload securely here: {{UploadLink}}&#10;&#10;— Bill Layne Insurance"></textarea>
+    <textarea id="mBody" rows="7" placeholder="Hi {{FirstName}},&#10;Thanks for choosing Bill Layne Insurance. To finish your policy, we still need: {{Outstanding}}.&#10;You can reply to this email or upload securely here: {{UploadLink}}&#10;&#10;— Bill Layne Insurance"></textarea>
     <div class="right" style="margin-top:10px">
       <button class="btn btn-ghost" id="btnPreview">Preview</button>
       <button class="btn btn-primary" id="btnSend">Send Email</button>
@@ -148,9 +120,7 @@
     <div class="note" style="margin-bottom:6px">Checking a box = we’ve received/uploaded that item.</div>
     <div id="reqTags" style="margin-bottom:6px" class="muted">Select Product & Company, then “Create / Update”.</div>
     <div id="reqList"></div>
-    <div class="right" style="margin-top:10px">
-      <button class="btn btn-primary" id="btnSaveReqs" disabled>Save Status</button>
-    </div>
+    <div class="right" style="margin-top:10px"><button class="btn btn-primary" id="btnSaveReqs" disabled>Save Status</button></div>
     <div id="reqMsg" class="note"></div>
   </section>
 
@@ -160,9 +130,7 @@
     <div class="upload-box">
       <label>Attach files (PDF, JPG, PNG)</label>
       <input id="fFiles" type="file" multiple />
-      <div class="right" style="margin-top:10px">
-        <button class="btn btn-primary" id="btnUpload">Upload</button>
-      </div>
+      <div class="right" style="margin-top:10px"><button class="btn btn-primary" id="btnUpload">Upload</button></div>
     </div>
     <div id="filesMsg" class="note" style="margin-top:6px"></div>
     <table class="table" style="margin-top:10px">
@@ -192,14 +160,10 @@
 </div>
 
 <script>
-/* ========= CONFIG (use your deployed Web App URL) ========= */
 const API_URL = "https://script.google.com/macros/s/AKfycby-9vCxMW1wtbKL_Q2i0TRSyFiTODCg_eTINdwC8Y55QjjL2Jm2MZSeaycfDLEXpOhjjA/exec";
-
-/* ========= State ========= */
 let currentCaseId = "";
 let currentRequirements = [];
 
-/* ========= Helpers: FormData POST ========= */
 async function postForm(data){
   const fd = new FormData();
   Object.entries(data).forEach(([k,v])=>{
@@ -211,11 +175,10 @@ async function postForm(data){
   const text = await res.text();
   try { return JSON.parse(text); } catch { return {ok:false, error:text.slice(0,300)}; }
 }
-
 function el(id){return document.getElementById(id)}
 function htmlEscape(s){return (s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]))}
 
-/* ========= UI Builders ========= */
+/* ---------- UI builders ---------- */
 function renderReqs(reqs, statuses={}){
   const box = el("reqList"); box.innerHTML = "";
   if(!reqs?.length){ box.innerHTML = '<div class="muted">No requirements for selection.</div>'; return; }
@@ -229,7 +192,6 @@ function renderReqs(reqs, statuses={}){
   el("btnSaveReqs").disabled = false;
   el("reqTags").innerHTML = reqs.map(r=>`<span class="pill">${htmlEscape(r.label)}</span>`).join("");
 }
-
 function renderFiles(files){
   const tb = el("filesBody"); tb.innerHTML="";
   if(!files?.length){ tb.innerHTML = '<tr><td colspan="4" class="muted">No files yet.</td></tr>'; return; }
@@ -239,7 +201,6 @@ function renderFiles(files){
     tb.appendChild(tr);
   });
 }
-
 function renderRows(rows){
   const tb = el("rows"); tb.innerHTML = "";
   if(!rows?.length){ tb.innerHTML = '<tr><td colspan="6" class="muted">No results.</td></tr>'; return; }
@@ -260,8 +221,7 @@ function renderRows(rows){
   });
 }
 
-/* ========= Actions ========= */
-
+/* ---------- Actions ---------- */
 async function createOrUpdate(){
   el("createMsg").textContent = "Saving…";
   const payload = {
@@ -282,7 +242,6 @@ async function createOrUpdate(){
   renderFiles(res.files||[]);
   el("createMsg").textContent = `Saved. Case # ${currentCaseId}`;
 }
-
 async function loadByEmail(){
   const email = el("cEmail").value.trim();
   if(!email){ el("createMsg").textContent="Enter email to load."; return; }
@@ -296,28 +255,26 @@ async function loadByEmail(){
   el("cCompany").value = res.company||"";
   el("cPolicy").value = res.policy||"";
   el("cEmail").value = res.email||"";
-  renderReqs(res.requirements||[], res.reqStatus||{});
+  currentRequirements = res.requirements||[];
+  renderReqs(currentRequirements, res.reqStatus||{});
   renderFiles(res.files||[]);
   el("createMsg").textContent = `Loaded. Case # ${currentCaseId}`;
 }
-
 async function saveReqs(){
   if(!currentCaseId){ el("reqMsg").textContent="Create or load a case first."; return; }
   const checks = Array.from(el("reqList").querySelectorAll("input[type=checkbox]"));
   const status = {};
-  checks.forEach(ch => status[ch.dataset.key] = ch.checked); // checked = received/uploaded
+  checks.forEach(ch => status[ch.dataset.key] = ch.checked);
   const res = await postForm({action:"saveReqs", caseId: currentCaseId, reqStatus: JSON.stringify(status)});
   el("reqMsg").textContent = res.ok ? "Saved checklist." : ("Error: "+(res.error||""));
 }
-
 async function uploadFiles(){
   if(!currentCaseId){ el("filesMsg").textContent="Create or load a case first."; return; }
   const files = el("fFiles").files;
   if(!files.length){ el("filesMsg").textContent="Choose files first."; return; }
   el("filesMsg").textContent="Uploading…";
   const fd = new FormData();
-  fd.append("action","upload");
-  fd.append("caseId", currentCaseId);
+  fd.append("action","upload"); fd.append("caseId", currentCaseId);
   for(const f of files) fd.append("files", f, f.name);
   const res = await fetch(API_URL, { method:"POST", body:fd });
   const text = await res.text();
@@ -328,32 +285,47 @@ async function uploadFiles(){
   el("fFiles").value="";
 }
 
-function buildChecklistText(){
+/* ---------- Email helpers ---------- */
+function checklistText(all=true){
   const labels = [];
   (currentRequirements||[]).forEach(r=>{
     const node = document.querySelector(`input[data-key="${r.key}"]`);
-    const mark = node?.checked ? "✅" : "⏳";
-    labels.push(`${mark} ${r.label}`);
+    const checked = !!node?.checked;
+    const mark = checked ? "✅" : "⏳";
+    if(all) labels.push(`${mark} ${r.label}`);
+    else if(!checked) labels.push(`${r.label}`);
   });
-  return labels.join(", ");
+  return labels.join(all ? ", " : ", ");
 }
-
 function makeUploadLink(){
-  const url = location.origin + location.pathname + `#case=${encodeURIComponent(currentCaseId)}`;
-  return url;
+  return location.origin + location.pathname + `#case=${encodeURIComponent(currentCaseId)}`;
 }
-
+function fillPlaceholders(text){
+  const firstName = (el("cName").value||"").split(" ")[0]||"there";
+  const product = el("cProduct").value||"";
+  const company = el("cCompany").value||"";
+  const policy = el("cPolicy").value||"";
+  const uploadLink = makeUploadLink();
+  const fullChecklist = checklistText(true) || "Signed Application";
+  const outstanding = checklistText(false) || "Nothing — you’re all set!";
+  return (text||"")
+    .replaceAll("{{FirstName}}", firstName)
+    .replaceAll("{{Product}}", product)
+    .replaceAll("{{Company}}", company)
+    .replaceAll("{{Policy}}", policy)
+    .replaceAll("{{UploadLink}}", `<a href="${uploadLink}" target="_blank">${uploadLink}</a>`)
+    .replaceAll("{{Checklist}}", fullChecklist)
+    .replaceAll("{{Outstanding}}", outstanding)
+    .replaceAll("{{CaseId}}", currentCaseId||"")
+    // agency tokens (optional future-proof)
+    .replaceAll("{{AgencyName}}", "Bill Layne Insurance Agency")
+    .replaceAll("{{AgencyPhone}}", "336-835-1993")
+    .replaceAll("{{AgencySite}}", `<a href="https://www.BillLayneInsurance.com" target="_blank">BillLayneInsurance.com</a>`);
+}
 let previewHtml = "";
 function previewEmail(){
   const subject = el("mSubject").value || "Quick follow-up on your insurance application";
-  const bodyTpl = el("mBody").value;
-  const firstName = (el("cName").value||"").split(" ")[0]||"there";
-  const checklist = buildChecklistText() || "Signed Application";
-  const uploadLink = makeUploadLink();
-  const html = bodyTpl
-    .replaceAll("{{FirstName}}", firstName)
-    .replaceAll("{{Checklist}}", checklist)
-    .replaceAll("{{UploadLink}}", `<a href="${uploadLink}" target="_blank">${uploadLink}</a>`);
+  const html = fillPlaceholders(el("mBody").value);
   previewHtml = `
     <div class="card" style="margin:8px 0">
       <div><strong>Subject:</strong> ${htmlEscape(subject)}</div>
@@ -361,34 +333,28 @@ function previewEmail(){
     </div>`;
   el("mailMsg").innerHTML = "Preview generated below." + previewHtml;
 }
-
 async function sendEmail(){
   if(!currentCaseId){ el("mailMsg").textContent="Create or load a case first."; return; }
   const subject = el("mSubject").value || "Quick follow-up on your insurance application";
-  const bodyTpl = el("mBody").value;
-  const firstName = (el("cName").value||"").split(" ")[0]||"there";
-  const checklist = buildChecklistText() || "Signed Application";
-  const uploadLink = makeUploadLink();
-  const html = bodyTpl
-    .replaceAll("{{FirstName}}", firstName)
-    .replaceAll("{{Checklist}}", checklist)
-    .replaceAll("{{UploadLink}}", `<a href="${uploadLink}" target="_blank">${uploadLink}</a>`);
+  const html = fillPlaceholders(el("mBody").value);
   el("mailMsg").textContent = "Sending…";
   const res = await postForm({action:"sendEmail", caseId: currentCaseId, subject, html});
   el("mailMsg").textContent = res.ok ? "Email sent." : ("Error: "+(res.error||""));
 }
-
-async function search(){
+async function loadEmailTemplate(){
   const res = await postForm({
-    action:"search",
-    q: el("q").value,
-    product: el("qProduct").value,
-    status: el("qStatus").value
+    action:"getEmailTemplate",
+    product: el("cProduct").value,
+    company: el("cCompany").value,
+    stage: el("mStage").value
   });
-  renderRows(res.rows||[]);
+  if(!res.ok || !res.subject){ el("mailMsg").textContent = "No template found. Edit and send manually."; return; }
+  el("mSubject").value = res.subject || "";
+  el("mBody").value = res.body || "";
+  el("mailMsg").textContent = "Template loaded. Use Preview before sending.";
 }
 
-/* ========= Case Loading via hash ========= */
+/* ---------- Case open via URL hash ---------- */
 async function loadCaseById(caseId){
   const res = await postForm({action:"loadById", caseId});
   if(!res.ok){ el("createMsg").textContent="Case not found."; return; }
@@ -399,11 +365,11 @@ async function loadCaseById(caseId){
   el("cProduct").value = res.product||"";
   el("cCompany").value = res.company||"";
   el("cPolicy").value = res.policy||"";
-  renderReqs(res.requirements||[], res.reqStatus||{});
+  currentRequirements = res.requirements||[];
+  renderReqs(currentRequirements, res.reqStatus||{});
   renderFiles(res.files||[]);
   el("createMsg").textContent = `Loaded. Case # ${currentCaseId}`;
 }
-
 window.addEventListener("hashchange", ()=>{
   const m = location.hash.match(/case=([^&]+)/);
   if(m) loadCaseById(decodeURIComponent(m[1]));
@@ -413,14 +379,18 @@ window.addEventListener("load", ()=>{
   if(m) loadCaseById(decodeURIComponent(m[1]));
 });
 
-/* ========= Events ========= */
+/* ---------- Events ---------- */
 el("btnCreate").addEventListener("click", createOrUpdate);
 el("btnLoad").addEventListener("click", loadByEmail);
 el("btnSaveReqs").addEventListener("click", saveReqs);
 el("btnUpload").addEventListener("click", uploadFiles);
 el("btnPreview").addEventListener("click", previewEmail);
 el("btnSend").addEventListener("click", sendEmail);
-el("btnSearch").addEventListener("click", search);
+el("btnSearch").addEventListener("click", async ()=>{
+  const res = await postForm({action:"search", q: el("q").value, product: el("qProduct").value, status: el("qStatus").value});
+  renderRows(res.rows||[]);
+});
+el("btnLoadTpl").addEventListener("click", loadEmailTemplate);
 </script>
 </body>
 </html>
