@@ -890,7 +890,7 @@
 </div>
 
 <script>
-// ============= YOUR EXACT SAME JAVASCRIPT - NO CHANGES =============
+// ============= YOUR EXACT SAME JAVASCRIPT WITH FIXED renderFiles =============
 // Your deployed Web App URL
 const API_URL = "https://script.google.com/macros/s/AKfycbwfSB6SG_fiZ3R81FUU1qmBEjER0ydXwxXYkVDp-bbLzxjGPywgSdcU4p0MnrfAQYb42g/exec";
 
@@ -1017,10 +1017,35 @@ function renderCase(d){
   renderFiles(d.files||[]);
 }
 
+// FIXED renderFiles function with better URL handling
 function renderFiles(files){
-  el("filesList").innerHTML = (!files || !files.length) ? 
-    `<span class="muted">No files uploaded yet.</span>` : 
-    files.map(f=>`<a class="pill" href="${f.url}" target="_blank">${esc(f.name)}</a>`).join("");
+  console.log("Customer page - Files received:", files); // Debug log
+  
+  if (!files || !files.length) {
+    el("filesList").innerHTML = `<span class="muted">No files uploaded yet.</span>`;
+    return;
+  }
+  
+  const fileLinks = files.map(f => {
+    console.log("Customer page - File object:", f); // Debug each file
+    
+    // Check if URL exists and create appropriate link
+    if (f.url) {
+      return `<a class="pill" href="${f.url}" target="_blank" rel="noopener">📄 ${esc(f.name)}</a>`;
+    } else if (f.id) {
+      // If no URL but has ID, construct Google Drive URL
+      const driveUrl = `https://drive.google.com/file/d/${f.id}/view`;
+      return `<a class="pill" href="${driveUrl}" target="_blank" rel="noopener">📄 ${esc(f.name)}</a>`;
+    } else if (f.webViewLink) {
+      // Another possible property from Google Drive API
+      return `<a class="pill" href="${f.webViewLink}" target="_blank" rel="noopener">📄 ${esc(f.name)}</a>`;
+    } else {
+      // No link available
+      return `<span class="pill" style="opacity: 0.7;">📄 ${esc(f.name)} (processing...)</span>`;
+    }
+  }).join("");
+  
+  el("filesList").innerHTML = fileLinks;
 }
 
 /* --- Actions --- */
@@ -1146,8 +1171,9 @@ async function uploadFiles(){
       el("fFiles").value = "";
       el("fCamera").value = "";
       
-      // Reload case to show new files
+      // Reload case to show new files with debugging
       setTimeout(async () => {
+        console.log("Customer page - Reloading files after upload...");
         const fd = new FormData();
         fd.append('action', 'loadById');
         fd.append('caseId', CASE_ID);
@@ -1155,13 +1181,14 @@ async function uploadFiles(){
         try {
           const response = await fetch(API_URL, { method: 'POST', body: fd });
           const r = await response.json();
+          console.log("Customer page - Reload response:", r);
           if (r.ok) {
             renderFiles(r.files || []);
           }
         } catch (err) {
           console.error('Error reloading files:', err);
         }
-      }, 1000);
+      }, 1500); // Increased delay to ensure backend processing
     }
     
   } catch (err) {
